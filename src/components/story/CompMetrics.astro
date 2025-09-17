@@ -1,0 +1,59 @@
+---
+export interface Metric {
+  number: string | number;
+  label: string;
+}
+
+export interface Props {
+  metrics: Metric[];
+}
+
+const { metrics } = Astro.props;
+---
+
+<div class="comp-metrics">
+  {metrics.map((metric) => (
+    <div class="metric-item">
+      <div class="metric-number">{metric.number}</div>
+      <div class="metric-label">{metric.label}</div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .comp-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin: 80px 0;
+    padding: 60px;
+    background: #0f0f0f;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }
+
+  .metric-item {
+    text-align: center;
+  }
+
+  .metric-number {
+    font-size: 48px;
+    font-weight: 300;
+    color: #4a9eff;
+    margin-bottom: 8px;
+  }
+
+  .metric-label {
+    font-size: 14px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .comp-metrics {
+      grid-template-columns: 1fr;
+      padding: 40px 20px;
+    }
+  }
+</style>

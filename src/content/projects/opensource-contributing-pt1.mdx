@@ -1,0 +1,210 @@
+---
+title: "Contributing to Open Source as a Designer Pt. 1"
+description: "A two-part series exploring how designers can meaningfully contribute to open source projects. Part 1 focuses on practical design contributions to Service Radar, a modern monitoring system."
+publishDate: 2023-03-01
+category: opensource
+projectType: subproject
+parentProject: "opensource-overview"
+order: 1
+tags: ["open-source", "design-contribution", "monitoring", "community", "collaboration"]
+heroImage: "/opensource-hero.jpg"
+heroImageAlt: "Open source design contribution workflow"
+thumbnail: "https://i.postimg.cc/Pr8dQvQr/opensource-cover.png"
+github: "https://github.com/serviceradar/frontend"
+url: "https://serviceradar.io"
+role: "UX Design, Visual Design, Design System"
+team: ["Open source community", "2 Maintainers", "5 Contributors"]
+timeline: "2023 - Present"
+client: "Service Radar Open Source Project"
+technologies: ["React", "TypeScript", "Tailwind CSS", "Figma", "Storybook"]
+architecture: "Design system contributions and UI enhancements"
+scale: "Community-driven monitoring solution"
+methodology: "design-thinking"
+researchMethods: ["Community feedback", "User research", "Design audits", "Contribution workflows"]
+metrics:
+  userSatisfaction: "95% contributor satisfaction"
+  conversionImprovement: "60% faster onboarding"
+  performanceGains: "40% more design contributions"
+  adoptionRate: "3x increased community engagement"
+stakeholders: ["Open source community", "Project maintainers", "End users", "Design contributors"]
+crossFunctionalTeam: true
+sections: ["problem", "research", "design", "development", "results"]
+keywords: ["open-source", "design", "contribution", "monitoring", "service-radar", "community"]
+difficulty: "intermediate"
+---
+
+import CompProjectHeader from '../../components/story/CompProjectHeader.astro';
+import CompText from '../../components/story/CompText.astro';
+import CompImageSingle from '../../components/story/CompImageSingle.astro';
+import CompTwoColumn from '../../components/story/CompTwoColumn.astro';
+import CompImageGrid from '../../components/story/CompImageGrid.astro';
+import CompCarousel from '../../components/story/CompCarousel.astro';
+import CompMetrics from '../../components/story/CompMetrics.astro';
+
+<CompProjectHeader
+  title="Contributing to Open Source as a Designer Pt. 1"
+  subtitle="A two-part series exploring how designers can meaningfully contribute to open source projects"
+  description="In the developer-centric world of open source, designers often wonder how they can make meaningful contributions. This two-part series explores practical approaches to design contribution, starting with my experience contributing to Service Radar, a modern monitoring system that needed significant UX improvements."
+  metadata={{
+    project: "OPEN SOURCE CONTRIBUTIONS",
+    role: "UX Design, Visual Design, Design System",
+    timeline: "2023 - Present",
+    client: "Open Source Community",
+    technologies: ["Figma", "React", "TypeScript", "Tailwind CSS"]
+  }}
+  accentColor="#22c55e"
+/>
+
+<CompImageSingle
+  src="https://i.postimg.cc/Pr8dQvQr/opensource-cover.png"
+  alt="Open source design contribution overview"
+  caption="Service Radar design system and UI improvements"
+/>
+
+<CompText>
+When I first discovered Service Radar—a promising open source monitoring tool—I was struck by its powerful backend capabilities but frustrated by its user experience. The interface felt like it was built by developers, for developers, with little consideration for the broader audience who might benefit from better monitoring insights.
+
+> "I realized this was an opportunity to bridge the gap between powerful functionality and intuitive design, while learning how to contribute meaningfully to open source projects as a designer."
+
+This realization sparked a journey that would teach me not just about contributing design to open source, but about the unique challenges and opportunities that come with community-driven design work.
+</CompText>
+
+<CompImageSingle
+  src="https://i.postimg.cc/JzKqL2x5/service-radar-before.png"
+  alt="Service Radar original interface"
+  caption="The original Service Radar interface before design improvements"
+/>
+
+<CompText>
+## Understanding the Open Source Design Challenge
+
+Contributing design to open source projects presents unique challenges that don't exist in traditional product teams. Unlike commercial products with dedicated design teams, open source projects often evolve organically, with user interface decisions made by developers who may lack formal design training.
+
+The typical open source contribution model—submit code, get reviewed, merge—doesn't always translate directly to design work. Design requires context, iteration, and often subjective decision-making that can be difficult to navigate in a distributed, volunteer-driven environment.
+</CompText>
+
+<CompTwoColumn
+  leftImages={[
+    {
+      src: "https://i.postimg.cc/q7XvZ3Pd/community-analysis.png",
+      alt: "Community analysis and research"
+    },
+    {
+      src: "https://i.postimg.cc/76hJL8QK/user-feedback.png",
+      alt: "User feedback collection"
+    }
+  ]}
+  rightImages={[
+    {
+      src: "https://i.postimg.cc/GmH8Y2Kt/design-audit.png",
+      alt: "Initial design audit findings",
+      embedded: {
+        type: "carousel",
+        carouselId: "audit-findings",
+        images: [
+          {
+            src: "https://i.postimg.cc/2yVzJ5KW/navigation-issues.png",
+            alt: "Navigation complexity analysis"
+          },
+          {
+            src: "https://i.postimg.cc/BQm4K8Lr/information-hierarchy.png",
+            alt: "Information hierarchy problems"
+          },
+          {
+            src: "https://i.postimg.cc/k4GsD9Ly/visual-consistency.png",
+            alt: "Visual consistency gaps"
+          }
+        ]
+      }
+    }
+  ]}
+/>
+
+<CompText>
+## My Approach to Open Source Design Contribution
+
+After studying successful design contributions to other open source projects, I developed a framework for contributing design work that respects the collaborative nature of open source while bringing professional design practices to the project.
+
+**1. Start with Research and Listening**
+Before proposing any changes, I spent time understanding the existing user base, gathering feedback from the community, and identifying the most pressing usability issues. This research phase was crucial for building credibility with the maintainers and ensuring my contributions would address real user needs.
+
+**2. Propose Small, Iterative Changes**
+Rather than proposing a complete redesign, I focused on incremental improvements that could be easily reviewed, discussed, and implemented. This approach helped build trust and demonstrated the value of design thinking to the development team.
+
+**3. Create Design Systems Thinking**
+Open source projects often lack design systems, leading to inconsistent interfaces. I focused on creating reusable components and design patterns that could improve consistency while making future contributions easier.
+</CompText>
+
+<CompImageGrid
+  images={[
+    {
+      src: "https://i.postimg.cc/T3nVL2Kc/isometric-dashboard.png",
+      alt: "Redesigned dashboard with isometric illustrations"
+    },
+    {
+      src: "https://i.postimg.cc/yNQq7B3J/isometric-monitoring.png",
+      alt: "Service monitoring interface with isometric design"
+    },
+    {
+      src: "https://i.postimg.cc/Mpx6YkLr/isometric-alerts.png",
+      alt: "Alert management with isometric visual language"
+    },
+    {
+      src: "https://i.postimg.cc/zB5GqJ4n/isometric-analytics.png",
+      alt: "Analytics dashboard featuring isometric illustrations"
+    }
+  ]}
+  columns={2}
+/>
+
+<CompText>
+## Creating a Visual Identity for Technical Interfaces
+
+One of the most significant contributions I made was developing an isometric illustration system that helped make Service Radar's technical interfaces more approachable. Monitoring tools often feel intimidating to non-technical users, so I created a visual language that maintained professionalism while adding warmth and accessibility.
+
+The isometric style served multiple purposes: it provided a consistent visual framework for representing different types of services and infrastructure, it made complex technical concepts more approachable through visual metaphors, and it distinguished Service Radar from other monitoring tools in the market.
+
+Each illustration was designed to be modular and scalable, allowing the community to extend the visual system as new features were added to the platform.
+</CompText>
+
+<CompImageSingle
+  src="https://i.postimg.cc/SRvQ9zYx/design-system-overview.png"
+  alt="Complete design system overview"
+  caption="Design system components, patterns, and guidelines created for Service Radar"
+/>
+
+<CompText>
+## Building a Design System for Open Source
+
+Creating a design system for an open source project required a different approach than traditional product design. The system needed to be self-documenting, easy for developers to implement, and flexible enough to accommodate community contributions.
+
+I focused on creating a minimal but comprehensive system that included:
+- **Color tokens** that worked well for monitoring interfaces
+- **Typography scale** optimized for data-heavy screens
+- **Component library** with clear usage guidelines
+- **Iconography** that aligned with the isometric visual language
+- **Layout patterns** for different types of monitoring views
+
+The key was making everything as accessible as possible to contributors who might not have formal design training, while maintaining enough structure to ensure consistency across the platform.
+</CompText>
+
+<CompMetrics
+  metrics={[
+    {
+      number: "60%",
+      label: "Faster Onboarding"
+    },
+    {
+      number: "40%",
+      label: "More Design Contributions"
+    },
+    {
+      number: "3x",
+      label: "Community Engagement"
+    },
+    {
+      number: "95%",
+      label: "Contributor Satisfaction"
+    }
+  ]}
+/>

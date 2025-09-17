@@ -1,0 +1,134 @@
+---
+export interface Props {
+  size?: 'narrow' | 'standard' | 'wide';
+  spacing?: 'tight' | 'normal' | 'loose';
+}
+
+const {
+  size = 'standard',
+  spacing = 'normal'
+} = Astro.props;
+---
+
+<div class={`comp-text comp-text--${size} comp-text--${spacing}`}>
+  <slot />
+</div>
+
+<style>
+  .comp-text {
+    margin: var(--space-20) 0;
+  }
+
+  .comp-text--narrow {
+    max-width: var(--container-xs);
+  }
+
+  .comp-text--standard {
+    max-width: var(--container-sm);
+  }
+
+  .comp-text--wide {
+    max-width: var(--container-md);
+  }
+
+  .comp-text--tight {
+    margin: var(--space-16) 0;
+  }
+
+  .comp-text--loose {
+    margin: var(--space-24) 0;
+  }
+
+  /* Typography styles using design tokens */
+  .comp-text :global(h2) {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-6);
+    letter-spacing: var(--letter-spacing-normal);
+    color: var(--color-text-primary);
+  }
+
+  .comp-text :global(h3) {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-medium);
+    margin: var(--space-8) 0 var(--space-4);
+    color: var(--color-text-primary);
+  }
+
+  .comp-text :global(h4) {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
+    margin: var(--space-6) 0 var(--space-3);
+    color: var(--color-text-primary);
+  }
+
+  .comp-text :global(p) {
+    margin-bottom: var(--space-5);
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
+    font-size: var(--font-size-base);
+  }
+
+  .comp-text :global(ul),
+  .comp-text :global(ol) {
+    margin: var(--space-5) 0;
+    padding-left: var(--space-6);
+    color: var(--color-text-secondary);
+  }
+
+  .comp-text :global(li) {
+    margin-bottom: var(--space-3);
+    line-height: var(--line-height-normal);
+  }
+
+  .comp-text :global(em) {
+    color: var(--color-accent-primary);
+    font-style: italic;
+  }
+
+  .comp-text :global(strong) {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .comp-text :global(blockquote) {
+    border-left: 3px solid var(--color-accent-primary);
+    padding-left: var(--space-6);
+    margin: var(--space-8) 0;
+    font-style: italic;
+    color: var(--color-text-tertiary);
+  }
+
+  .comp-text :global(code) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-1) var(--space-2);
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--color-text-primary);
+  }
+
+  .comp-text :global(pre) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-6);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--space-8) 0;
+  }
+
+  .comp-text :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .comp-text :global(a) {
+    color: var(--color-accent-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color var(--transition-normal);
+  }
+
+  .comp-text :global(a:hover) {
+    color: var(--color-accent-hover);
+  }
+</style>

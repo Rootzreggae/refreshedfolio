@@ -1,0 +1,114 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  category: CollectionEntry<'projects'>;
+  subProjects: CollectionEntry<'projects'>[];
+}
+
+const { category, subProjects } = Astro.props;
+const { title, description } = category.data;
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="mx-auto max-w-6xl px-4 py-8">
+    <!-- Back Navigation -->
+    <nav class="mb-8">
+      <a href="/" class="back-nav">← BACK TO WORK</a>
+    </nav>
+
+    <header class="mb-12 text-center">
+      <h1 class="mb-4 text-5xl font-bold">{title}</h1>
+      <p class="mx-auto max-w-2xl text-xl text-gray-400">{description}</p>
+    </header>
+
+    {subProjects && subProjects.length > 0 && (
+      <section class="grid gap-8 md:grid-cols-2">
+        {subProjects
+          .sort((a, b) => (a.data.order || 999) - (b.data.order || 999))
+          .map((project) => {
+            const categoryName = category.data.category;
+            const projectSlug = project.slug.replace(`${categoryName}-`, '');
+            const projectUrl = `/work/${categoryName}/${projectSlug}`;
+            
+            return (
+              <article class="group rounded-lg border border-gray-800 bg-gray-900 p-6 transition-all hover:border-gray-600 hover:bg-gray-800">
+                {project.data.thumbnail && (
+                  <div class="mb-4 overflow-hidden rounded-lg">
+                    <img
+                      src={project.data.thumbnail}
+                      alt={project.data.title}
+                      class="aspect-video w-full object-cover transition-transform group-hover:scale-105"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
+                
+                <h2 class="mb-3 text-2xl font-semibold">
+                  <a 
+                    href={projectUrl}
+                    class="transition-colors group-hover:text-blue-400"
+                  >
+                    {project.data.title}
+                  </a>
+                </h2>
+                
+                <p class="mb-4 line-clamp-2 text-gray-400">
+                  {project.data.description}
+                </p>
+                
+                <div class="mb-4 flex items-center gap-4 text-sm text-gray-500">
+                  {project.data.role && (
+                    <span>{project.data.role}</span>
+                  )}
+                  {project.data.duration && (
+                    <span>•</span>
+                    <span>{project.data.duration}</span>
+                  )}
+                </div>
+                
+                <div class="flex flex-wrap gap-2">
+                  {project.data.technologies.slice(0, 4).map((tech) => (
+                    <span class="rounded bg-gray-700 px-2 py-1 text-xs">
+                      {tech}
+                    </span>
+                  ))}
+                  {project.data.technologies.length > 4 && (
+                    <span class="rounded bg-gray-700 px-2 py-1 text-xs">
+                      +{project.data.technologies.length - 4}
+                    </span>
+                  )}
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-gray-800">
+                  <a 
+                    href={projectUrl}
+                    class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    View Project →
+                  </a>
+                </div>
+              </article>
+            );
+          })
+        }
+      </section>
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .back-nav {
+    font-size: 16px;
+    color: #666666;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+  }
+
+  .back-nav:hover {
+    color: #ffffff;
+  }
+</style>

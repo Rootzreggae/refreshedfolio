@@ -1,16 +1,430 @@
 ---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { generateUrl } from '../lib/routing';
 
+// Get featured projects for navigation
+const projects = await getCollection('projects');
+const featuredProjects = projects
+  .filter(project => project.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Generate URLs for each featured project
+const projectUrls = featuredProjects.reduce((urls, project) => {
+  urls[project.data.category] = generateUrl(project);
+  return urls;
+}, {} as Record<string, string>);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Nilson Gaspar"
+  description="Principal Product Designer building tools for developers at Dynatrace"
+>
+  <style>
+    @font-face {
+      font-family: 'NB International';
+      src: url('/font/NB International Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    
+    body {
+      background: #1a1a1a;
+      color: #ffffff;
+      font-family: 'NB International', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Hero Text */
+    .hero-text {
+      position: absolute;
+      left: 300px;
+      top: calc(50% - 1.8rem);
+      transform: translateY(-50%);
+      font-size: 120px;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    
+    .hero-text .underline {
+      text-decoration: underline;
+      text-decoration-thickness: 4px;
+      text-underline-offset: 8px;
+    }
+    
+    /* Right Navigation */
+    .right-nav {
+      position: absolute;
+      right: 300px;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: right;
+    }
+    
+    .nav-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+    
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .nav-links a {
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      text-decoration: underline;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s ease;
+    }
+    
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+    
+    .nav-links a.dimmed {
+      color: #555555;
+    }
+    
+    .nav-links li {
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Bottom Left */
+    .bottom-left {
+      position: absolute;
+      left: 300px;
+      bottom: 60px;
+    }
+    
+    .explore-link {
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      text-decoration: underline;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+      display: block;
+    }
+    
+    .coordinates {
+      font-size: 14px;
+      font-weight: 400;
+      color: #ffffff;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      margin-bottom: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typewriter 3s steps(20, end) 1s both, blink 1s infinite 4s;
+    }
+    
+    @keyframes typewriter {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+    
+    @keyframes blink {
+      0%, 50% {
+        border-right: 2px solid #ffffff;
+      }
+      51%, 100% {
+        border-right: 2px solid transparent;
+      }
+    }
+    
+    .location-info {
+      font-size: 18px;
+      font-weight: 400;
+      color: #888888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Bottom Right */
+    .bottom-right {
+      position: absolute;
+      right: 300px;
+      bottom: 60px;
+      display: flex;
+      gap: 40px;
+    }
+    
+    .bottom-right a {
+      font-size: 18px;
+      font-weight: 500;
+      color: #888888;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s ease;
+    }
+    
+    .bottom-right a:hover {
+      color: #ffffff;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .hero-text {
+        left: 200px;
+        font-size: 90px;
+      }
+      
+      .right-nav {
+        right: 200px;
+      }
+      
+      .bottom-left {
+        left: 200px;
+        bottom: 40px;
+      }
+      
+      .bottom-right {
+        right: 200px;
+        bottom: 40px;
+      }
+    }
+    
+    @media (max-width: 1024px) {
+      .hero-text {
+        left: 100px;
+        font-size: 80px;
+        width: calc(100% - 300px);
+      }
+      
+      .right-nav {
+        right: 100px;
+      }
+      
+      .bottom-left {
+        left: 100px;
+      }
+      
+      .bottom-right {
+        right: 100px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+      
+      .hero-text {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        font-size: 48px;
+        line-height: 1.1;
+        text-align: center;
+        padding: 80px 20px 60px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      
+      .right-nav {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        text-align: center;
+        padding: 0 20px 40px;
+        margin: 0 auto;
+      }
+      
+      .nav-title {
+        font-size: 16px;
+        margin-bottom: 24px;
+      }
+      
+      .nav-links {
+        gap: 16px;
+      }
+      
+      .nav-links a {
+        font-size: 16px;
+        padding: 12px 0;
+        display: block;
+        min-height: 44px;
+        line-height: 1.4;
+      }
+      
+      .bottom-left {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        padding: 40px 20px 0;
+        text-align: center;
+      }
+      
+      .explore-link {
+        font-size: 16px;
+        padding: 12px 0;
+        min-height: 44px;
+        display: inline-block;
+        margin-bottom: 32px;
+      }
+      
+      .coordinates {
+        font-size: 12px;
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      
+      .location-info {
+        font-size: 14px;
+        text-align: center;
+        line-height: 1.4;
+        margin-bottom: 40px;
+      }
+      
+      .bottom-right {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        padding: 0 20px 40px;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 24px;
+      }
+      
+      .bottom-right a {
+        font-size: 16px;
+        padding: 12px 16px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  </style>
+
+  <main role="main" aria-label="Homepage">
+    <!-- Hero Text -->
+    <section class="hero-text" aria-labelledby="hero-heading">
+      <h1 id="hero-heading">
+        Nilson is building<br>
+        tools at <a href="https://www.dynatrace.com/" class="underline" target="_blank" rel="noopener noreferrer" aria-label="Dynatrace website (opens in new tab)">Dynatrace.</a>
+      </h1>
+    </section>
+    
+    <!-- Right Navigation -->
+    <nav class="right-nav" aria-label="Past work navigation">
+      <h2 class="nav-title">Past Work</h2>
+      <ul class="nav-links" role="list">
+        <li><a href={projectUrls.keystrok || '/work/keystrok-main'} aria-label="View Keystrok project">Keystrok</a></li>
+        <li><a href={projectUrls.opensource || '/work/opensource'} aria-label="View Open Source projects">Open Source</a></li>
+        <li><a href={projectUrls.grafana || '/work/grafana'} aria-label="View Grafana Labs projects">Grafana Labs</a></li>
+        <li><a href={projectUrls.jungleai || '/work/jungleai-main'} aria-label="View Jungle AI project">Jungle AI</a></li>
+        <li><span class="dimmed" aria-label="More projects coming soon">More</span></li>
+      </ul>
+    </nav>
+    
+    <!-- Bottom Left -->
+    <section class="bottom-left" aria-label="Notes and location information">
+      <a href="/notes" class="explore-link" aria-label="Explore my notes and thoughts">Explore My Notes</a>
+      <div class="coordinates" aria-label="Current coordinates" role="status" id="animated-coordinates">38.6615590794496883170</div>
+      <div class="location-info" aria-label="Last seen location">
+        Last seen 2 days ago, at Gulbenkian Art Gallery in Lisbon.
+      </div>
+    </section>
+    
+    <!-- Bottom Right -->
+    <nav class="bottom-right" aria-label="Contact and social links">
+      <a href="mailto:hello@nilsongaspar.com" aria-label="Send email to hello@nilsongaspar.com">Email</a>
+      <a href="https://bluesky.app/profile/nilsongaspar.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Follow on Bluesky (opens in new tab)">Bluesky</a>
+      <a href="https://github.com/nilsongaspar" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)">GitHub</a>
+    </nav>
+  </main>
+
+  <script>
+    function animateCoordinates() {
+      const coordinatesElement = document.getElementById('animated-coordinates');
+      if (!coordinatesElement) return;
+
+      // Base coordinates (Lisbon area) with some meaningful variations
+      const baseCoordinates = [
+        '38.6615590794496883170',
+        '38.7071631194728293841',
+        '38.6892194851637482915',
+        '38.7223847162849573622',
+        '38.6439285740193847261',
+        '38.7158394625847291834',
+        '38.6784629351928574038',
+        '38.6947382951647382947'
+      ];
+
+      let currentIndex = 0;
+      let isAnimating = false;
+
+      function getRandomVariation(baseNumber: string): string {
+        // Add slight random variation to the last few digits
+        const variation = (Math.random() - 0.5) * 0.0001;
+        return (parseFloat(baseNumber) + variation).toFixed(13);
+      }
+
+      function updateCoordinate() {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const currentBase = baseCoordinates[currentIndex];
+        const newCoordinate = getRandomVariation(currentBase);
+        
+        // Smooth transition effect
+        if (coordinatesElement) {
+          coordinatesElement.style.opacity = '0.7';
+
+          setTimeout(() => {
+            if (coordinatesElement) {
+              coordinatesElement.textContent = newCoordinate;
+              coordinatesElement.style.opacity = '1';
+            }
+            isAnimating = false;
+          }, 150);
+        }
+
+        // Move to next base coordinate occasionally
+        if (Math.random() < 0.1) { // 10% chance to change location
+          currentIndex = (currentIndex + 1) % baseCoordinates.length;
+        }
+      }
+
+      // Start animation after initial typewriter completes
+      setTimeout(() => {
+        updateCoordinate();
+        setInterval(updateCoordinate, 800 + Math.random() * 400); // 800-1200ms intervals
+      }, 4500); // Wait for typewriter to complete
+    }
+
+    // Initialize when DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', animateCoordinates);
+    } else {
+      animateCoordinates();
+    }
+  </script>
+</BaseLayout>

@@ -1,0 +1,250 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navigation from '../components/ui/Navigation.astro';
+import ProjectHeader from '../components/ui/ProjectHeader.astro';
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  project?: CollectionEntry<'projects'>;
+  title?: string;
+  description?: string;
+  image?: string;
+  layout?: 'project' | 'story' | 'category' | 'prose';
+  containerSize?: 'standard' | 'wide' | 'narrow';
+  showHeader?: boolean;
+  showNavigation?: boolean;
+  headerLayout?: 'standard' | 'hero';
+  navigation?: {
+    backLink?: string;
+    backText?: string;
+    nextLink?: string;
+    nextText?: string;
+  };
+}
+
+const {
+  project,
+  title,
+  description,
+  image,
+  layout = 'project',
+  containerSize = 'standard',
+  showHeader = true,
+  showNavigation = true,
+  headerLayout = 'standard',
+  navigation = {}
+} = Astro.props;
+
+// Extract data from project if provided
+const pageTitle = title || project?.data.title || 'Portfolio';
+const pageDescription = description || project?.data.description || '';
+const pageImage = image || project?.data.heroImage;
+
+// SEO optimization
+const seoTitle = project ? `${pageTitle} - Portfolio` : pageTitle;
+
+// Extract metadata for header
+const metadata = project ? {
+  Project: project.data.title,
+  Role: project.data.role,
+  Timeline: project.data.duration,
+  ...(project.data.technologies && { Technologies: project.data.technologies }),
+  ...(project.data.team && { Team: project.data.team }),
+  ...(project.data.client && { Client: project.data.client })
+} : {};
+
+// Navigation configuration
+const navConfig = {
+  backLink: navigation.backLink || (layout === 'category' ? '/' : '/work'),
+  backText: navigation.backText || (layout === 'category' ? 'Back to Home' : 'Back to Work'),
+  nextLink: navigation.nextLink,
+  nextText: navigation.nextText,
+};
+
+// Container classes based on layout and size
+const getContainerClass = () => {
+  const base = layout === 'story' ? 'container-wide' : 'container';
+
+  if (containerSize === 'narrow') return 'container-xs';
+  if (containerSize === 'wide') return 'container-xl';
+
+  return base;
+};
+---
+
+<BaseLayout title={seoTitle} description={pageDescription} image={pageImage}>
+  <main class={`unified-layout unified-layout--${layout}`}>
+    {showNavigation && (
+      <Navigation
+        backLink={navConfig.backLink}
+        backText={navConfig.backText}
+        variant="header"
+        showDivider={showHeader}
+      />
+    )}
+
+    {showHeader && project && (
+      <ProjectHeader
+        title={pageTitle}
+        subtitle={''}
+        description={project.data.description}
+        metadata={metadata}
+        layout={headerLayout}
+        showDivider={layout !== 'story'}
+      />
+    )}
+
+    <div class={`content-wrapper content-wrapper--${containerSize}`}>
+      <div class={`content-container ${getContainerClass()}`}>
+        <slot />
+      </div>
+    </div>
+
+    {showNavigation && (navConfig.nextLink || layout !== 'category') && (
+      <Navigation
+        backLink={navConfig.backLink}
+        backText={navConfig.backText}
+        nextLink={navConfig.nextLink}
+        nextText={navConfig.nextText}
+        variant="footer"
+        showDivider={true}
+      />
+    )}
+  </main>
+</BaseLayout>
+
+<style>
+  .unified-layout {
+    min-height: 100vh;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+  }
+
+  .content-wrapper {
+    width: 100%;
+  }
+
+  .content-container {
+    margin: 0 auto;
+    padding-left: var(--container-padding-x);
+    padding-right: var(--container-padding-x);
+  }
+
+  .content-container.container-xs {
+    max-width: var(--container-xs);
+  }
+
+  .content-container.container {
+    max-width: var(--container-lg);
+  }
+
+  .content-container.container-wide {
+    max-width: var(--container-xl);
+  }
+
+  /* Layout-specific styles */
+  .unified-layout--story .content-wrapper {
+    padding: 0;
+  }
+
+  .unified-layout--story .content-container {
+    padding-bottom: var(--space-32);
+  }
+
+  .unified-layout--prose .content-container {
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-20);
+  }
+
+  .unified-layout--category .content-container {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-20);
+  }
+
+  @media (min-width: 768px) {
+    .content-container {
+      padding-left: var(--container-padding-x-md);
+      padding-right: var(--container-padding-x-md);
+    }
+  }
+
+  /* Global prose styling for markdown content */
+  .unified-layout--prose :global(.prose) {
+    max-width: none;
+    color: var(--color-text-secondary);
+  }
+
+  .unified-layout--prose :global(.prose h1) {
+    font-size: var(--font-size-6xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--space-8);
+    color: var(--color-text-primary);
+  }
+
+  .unified-layout--prose :global(.prose h2) {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-normal);
+    margin-bottom: var(--space-6);
+    margin-top: var(--space-12);
+    color: var(--color-text-primary);
+  }
+
+  .unified-layout--prose :global(.prose h3) {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-normal);
+    margin-bottom: var(--space-5);
+    margin-top: var(--space-10);
+    color: var(--color-text-primary);
+  }
+
+  .unified-layout--prose :global(.prose p) {
+    margin-bottom: var(--space-5);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .unified-layout--prose :global(.prose ul),
+  .unified-layout--prose :global(.prose ol) {
+    margin: var(--space-5) 0;
+    padding-left: var(--space-6);
+  }
+
+  .unified-layout--prose :global(.prose li) {
+    margin-bottom: var(--space-3);
+  }
+
+  .unified-layout--prose :global(.prose blockquote) {
+    border-left: 3px solid var(--color-accent-primary);
+    padding-left: var(--space-6);
+    margin: var(--space-8) 0;
+    font-style: italic;
+    color: var(--color-text-tertiary);
+  }
+
+  .unified-layout--prose :global(.prose img) {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: var(--space-8) 0;
+  }
+
+  .unified-layout--prose :global(.prose code) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-1) var(--space-2);
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: var(--font-mono);
+  }
+
+  .unified-layout--prose :global(.prose pre) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-6);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--space-8) 0;
+  }
+
+  .unified-layout--prose :global(.prose pre code) {
+    background-color: transparent;
+    padding: 0;
+  }
+</style>

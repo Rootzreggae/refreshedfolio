@@ -1,0 +1,190 @@
+---
+// DEPRECATED: Use UnifiedLayout with layout="project" instead
+// This component is maintained for backward compatibility
+// See DESIGN_SYSTEM_GUIDE.md for migration instructions
+
+import UnifiedLayout from './UnifiedLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  project: CollectionEntry<'projects'>;
+  pageType?: 'single' | 'category' | 'subproject';
+  subProjects?: CollectionEntry<'projects'>[];
+  parentCategory?: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { publishDate, tags, heroImage, heroImageAlt } = project.data;
+
+// Create metadata for the unified header
+const metadata: Record<string, string | string[]> = {};
+
+if (project.data.role) metadata.Role = project.data.role;
+if (project.data.duration) metadata.Timeline = project.data.duration;
+if (project.data.technologies) metadata.Technologies = project.data.technologies;
+if (publishDate) {
+  metadata['Published'] = publishDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+if (tags?.length > 0) metadata.Tags = tags;
+---
+
+<UnifiedLayout
+  project={project}
+  layout="project"
+  containerSize="standard"
+  showHeader={true}
+  showNavigation={true}
+  headerLayout="standard"
+>
+  <!-- Legacy content structure for backward compatibility -->
+  <article class="project-article">
+    {
+      heroImage && (
+        <div class="project-hero-image">
+          <img
+            src={heroImage}
+            alt={heroImageAlt || project.data.title}
+            loading="lazy"
+            class="project-hero-image__img"
+          />
+        </div>
+      )
+    }
+
+    <div class="prose-content">
+      <slot />
+    </div>
+  </article>
+</UnifiedLayout>
+
+<style>
+  .project-article {
+    padding-top: var(--space-8);
+  }
+
+  .project-hero-image {
+    margin-bottom: var(--space-8);
+  }
+
+  .project-hero-image__img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-secondary);
+  }
+
+  /* Enhanced prose styling using design tokens */
+  .prose-content {
+    max-width: none;
+    color: var(--color-text-secondary);
+  }
+
+  .prose-content :global(h1) {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--space-8);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-tight);
+  }
+
+  .prose-content :global(h2) {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-6);
+    margin-top: var(--space-12);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-snug);
+  }
+
+  .prose-content :global(h3) {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-5);
+    margin-top: var(--space-10);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-snug);
+  }
+
+  .prose-content :global(p) {
+    margin-bottom: var(--space-5);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+  }
+
+  .prose-content :global(ul),
+  .prose-content :global(ol) {
+    margin: var(--space-5) 0;
+    padding-left: var(--space-6);
+    color: var(--color-text-secondary);
+  }
+
+  .prose-content :global(li) {
+    margin-bottom: var(--space-3);
+    line-height: var(--line-height-normal);
+  }
+
+  .prose-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent-primary);
+    padding-left: var(--space-6);
+    margin: var(--space-8) 0;
+    font-style: italic;
+    color: var(--color-text-tertiary);
+  }
+
+  .prose-content :global(code) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-1) var(--space-2);
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--color-text-primary);
+  }
+
+  .prose-content :global(pre) {
+    background-color: var(--color-bg-elevated);
+    padding: var(--space-6);
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: var(--space-8) 0;
+  }
+
+  .prose-content :global(pre code) {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  .prose-content :global(a) {
+    color: var(--color-accent-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+    transition: color var(--transition-normal);
+  }
+
+  .prose-content :global(a:hover) {
+    color: var(--color-accent-hover);
+  }
+
+  .prose-content :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: var(--space-8) 0;
+    border: 1px solid var(--color-border-primary);
+    background: var(--color-bg-secondary);
+  }
+
+  .prose-content :global(strong) {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .prose-content :global(em) {
+    color: var(--color-accent-primary);
+    font-style: italic;
+  }
+</style>

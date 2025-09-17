@@ -1,0 +1,87 @@
+---
+import CompCarousel from '../components/story/CompCarousel.astro';
+import CompSideBySide from '../components/story/CompSideBySide.astro';
+import CompExpandable from '../components/story/CompExpandable.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const testImages = [
+  {
+    src: 'https://picsum.photos/800/500?random=1',
+    alt: 'Test image 1'
+  },
+  {
+    src: 'https://picsum.photos/800/500?random=2',
+    alt: 'Test image 2'
+  },
+  {
+    src: 'https://picsum.photos/800/500?random=3',
+    alt: 'Test image 3'
+  }
+];
+---
+
+<BaseLayout title="Story Components Test" description="Testing the story component system">
+  <div class="container">
+    <header class="header">
+      <h1>Story Components Test</h1>
+    </header>
+    
+    <main class="content">
+      <div class="content-block text-block">
+        <h2>Testing Story Components</h2>
+        <p>This page tests our modular story components independently.</p>
+      </div>
+      
+      <CompCarousel
+        id="test-carousel"
+        images={testImages}
+      />
+
+      <CompSideBySide
+        leftContent={{
+          title: "Side by Side Component",
+          text: "This demonstrates the side-by-side layout with text content and an image.",
+          items: ["Feature one", "Feature two", "Feature three"]
+        }}
+        rightContent={{
+          type: "image",
+          src: "https://picsum.photos/400/400?random=4",
+          alt: "Test image"
+        }}
+      />
+      
+      <CompExpandable title="Test Expandable Section">
+        <h4>Hidden Content</h4>
+        <p>This content is hidden by default and can be expanded by clicking the title above.</p>
+        <ul>
+          <li>Technical detail one</li>
+          <li>Technical detail two</li>
+          <li>Technical detail three</li>
+        </ul>
+      </CompExpandable>
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+  
+  .header {
+    padding: 40px 0;
+    border-bottom: 1px solid #333333;
+  }
+  
+  .header h1 {
+    font-size: 48px;
+    font-weight: 300;
+    color: #ffffff;
+  }
+  
+  .content {
+    padding: 80px 0;
+  }
+</style></BaseLayout>

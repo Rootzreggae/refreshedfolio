@@ -1,0 +1,99 @@
+---
+export interface Props {
+  title: string;
+  defaultOpen?: boolean;
+}
+
+const { title, defaultOpen = false } = Astro.props;
+const id = `expandable-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class={`expandable ${defaultOpen ? 'open' : ''}`} id={id}>
+  <button class="expand-trigger" type="button">
+    {title}
+    <span class="expand-icon">▼</span>
+  </button>
+  <div class="expand-content">
+    <div class="expand-inner">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .expandable {
+    margin: 60px 0;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .expand-trigger {
+    width: 100%;
+    padding: 20px 30px;
+    background: #0f0f0f;
+    border: none;
+    color: #ffffff;
+    text-align: left;
+    font-size: 18px;
+    font-weight: 400;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
+  }
+  
+  .expand-trigger:hover {
+    background: #1a1a1a;
+  }
+  
+  .expand-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  .expandable.open .expand-icon {
+    transform: rotate(180deg);
+  }
+  
+  .expand-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #111111;
+  }
+  
+  .expandable.open .expand-content {
+    max-height: 500px;
+  }
+  
+  .expand-inner {
+    padding: 30px;
+    color: #cccccc;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .expand-inner h4 {
+    margin-bottom: 15px;
+    color: #ffffff;
+  }
+  
+  .expand-inner ul {
+    margin: 15px 0;
+    padding-left: 20px;
+  }
+  
+  .expand-inner li {
+    margin-bottom: 8px;
+  }
+</style>
+
+<script define:vars={{ id }}>
+  const expandable = document.getElementById(id);
+  const trigger = expandable.querySelector('.expand-trigger');
+  
+  trigger.addEventListener('click', function() {
+    expandable.classList.toggle('open');
+  });
+</script>

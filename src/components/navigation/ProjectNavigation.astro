@@ -1,0 +1,258 @@
+---
+/**
+ * Universal Project Navigation Component
+ *
+ * Provides consistent navigation across all project pages with proper
+ * breadcrumb generation and related project links.
+ */
+
+import type { CollectionEntry } from 'astro:content';
+import { generateUrl, generateBreadcrumbs, getParentCategory, getSubprojects } from '../../lib/routing';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  allProjects?: CollectionEntry<'projects'>[];
+  showBreadcrumbs?: boolean;
+  showRelatedProjects?: boolean;
+  className?: string;
+}
+
+const {
+  project,
+  allProjects = [],
+  showBreadcrumbs = true,
+  showRelatedProjects = false,
+  className = ''
+} = Astro.props;
+
+// Generate breadcrumbs
+const breadcrumbs = showBreadcrumbs ? generateBreadcrumbs(project, allProjects) : [];
+
+// Get related projects based on type
+let relatedProjects: CollectionEntry<'projects'>[] = [];
+if (showRelatedProjects && allProjects.length > 0) {
+  if (project.data.projectType === 'category') {
+    relatedProjects = getSubprojects(project, allProjects);
+  } else if (project.data.projectType === 'subproject') {
+    relatedProjects = allProjects.filter(p =>
+      p.data.projectType === 'subproject' &&
+      p.data.category === project.data.category &&
+      p.slug !== project.slug
+    );
+  }
+}
+
+// Get parent category for subprojects
+const parentCategory = project.data.projectType === 'subproject'
+  ? getParentCategory(project, allProjects)
+  : undefined;
+---
+
+<nav class={`project-navigation ${className}`}>
+  <!-- Breadcrumbs -->
+  {showBreadcrumbs && breadcrumbs.length > 1 && (
+    <div class="breadcrumbs">
+      {breadcrumbs.map((crumb, index) => (
+        <span class="breadcrumb-item">
+          {index < breadcrumbs.length - 1 ? (
+            <>
+              <a href={crumb.url} class="breadcrumb-link">
+                {crumb.label}
+              </a>
+              <span class="breadcrumb-separator"> / </span>
+            </>
+          ) : (
+            <span class="breadcrumb-current">{crumb.label}</span>
+          )}
+        </span>
+      ))}
+    </div>
+  )}
+
+  <!-- Back to parent (for subprojects) -->
+  {parentCategory && (
+    <div class="parent-navigation">
+      <a href={generateUrl(parentCategory)} class="parent-link">
+        ← Back to {parentCategory.data.title}
+      </a>
+    </div>
+  )}
+
+  <!-- Related projects -->
+  {showRelatedProjects && relatedProjects.length > 0 && (
+    <div class="related-projects">
+      <h3 class="related-title">
+        {project.data.projectType === 'category' ? 'Projects' : 'Related Work'}
+      </h3>
+      <ul class="related-list">
+        {relatedProjects.slice(0, 3).map((related) => (
+          <li class="related-item">
+            <a href={generateUrl(related)} class="related-link">
+              <span class="related-name">{related.data.title}</span>
+              {related.data.role && (
+                <span class="related-role">{related.data.role}</span>
+              )}
+            </a>
+          </li>
+        ))}
+        {relatedProjects.length > 3 && (
+          <li class="related-item">
+            <span class="related-more">
+              +{relatedProjects.length - 3} more
+            </span>
+          </li>
+        )}
+      </ul>
+    </div>
+  )}
+</nav>
+
+<style>
+  .project-navigation {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumbs {
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #666666;
+  }
+
+  .breadcrumb-link {
+    color: #888888;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .breadcrumb-link:hover {
+    color: #ffffff;
+  }
+
+  .breadcrumb-separator {
+    margin: 0 0.5rem;
+    color: #444444;
+  }
+
+  .breadcrumb-current {
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+
+  /* Parent navigation */
+  .parent-navigation {
+    margin-bottom: 1.5rem;
+  }
+
+  .parent-link {
+    display: inline-flex;
+    align-items: center;
+    color: #888888;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .parent-link:hover {
+    color: #ffffff;
+  }
+
+  /* Related projects */
+  .related-projects {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #333333;
+  }
+
+  .related-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .related-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .related-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .related-link {
+    display: block;
+    color: #888888;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    line-height: 1.4;
+  }
+
+  .related-link:hover {
+    color: #ffffff;
+  }
+
+  .related-name {
+    display: block;
+    font-weight: 500;
+  }
+
+  .related-role {
+    display: block;
+    font-size: 0.875rem;
+    color: #666666;
+    margin-top: 0.25rem;
+  }
+
+  .related-more {
+    color: #666666;
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .breadcrumbs,
+    .parent-link {
+      font-size: 0.8rem;
+    }
+
+    .related-projects {
+      margin-top: 1.5rem;
+    }
+
+    .breadcrumb-separator {
+      margin: 0 0.25rem;
+    }
+  }
+
+  /* Dark mode optimizations */
+  @media (prefers-color-scheme: dark) {
+    .breadcrumb-link {
+      color: #999999;
+    }
+
+    .breadcrumb-link:hover {
+      color: #ffffff;
+    }
+
+    .parent-link {
+      color: #999999;
+    }
+
+    .parent-link:hover {
+      color: #ffffff;
+    }
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+export interface Props {
+  images: Array<{
+    src: string;
+    alt?: string;
+    size?: 'normal' | 'tall' | 'wide' | 'large';
+    caption?: string;
+  }>;
+  columns?: number;
+  gap?: string;
+}
+
+const { images, columns = 4, gap = "20px" } = Astro.props;
+---
+
+<div 
+  class="image-grid" 
+  style={`grid-template-columns: repeat(${columns}, 1fr); gap: ${gap};`}
+>
+  {images.map((image, index) => (
+    <div class={`grid-item ${image.size || 'normal'}`}>
+      <img src={image.src} alt={image.alt || `Grid image ${index + 1}`} loading="lazy" />
+      {image.caption && <p class="grid-caption">{image.caption}</p>}
+    </div>
+  ))}
+</div>
+
+<style>
+  .image-grid {
+    display: grid;
+    grid-template-rows: repeat(3, 200px);
+    margin: 80px 0;
+  }
+  
+  .grid-item {
+    background: #111111;
+    border: 1px solid #333333;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .grid-item:hover {
+    border-color: #555555;
+  }
+  
+  .grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .grid-item.tall {
+    grid-row: span 2;
+  }
+  
+  .grid-item.wide {
+    grid-column: span 2;
+  }
+  
+  .grid-item.large {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  .grid-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: #ffffff;
+    font-size: 12px;
+    padding: 20px 15px 15px;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .image-grid {
+      grid-template-columns: 1fr 1fr !important;
+      grid-template-rows: repeat(6, 150px);
+    }
+    
+    .grid-item.large, .grid-item.wide, .grid-item.tall {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+  }
+</style>

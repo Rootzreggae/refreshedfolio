@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import StoryHeader from '../components/story/StoryHeader.astro';
+import StoryFooter from '../components/story/StoryFooter.astro';
+
+export interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+
+// Extract footer data
+const footerData = data.footer || {};
+
+// SEO meta data
+const seoTitle = `${data.title} - Portfolio`;
+const seoDescription = data.description;
+const seoImage = data.heroImage;
+---
+
+<BaseLayout title={seoTitle} description={seoDescription} image={seoImage}>
+  <main class="component-case-study">
+    <StoryHeader />
+
+    <div class="container">
+      <!-- MDX content with components gets rendered here -->
+      <slot />
+    </div>
+
+    <StoryFooter
+      backLink={footerData.backLink || "/"}
+      backText={footerData.backText || "All Work"}
+      nextLink={footerData.nextLink}
+      nextText={footerData.nextText}
+    />
+  </main>
+</BaseLayout>
+
+<style is:global>
+  .component-case-study {
+    background: #1a1a1a;
+    color: #e5e5e5;
+    min-height: 100vh;
+  }
+
+  .component-case-study .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 140px 60px 60px;
+  }
+
+  @media (max-width: 768px) {
+    .component-case-study .container {
+      padding: 120px 30px 30px;
+    }
+  }
+</style>

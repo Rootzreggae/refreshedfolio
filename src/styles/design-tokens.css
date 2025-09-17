@@ -1,0 +1,68 @@
+/* Design Tokens - Extract these values from Figma */
+:root {
+  /* Typography Scale */
+  --font-size-hero: clamp(2rem, 8vw, 7rem);
+  --font-size-section-heading: 0.75rem;
+  --font-size-nav: 1.125rem;
+  --font-size-body: 0.875rem;
+  --font-size-caption: 0.75rem;
+  
+  /* Line Heights */
+  --line-height-hero: 1.1;
+  --line-height-body: 1.5;
+  --line-height-heading: 1.2;
+  
+  /* Spacing Scale */
+  --space-xs: 0.25rem;    /* 4px */
+  --space-sm: 0.5rem;     /* 8px */
+  --space-md: 0.75rem;    /* 12px */
+  --space-lg: 1rem;       /* 16px */
+  --space-xl: 1.5rem;     /* 24px */
+  --space-2xl: 2rem;      /* 32px */
+  --space-3xl: 3rem;      /* 48px */
+  --space-4xl: 4rem;      /* 64px */
+  --space-5xl: 6rem;      /* 96px */
+  --space-6xl: 8rem;      /* 128px */
+  
+  /* Layout */
+  --container-max-width: 75rem; /* 1200px */
+  --hero-min-height: 80vh;
+  --section-padding-y: 4rem;
+  
+  /* Colors */
+  --color-bg-primary: #111111;
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #888888;
+  --color-text-muted: #666666;
+  --color-border: #222222;
+  --color-border-subtle: #333333;
+  --color-accent: #4ade80;
+  --color-surface: #1a1a1a;
+}
+
+/* Component-specific tokens */
+.hero-section {
+  --hero-content-max-width: 100%;
+  --hero-padding-x: var(--space-xl);
+  --hero-padding-y: var(--space-3xl);
+}
+
+.status-badge {
+  --badge-padding-x: var(--space-md);
+  --badge-padding-y: var(--space-xs);
+  --badge-border-radius: 9999px;
+  --badge-gap: var(--space-md);
+}
+
+.navigation-section {
+  --nav-grid-columns: 1fr 2fr;
+  --nav-gap: var(--space-4xl);
+  --nav-padding-y: var(--space-4xl);
+}
+
+@media (max-width: 1024px) {
+  .navigation-section {
+    --nav-grid-columns: 1fr;
+    --nav-gap: var(--space-3xl);
+  }
+}

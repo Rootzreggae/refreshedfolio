@@ -1,0 +1,102 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import StoryHeader from '../components/story/StoryHeader.astro';
+import StoryHero from '../components/story/StoryHero.astro';
+import StoryFooter from '../components/story/StoryFooter.astro';
+
+export interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { data } = project;
+
+// Extract hero data with fallbacks
+const heroData = data.hero || {
+  title: data.title,
+  description: data.description,
+  project: data.title,
+  role: data.role,
+  timeline: data.duration,
+  status: data.projectType === 'single' ? 'Completed' : 'Ongoing'
+};
+
+// Extract footer data
+const footerData = data.footer || {};
+
+// SEO meta data
+const seoTitle = `${data.title} - Portfolio`;
+const seoDescription = data.description;
+const seoImage = data.heroImage;
+---
+
+<BaseLayout title={seoTitle} description={seoDescription} image={seoImage}>
+  <main>
+    <StoryHeader />
+    
+    <StoryHero
+      title={heroData.title}
+      description={heroData.description}
+      project={heroData.project}
+      role={heroData.role}
+      timeline={heroData.timeline}
+      status={heroData.status}
+    />
+    
+    <!-- Markdown content gets rendered here -->
+    <slot />
+    
+    <StoryFooter
+      backLink={footerData.backLink}
+      backText={footerData.backText}
+      nextLink={footerData.nextLink}
+      nextText={footerData.nextText}
+    />
+  </main>
+</BaseLayout>
+
+<style is:global>
+  /* Global styles for markdown content within story components */
+  body {
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: 'NB International', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* Ensure story components can contain markdown content */
+  .story-text-content h2 {
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .story-text-content h3 {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  .story-text-content p {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+
+  .story-text-content .emphasis {
+    color: #ffffff;
+    font-weight: 400;
+  }
+  
+  .story-text-content span.emphasis {
+    color: #ffffff;
+    font-weight: 400;
+  }
+</style>

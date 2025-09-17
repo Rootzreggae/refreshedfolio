@@ -1,0 +1,176 @@
+---
+export interface Props {
+  title: string;
+  subtitle?: string;
+  description?: string;
+  metadata?: Record<string, string | string[]>;
+  layout?: 'standard' | 'hero';
+  showDivider?: boolean;
+  accentColor?: string;
+}
+
+const {
+  title,
+  subtitle,
+  description,
+  metadata = {},
+  layout = 'standard',
+  showDivider = true,
+  accentColor = 'var(--color-accent-primary)'
+} = Astro.props;
+
+// Normalize metadata values to strings
+const normalizedMetadata = Object.entries(metadata).map(([key, value]) => [
+  key,
+  Array.isArray(value) ? value.join(', ') : value
+]);
+---
+
+<header class={`project-header project-header--${layout}`} class:list={{ 'project-header--divider': showDivider }}>
+  <div class="project-header__container">
+    <div class="project-header__content">
+      <h1 class={layout === 'hero' ? 'heading-hero' : 'heading-1'}>
+        {title}
+      </h1>
+
+      {subtitle && (
+        <p class="project-header__subtitle">
+          {subtitle}
+        </p>
+      )}
+
+      {description && (
+        <div class="project-header__description body-lg">
+          {description}
+        </div>
+      )}
+    </div>
+
+    {normalizedMetadata.length > 0 && (
+      <aside class="project-header__metadata">
+        {normalizedMetadata.map(([key, value]) => (
+          <div class="metadata-item">
+            <dt class="metadata-item__label caption">
+              {key.toUpperCase()}
+            </dt>
+            <dd class="metadata-item__value body-sm">
+              {value}
+            </dd>
+          </div>
+        ))}
+      </aside>
+    )}
+  </div>
+</header>
+
+<style define:vars={{ accentColor }}>
+  .project-header {
+    width: 100%;
+  }
+
+  .project-header__container {
+    max-width: var(--container-lg);
+    margin: 0 auto;
+    padding-left: var(--container-padding-x);
+    padding-right: var(--container-padding-x);
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--space-20);
+    align-items: start;
+    padding-top: var(--section-padding-y);
+    padding-bottom: var(--section-padding-y);
+  }
+
+  .project-header--hero .project-header__container {
+    padding-top: var(--space-24);
+    padding-bottom: var(--space-24);
+  }
+
+  .project-header--divider {
+    position: relative;
+  }
+
+  .project-header--divider::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--color-border-primary) 20%, var(--color-border-primary) 80%, transparent);
+  }
+
+  .project-header__content {
+    max-width: 45rem;
+  }
+
+  .project-header__subtitle {
+    font-size: clamp(var(--font-size-xl), 2.5vw, var(--font-size-3xl));
+    font-weight: var(--font-weight-light);
+    line-height: var(--line-height-snug);
+    margin: var(--space-6) 0 var(--space-8);
+    color: var(--color-text-tertiary);
+  }
+
+  .project-header__description {
+    margin-top: var(--space-8);
+  }
+
+  .project-header__metadata {
+    padding-top: var(--space-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .metadata-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .metadata-item__label {
+    margin: 0;
+  }
+
+  .metadata-item__value {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  @media (min-width: 768px) {
+    .project-header__container {
+      padding-left: var(--container-padding-x-md);
+      padding-right: var(--container-padding-x-md);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .project-header__container {
+      grid-template-columns: 1fr 280px;
+      gap: var(--space-16);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .project-header__container {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+
+    .project-header__metadata {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-8) var(--space-10);
+      padding-top: var(--space-12);
+      border-top: 1px solid var(--color-border-primary);
+    }
+  }
+
+  @media (max-width: 479px) {
+    .project-header__metadata {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

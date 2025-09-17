@@ -1,0 +1,64 @@
+---
+export interface Phase {
+  title: string;
+  description: string;
+}
+
+export interface Props {
+  title?: string;
+  steps: Phase[];
+}
+
+const { title, steps } = Astro.props;
+---
+
+<div class="comp-process">
+  {title && <h2 class="process-title">{title}</h2>}
+  {steps.map((step) => (
+    <div class="process-phase">
+      <div class="phase-title">{step.title}</div>
+      <div class="phase-description">{step.description}</div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .comp-process {
+    margin: 80px 0;
+  }
+
+  .process-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 40px;
+  }
+
+  .process-phase {
+    margin: 60px 0;
+    padding: 40px;
+    background: #0f0f0f;
+    border-left: 4px solid #4a9eff;
+    border-radius: 8px;
+  }
+
+  .phase-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #4a9eff;
+    margin-bottom: 16px;
+  }
+
+  .phase-description {
+    font-size: 16px;
+    color: #ccc;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .process-phase {
+      padding: 24px;
+      margin: 40px 0;
+    }
+  }
+</style>

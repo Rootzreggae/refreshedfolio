@@ -1,0 +1,177 @@
+---
+export interface Props {
+  title: string;
+  subtitle?: string;
+  description?: string;
+  project?: string;
+  role?: string;
+  timeline?: string;
+  client?: string;
+  team?: string;
+  technologies?: string | string[];
+  metadata?: Record<string, string>;
+  links?: {
+    demo?: string;
+    github?: string;
+  };
+}
+
+const { title, subtitle, description, project, role, timeline, client, team, technologies, metadata, links } = Astro.props;
+---
+
+<div class="comp-hero">
+  <div class="hero-content">
+    <h1>{title}</h1>
+    {subtitle && <p class="subtitle">{subtitle}</p>}
+
+    {description && (
+      <div class="hero-description">
+        {description}
+      </div>
+    )}
+
+    {links && (links.demo || links.github) && (
+      <div class="hero-links">
+        {links.demo && (
+          <a href={links.demo} target="_blank" rel="noopener noreferrer">
+            View Live Demo
+          </a>
+        )}
+        {links.github && (
+          <a href={links.github} target="_blank" rel="noopener noreferrer">
+            GitHub
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+
+  <div class="hero-meta">
+    {metadata && Object.entries(metadata).map(([key, value]) => (
+      <div class="meta-item">
+        <div class="meta-label">{key.toUpperCase()}</div>
+        <div class="meta-value">{value}</div>
+      </div>
+    ))}
+    {!metadata && (
+      <>
+        {project && (
+          <div class="meta-item">
+            <div class="meta-label">PROJECT</div>
+            <div class="meta-value">{project}</div>
+          </div>
+        )}
+        {role && (
+          <div class="meta-item">
+            <div class="meta-label">ROLE</div>
+            <div class="meta-value">{role}</div>
+          </div>
+        )}
+        {timeline && (
+          <div class="meta-item">
+            <div class="meta-label">TIMELINE</div>
+            <div class="meta-value">{timeline}</div>
+          </div>
+        )}
+        {team && (
+          <div class="meta-item">
+            <div class="meta-label">TEAM</div>
+            <div class="meta-value">{team}</div>
+          </div>
+        )}
+        {client && (
+          <div class="meta-item">
+            <div class="meta-label">CLIENT</div>
+            <div class="meta-value">{client}</div>
+          </div>
+        )}
+        {technologies && (
+          <div class="meta-item">
+            <div class="meta-label">TECHNOLOGIES</div>
+            <div class="meta-value">{Array.isArray(technologies) ? technologies.join(', ') : technologies}</div>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+</div>
+
+<style>
+  .comp-hero {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 60px;
+    margin-bottom: 120px;
+    padding-bottom: 60px;
+    border-bottom: 1px solid #333;
+  }
+
+  .hero-content h1 {
+    font-size: 48px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-content .subtitle {
+    font-size: 24px;
+    color: #888;
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  .hero-description {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #ccc;
+    margin-top: 32px;
+  }
+
+  .hero-links {
+    display: flex;
+    gap: 24px;
+    margin-top: 32px;
+  }
+
+  .hero-links a {
+    color: #4a9eff;
+    text-decoration: none;
+    border-bottom: 1px solid #4a9eff;
+    padding-bottom: 2px;
+    transition: opacity 0.3s;
+  }
+
+  .hero-links a:hover {
+    opacity: 0.8;
+  }
+
+  .hero-meta {
+    padding-top: 12px;
+  }
+
+  .meta-item {
+    margin-bottom: 24px;
+  }
+
+  .meta-label {
+    font-size: 11px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    color: #ccc;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 768px) {
+    .comp-hero {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+</style>

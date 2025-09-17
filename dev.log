@@ -1,0 +1,358 @@
+
+> refreshedfolio@0.0.1 dev
+> astro dev
+
+11:20:42 [types] Generated 0ms
+11:20:42 [content] Syncing content
+11:20:42 [WARN] [glob-loader] No files found matching "**/*{.md,.mdx},!**/_*/**/*{.md,.mdx},!**/_*{.md,.mdx}" in directory "src/content/notes"
+11:20:42 [content] Synced content
+11:20:42 [vite] Port 4321 is in use, trying another one...
+11:20:42 [vite] Port 4322 is in use, trying another one...
+11:20:42 [vite] Port 4323 is in use, trying another one...
+11:20:42 [vite] Port 4324 is in use, trying another one...
+11:20:42 [vite] Port 4325 is in use, trying another one...
+
+ astro  v5.13.2 ready in 416 ms
+
+┃ Local    http://localhost:4326/
+┃ Network  use --host to expose
+
+11:20:42 watching for file changes...
+✅ Project routing validation passed
+📄 Rendering: Keystrok: Identifying and Solving a $2.3B Security Gap
+🔗 URL: /work/keystrok
+🎨 Layout: component-case-study
+📁 Type: single
+11:21:04 [200] /work/keystrok 154ms
+✅ Project routing validation passed
+
+🔍 GENERATING STATIC PATHS
+📁 Processing 8 projects
+11:21:13 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/work/grafana-frontend-observability`.
+
+Possible dynamic routes being matched: src/pages/work/[category].astro, src/pages/work/[...slug].astro.
+11:21:13 [404] HEAD /work/grafana-frontend-observability 1ms
+11:21:30 [200] HEAD /work/grafana 12ms
+✅ Project routing validation passed
+
+🔍 GENERATING STATIC PATHS
+📁 Processing 8 projects
+📄 Application Observability:
+   File: grafana-application-observability.mdx
+   Astro Slug: grafana-application-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/application-observability
+   Route Slug: grafana/application-observability
+📄 Cloud Onboarding:
+   File: grafana-cloud-onboarding.mdx
+   Astro Slug: grafana-cloud-onboarding
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/cloud-onboarding
+   Route Slug: grafana/cloud-onboarding
+📄 Frontend Application Observability:
+   File: grafana-frontend-observability.mdx
+   Astro Slug: grafana-frontend-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/frontend-observability
+   Route Slug: grafana/frontend-observability
+📄 Contributing to Open Source as a Designer Pt. 2:
+   File: opensource-contributing-pt2.mdx
+   Astro Slug: opensource-contributing-pt2
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt2
+   Route Slug: opensource-contributing-pt2
+📄 Contributing to Open Source as a Designer Pt. 1:
+   File: opensource-contributing-pt1.mdx
+   Astro Slug: opensource-contributing-pt1
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt1
+   Route Slug: opensource-contributing-pt1
+📄 Keystrok: Identifying and Solving a $2.3B Security Gap:
+   File: keystrok-main.mdx
+   Astro Slug: keystrok-main
+   Category: keystrok
+   Type: single
+   Generated URL: /work/keystrok
+   Route Slug: keystrok
+📄 GRAFANA PROJECTS:
+   File: grafana-overview.md
+   Astro Slug: grafana-overview
+   Category: grafana
+   Type: category
+   Generated URL: /work/grafana
+   Route Slug: grafana
+📄 Jungle AI - Enterprise ML Platform Redesign:
+   File: jungleai-main.md
+   Astro Slug: jungleai-main
+   Category: jungleai
+   Type: single
+   Generated URL: /work/jungleai
+   Route Slug: jungleai
+
+✅ Generated 8 static paths
+📋 All generated paths:
+   grafana/application-observability -> /work/grafana/application-observability
+   grafana/cloud-onboarding -> /work/grafana/cloud-onboarding
+   grafana/frontend-observability -> /work/grafana/frontend-observability
+   opensource-contributing-pt2 -> /work/opensource-contributing-pt2
+   opensource-contributing-pt1 -> /work/opensource-contributing-pt1
+   keystrok -> /work/keystrok
+   grafana -> /work/grafana
+   jungleai -> /work/jungleai
+11:21:50 [WARN] [router] A `getStaticPaths()` route pattern was matched, but no matching static path was found for requested path `/work/test-invalid-route`.
+
+Possible dynamic routes being matched: src/pages/work/[category].astro, src/pages/work/[...slug].astro.
+11:21:50 [404] /work/test-invalid-route 0ms
+✅ Project routing validation passed
+
+🔍 GENERATING STATIC PATHS
+📁 Processing 8 projects
+📄 Application Observability:
+   File: grafana-application-observability.mdx
+   Astro Slug: grafana-application-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/application-observability
+   Route Slug: grafana/application-observability
+📄 Cloud Onboarding:
+   File: grafana-cloud-onboarding.mdx
+   Astro Slug: grafana-cloud-onboarding
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/cloud-onboarding
+   Route Slug: grafana/cloud-onboarding
+📄 Frontend Application Observability:
+   File: grafana-frontend-observability.mdx
+   Astro Slug: grafana-frontend-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/frontend-observability
+   Route Slug: grafana/frontend-observability
+📄 Contributing to Open Source as a Designer Pt. 2:
+   File: opensource-contributing-pt2.mdx
+   Astro Slug: opensource-contributing-pt2
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt2
+   Route Slug: opensource-contributing-pt2
+📄 Contributing to Open Source as a Designer Pt. 1:
+   File: opensource-contributing-pt1.mdx
+   Astro Slug: opensource-contributing-pt1
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt1
+   Route Slug: opensource-contributing-pt1
+📄 Keystrok: Identifying and Solving a $2.3B Security Gap:
+   File: keystrok-main.mdx
+   Astro Slug: keystrok-main
+   Category: keystrok
+   Type: single
+   Generated URL: /work/keystrok
+   Route Slug: keystrok
+📄 GRAFANA PROJECTS:
+   File: grafana-overview.md
+   Astro Slug: grafana-overview
+   Category: grafana
+   Type: category
+   Generated URL: /work/grafana
+   Route Slug: grafana
+📄 Jungle AI - Enterprise ML Platform Redesign:
+   File: jungleai-main.md
+   Astro Slug: jungleai-main
+   Category: jungleai
+   Type: single
+   Generated URL: /work/jungleai
+   Route Slug: jungleai
+
+✅ Generated 8 static paths
+📋 All generated paths:
+   grafana/application-observability -> /work/grafana/application-observability
+   grafana/cloud-onboarding -> /work/grafana/cloud-onboarding
+   grafana/frontend-observability -> /work/grafana/frontend-observability
+   opensource-contributing-pt2 -> /work/opensource-contributing-pt2
+   opensource-contributing-pt1 -> /work/opensource-contributing-pt1
+   keystrok -> /work/keystrok
+   grafana -> /work/grafana
+   jungleai -> /work/jungleai
+📄 Rendering: Frontend Application Observability
+🔗 URL: /work/grafana/frontend-observability
+🎨 Layout: component-case-study
+📁 Type: subproject
+11:22:00 [200] HEAD /work/grafana/frontend-observability 109ms
+11:22:30 [200] HEAD /work/grafana 3ms
+✅ Project routing validation passed
+
+🔍 GENERATING STATIC PATHS
+📁 Processing 8 projects
+📄 Application Observability:
+   File: grafana-application-observability.mdx
+   Astro Slug: grafana-application-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/application-observability
+   Route Slug: grafana/application-observability
+📄 Cloud Onboarding:
+   File: grafana-cloud-onboarding.mdx
+   Astro Slug: grafana-cloud-onboarding
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/cloud-onboarding
+   Route Slug: grafana/cloud-onboarding
+📄 Frontend Application Observability:
+   File: grafana-frontend-observability.mdx
+   Astro Slug: grafana-frontend-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/frontend-observability
+   Route Slug: grafana/frontend-observability
+📄 Contributing to Open Source as a Designer Pt. 2:
+   File: opensource-contributing-pt2.mdx
+   Astro Slug: opensource-contributing-pt2
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt2
+   Route Slug: opensource-contributing-pt2
+📄 Contributing to Open Source as a Designer Pt. 1:
+   File: opensource-contributing-pt1.mdx
+   Astro Slug: opensource-contributing-pt1
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt1
+   Route Slug: opensource-contributing-pt1
+📄 Keystrok: Identifying and Solving a $2.3B Security Gap:
+   File: keystrok-main.mdx
+   Astro Slug: keystrok-main
+   Category: keystrok
+   Type: single
+   Generated URL: /work/keystrok
+   Route Slug: keystrok
+📄 GRAFANA PROJECTS:
+   File: grafana-overview.md
+   Astro Slug: grafana-overview
+   Category: grafana
+   Type: category
+   Generated URL: /work/grafana
+   Route Slug: grafana
+📄 Jungle AI - Enterprise ML Platform Redesign:
+   File: jungleai-main.md
+   Astro Slug: jungleai-main
+   Category: jungleai
+   Type: single
+   Generated URL: /work/jungleai
+   Route Slug: jungleai
+
+✅ Generated 8 static paths
+📋 All generated paths:
+   grafana/application-observability -> /work/grafana/application-observability
+   grafana/cloud-onboarding -> /work/grafana/cloud-onboarding
+   grafana/frontend-observability -> /work/grafana/frontend-observability
+   opensource-contributing-pt2 -> /work/opensource-contributing-pt2
+   opensource-contributing-pt1 -> /work/opensource-contributing-pt1
+   keystrok -> /work/keystrok
+   grafana -> /work/grafana
+   jungleai -> /work/jungleai
+📄 Rendering: Jungle AI - Enterprise ML Platform Redesign
+🔗 URL: /work/jungleai
+🎨 Layout: markdown-case-study
+📁 Type: single
+11:22:36 [200] HEAD /work/jungleai 3ms
+📄 Rendering: Contributing to Open Source as a Designer Pt. 1
+🔗 URL: /work/opensource-contributing-pt1
+🎨 Layout: component-case-study
+📁 Type: single
+11:22:42 [200] HEAD /work/opensource-contributing-pt1 47ms
+11:22:46 [glob-loader] Reloaded data from opensource-overview.md
+11:22:46 [glob-loader] Reloaded data from opensource-overview.md
+Category "OPEN SOURCE PROJECTS" has no subprojects
+✅ Project routing validation passed
+
+🔍 GENERATING STATIC PATHS
+📁 Processing 9 projects
+📄 Application Observability:
+   File: grafana-application-observability.mdx
+   Astro Slug: grafana-application-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/application-observability
+   Route Slug: grafana/application-observability
+📄 Cloud Onboarding:
+   File: grafana-cloud-onboarding.mdx
+   Astro Slug: grafana-cloud-onboarding
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/cloud-onboarding
+   Route Slug: grafana/cloud-onboarding
+📄 Frontend Application Observability:
+   File: grafana-frontend-observability.mdx
+   Astro Slug: grafana-frontend-observability
+   Category: grafana
+   Type: subproject
+   Generated URL: /work/grafana/frontend-observability
+   Route Slug: grafana/frontend-observability
+📄 Contributing to Open Source as a Designer Pt. 2:
+   File: opensource-contributing-pt2.mdx
+   Astro Slug: opensource-contributing-pt2
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt2
+   Route Slug: opensource-contributing-pt2
+📄 Contributing to Open Source as a Designer Pt. 1:
+   File: opensource-contributing-pt1.mdx
+   Astro Slug: opensource-contributing-pt1
+   Category: opensource
+   Type: single
+   Generated URL: /work/opensource-contributing-pt1
+   Route Slug: opensource-contributing-pt1
+📄 Keystrok: Identifying and Solving a $2.3B Security Gap:
+   File: keystrok-main.mdx
+   Astro Slug: keystrok-main
+   Category: keystrok
+   Type: single
+   Generated URL: /work/keystrok
+   Route Slug: keystrok
+📄 GRAFANA PROJECTS:
+   File: grafana-overview.md
+   Astro Slug: grafana-overview
+   Category: grafana
+   Type: category
+   Generated URL: /work/grafana
+   Route Slug: grafana
+📄 Jungle AI - Enterprise ML Platform Redesign:
+   File: jungleai-main.md
+   Astro Slug: jungleai-main
+   Category: jungleai
+   Type: single
+   Generated URL: /work/jungleai
+   Route Slug: jungleai
+📄 OPEN SOURCE PROJECTS:
+   File: opensource-overview.md
+   Astro Slug: opensource-overview
+   Category: opensource
+   Type: category
+   Generated URL: /work/opensource
+   Route Slug: opensource
+
+✅ Generated 9 static paths
+📋 All generated paths:
+   grafana/application-observability -> /work/grafana/application-observability
+   grafana/cloud-onboarding -> /work/grafana/cloud-onboarding
+   grafana/frontend-observability -> /work/grafana/frontend-observability
+   opensource-contributing-pt2 -> /work/opensource-contributing-pt2
+   opensource-contributing-pt1 -> /work/opensource-contributing-pt1
+   keystrok -> /work/keystrok
+   grafana -> /work/grafana
+   jungleai -> /work/jungleai
+   opensource -> /work/opensource
+📄 Rendering: Application Observability
+🔗 URL: /work/grafana/application-observability
+🎨 Layout: component-case-study
+📁 Type: subproject
+11:22:48 [200] HEAD /work/grafana/application-observability 19ms
+11:22:51 [glob-loader] Reloaded data from opensource-contributing-pt1.mdx
+11:22:56 [200] HEAD /work/opensource 11ms
+11:23:10 [glob-loader] Reloaded data from opensource-contributing-pt2.mdx

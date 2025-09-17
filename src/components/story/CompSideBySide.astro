@@ -1,0 +1,116 @@
+---
+import CompCarousel from './CompCarousel.astro';
+
+export interface Props {
+  leftContent: {
+    title?: string;
+    text?: string;
+    items?: string[];
+    secondTitle?: string;
+    secondItems?: string[];
+  };
+  rightContent: {
+    type: 'image' | 'carousel';
+    src?: string;
+    alt?: string;
+    caption?: string;
+    carouselId?: string;
+    images?: Array<{
+      src: string;
+      alt: string;
+    }>;
+  };
+}
+
+const { leftContent, rightContent } = Astro.props;
+---
+
+<div class="comp-side-by-side">
+  <div class="side-content">
+    {leftContent.title && <h3>{leftContent.title}</h3>}
+    {leftContent.text && <p>{leftContent.text}</p>}
+    {leftContent.items && leftContent.items.length > 0 && (
+      <ul>
+        {leftContent.items.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    )}
+
+    {leftContent.secondTitle && <h3>{leftContent.secondTitle}</h3>}
+    {leftContent.secondItems && leftContent.secondItems.length > 0 && (
+      <ul>
+        {leftContent.secondItems.map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+    )}
+  </div>
+
+  <div class="side-visual">
+    {rightContent.type === 'carousel' && rightContent.carouselId && rightContent.images ? (
+      <CompCarousel id={rightContent.carouselId} images={rightContent.images} />
+    ) : rightContent.type === 'image' && rightContent.src ? (
+      <div>
+        <img src={rightContent.src} alt={rightContent.alt || ''} />
+        {rightContent.caption && <p class="image-caption">{rightContent.caption}</p>}
+      </div>
+    ) : null}
+  </div>
+</div>
+
+<style>
+  .comp-side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    margin: 80px 0;
+  }
+
+  .side-content h3 {
+    font-size: 24px;
+    margin-bottom: 16px;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .side-content p {
+    color: #ccc;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  .side-content ul {
+    margin: 16px 0;
+    padding-left: 24px;
+    color: #ccc;
+  }
+
+  .side-content li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .side-visual img {
+    width: 100%;
+    border: 1px solid #333;
+    border-radius: 8px;
+    background: #0a0a0a;
+  }
+
+  .image-caption {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .comp-side-by-side {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+</style>

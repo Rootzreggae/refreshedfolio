@@ -1,0 +1,106 @@
+---
+export interface Props {
+  backLink?: string;
+  backText?: string;
+  nextLink?: string;
+  nextText?: string;
+  variant?: 'header' | 'footer';
+  showDivider?: boolean;
+}
+
+const {
+  backLink = '/',
+  backText = 'Back to Work',
+  nextLink,
+  nextText,
+  variant = 'header',
+  showDivider = true
+} = Astro.props;
+---
+
+<nav class={`navigation navigation--${variant}`} class:list={{ 'navigation--divider': showDivider }}>
+  <div class="navigation__container">
+    {variant === 'header' ? (
+      <a href={backLink} class="navigation__link navigation__link--back">
+        ← {backText}
+      </a>
+    ) : (
+      <div class="navigation__footer">
+        <a href={backLink} class="navigation__link">
+          ← {backText}
+        </a>
+        {nextLink && nextText && (
+          <a href={nextLink} class="navigation__link">
+            {nextText} →
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+</nav>
+
+<style>
+  .navigation {
+    width: 100%;
+  }
+
+  .navigation__container {
+    max-width: var(--container-lg);
+    margin: 0 auto;
+    padding-left: var(--container-padding-x);
+    padding-right: var(--container-padding-x);
+  }
+
+  .navigation--header {
+    padding: var(--space-10) 0;
+  }
+
+  .navigation--header.navigation--divider {
+    border-bottom: 1px solid var(--color-border-primary);
+    margin-bottom: var(--space-20);
+  }
+
+  .navigation--footer {
+    margin-top: var(--space-32);
+    padding: var(--space-20) 0 var(--space-16) 0;
+  }
+
+  .navigation--footer.navigation--divider {
+    border-top: 1px solid var(--color-border-primary);
+  }
+
+  .navigation__link {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-quaternary);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wider);
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-normal);
+  }
+
+  .navigation__link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .navigation__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .navigation__container {
+      padding-left: var(--container-padding-x-md);
+      padding-right: var(--container-padding-x-md);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .navigation__footer {
+      flex-direction: column;
+      gap: var(--space-4);
+      align-items: flex-start;
+    }
+  }
+</style>

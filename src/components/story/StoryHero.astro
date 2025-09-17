@@ -1,0 +1,93 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  project?: string;
+  role?: string;
+  timeline?: string;
+  status?: string;
+}
+
+const { title, description, project, role, timeline, status } = Astro.props;
+---
+
+<div class="story-container">
+  <div class="comp-hero">
+    <div class="hero-grid">
+      <div>
+        <h1 class="hero-title">{title}</h1>
+        <p class="hero-description">{description}</p>
+      </div>
+      
+      <div class="hero-meta">
+        {project && (
+          <>PROJECT: <span class="meta-highlight">{project.toUpperCase()}</span><br></>
+        )}
+        {role && (
+          <>ROLE: <span class="meta-highlight">{role.toUpperCase()}</span><br></>
+        )}
+        {timeline && (
+          <>TIMELINE: <span class="meta-highlight">{timeline.toUpperCase()}</span><br></>
+        )}
+        {status && (
+          <>STATUS: <span class="meta-highlight">{status.toUpperCase()}</span></>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .comp-hero {
+    margin-bottom: 100px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .hero-title {
+    font-size: clamp(48px, 6vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 30px;
+  }
+
+  .hero-description {
+    font-size: 18px;
+    color: #cccccc;
+    line-height: 1.7;
+  }
+
+  .hero-meta {
+    font-size: 11px;
+    color: #666666;
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+  }
+
+  .meta-highlight {
+    color: #888888;
+  }
+
+  @media (max-width: 768px) {
+    .story-container {
+      padding: 0 30px;
+    }
+    
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+  }
+</style>

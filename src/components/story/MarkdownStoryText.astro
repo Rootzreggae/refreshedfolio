@@ -1,0 +1,72 @@
+---
+export interface Props {
+  container?: 'default' | 'narrow' | 'wide';
+  margin?: 'default' | 'large';
+}
+
+const { container = 'default', margin = 'default' } = Astro.props;
+---
+
+<div class={`story-container ${container === 'narrow' ? 'narrow' : container === 'wide' ? 'wide' : ''}`}>
+  <div class={`comp-text ${margin === 'large' ? 'large-margin' : ''}`}>
+    <div class="text-content story-text-content">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .story-container.narrow {
+    max-width: 800px;
+  }
+
+  .story-container.wide {
+    max-width: 1400px;
+  }
+
+  .comp-text {
+    margin-bottom: 80px;
+  }
+
+  .comp-text.large-margin {
+    margin-bottom: 120px;
+  }
+
+  .text-content h2 {
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
+  }
+
+  .text-content h3 {
+    font-size: 24px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .text-content p {
+    font-size: 16px;
+    color: #cccccc;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+
+  .text-content .emphasis {
+    color: #ffffff;
+    font-weight: 400;
+  }
+
+  @media (max-width: 768px) {
+    .story-container {
+      padding: 0 30px;
+    }
+  }
+</style>

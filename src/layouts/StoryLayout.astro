@@ -1,0 +1,185 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+// Import all story components for MDX
+import CompCarousel from '../components/story/CompCarousel.astro';
+import CompSideBySide from '../components/story/CompSideBySide.astro';
+import CompExpandable from '../components/story/CompExpandable.astro';
+import CompBeforeAfter from '../components/story/CompBeforeAfter.astro';
+import CompImageGrid from '../components/story/CompImageGrid.astro';
+import CompParallax from '../components/story/CompParallax.astro';
+
+export interface Props {
+  project: CollectionEntry<'projects'>;
+  pageType?: 'single' | 'category' | 'subproject';
+  subProjects?: CollectionEntry<'projects'>[];
+  parentCategory?: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, description, publishDate, tags, heroImage, heroImageAlt, hero, footer } = project.data;
+
+// Export components to the global scope for MDX
+---
+
+<BaseLayout title={title} description={description} image={heroImage}>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <a href="/work" class="back-link">← Back to Work</a>
+    </header>
+    
+    <!-- Hero Section -->
+    {hero && (
+      <section class="hero">
+        <div>
+          <h1 class="hero-title">{hero.title}</h1>
+          <p class="hero-description">{hero.description}</p>
+        </div>
+        
+        <div class="project-meta">
+          {hero.project && (
+            <>PROJECT: <span class="highlight">{hero.project}</span><br/></>
+          )}
+          {hero.role && (
+            <>ROLE: <span class="highlight">{hero.role}</span><br/></>
+          )}
+          {hero.timeline && (
+            <>TIMELINE: <span class="highlight">{hero.timeline}</span><br/></>
+          )}
+          {hero.status && (
+            <>STATUS: <span class="highlight">{hero.status}</span><br/></>
+          )}
+        </div>
+      </section>
+    )}
+    
+    <!-- Main Content -->
+    <main class="content">
+      <slot />
+    </main>
+    
+    <!-- Footer Navigation -->
+    {footer && (
+      <footer class="nav-footer">
+        {footer.backLink && (
+          <a href={footer.backLink} class="nav-link">{footer.backText || '← Back'}</a>
+        )}
+        {footer.nextLink && (
+          <a href={footer.nextLink} class="nav-link">{footer.nextText || 'Next →'}</a>
+        )}
+      </footer>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+  
+  /* Header */
+  .header {
+    padding: 40px 0;
+    border-bottom: 1px solid #333333;
+  }
+  
+  .back-link {
+    font-size: 13px;
+    color: #888888;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  .back-link:hover {
+    color: #ffffff;
+  }
+  
+  /* Hero Section */
+  .hero {
+    padding: 80px 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  
+  .hero-title {
+    font-size: clamp(48px, 6vw, 72px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 30px;
+  }
+  
+  .hero-description {
+    font-size: 18px;
+    color: #cccccc;
+    line-height: 1.7;
+  }
+  
+  .project-meta {
+    font-size: 11px;
+    color: #666666;
+    line-height: 1.8;
+    letter-spacing: 0.3px;
+    font-weight: 400;
+  }
+  
+  .project-meta .highlight {
+    color: #888888;
+  }
+  
+  /* Content */
+  .content {
+    padding: 0 0 120px 0;
+  }
+  
+  /* Navigation Footer */
+  .nav-footer {
+    padding: 80px 0 60px 0;
+    border-top: 1px solid #333333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .nav-link {
+    font-size: 13px;
+    color: #888888;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  
+  .nav-link:hover {
+    color: #ffffff;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 40px;
+    }
+    
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 60px 0;
+    }
+  }
+</style>
+</BaseLayout>
+
+<!-- Make components available globally for MDX -->
+<script>
+  // Components are automatically available in MDX through the remark plugin
+</script>

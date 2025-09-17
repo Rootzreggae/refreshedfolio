@@ -1,0 +1,57 @@
+---
+export interface Props {
+  text: string;
+  source?: string;
+}
+
+const { text, source } = Astro.props;
+---
+
+<div class="story-container">
+  <div class="comp-quote">
+    <p class="quote-text">"{text}"</p>
+    {source && <p class="quote-source">— {source}</p>}
+  </div>
+</div>
+
+<style>
+  .story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .comp-quote {
+    margin: 100px 0;
+    padding: 60px 80px;
+    background: #050505;
+    border-left: 4px solid #3390ff;
+    border-radius: 4px;
+  }
+
+  .quote-text {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .quote-source {
+    font-size: 12px;
+    color: #666666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 768px) {
+    .story-container {
+      padding: 0 30px;
+    }
+    
+    .comp-quote {
+      padding: 40px 30px;
+      margin: 60px 0;
+    }
+  }
+</style>

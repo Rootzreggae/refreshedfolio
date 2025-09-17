@@ -1,0 +1,60 @@
+---
+export interface Props {
+  backLink?: string;
+  backText?: string;
+  nextLink?: string;
+  nextText?: string;
+}
+
+const { 
+  backLink = '/work', 
+  backText = 'All Work', 
+  nextLink, 
+  nextText 
+} = Astro.props;
+---
+
+<div class="story-container">
+  <div class="comp-footer">
+    <a href={backLink} class="nav-link">← {backText}</a>
+    {nextLink && nextText && (
+      <a href={nextLink} class="nav-link">{nextText} →</a>
+    )}
+  </div>
+</div>
+
+<style>
+  .story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .comp-footer {
+    margin-top: 120px;
+    padding: 80px 0 60px 0;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nav-link {
+    font-size: 12px;
+    color: #666666;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .story-container {
+      padding: 0 30px;
+    }
+  }
+</style>

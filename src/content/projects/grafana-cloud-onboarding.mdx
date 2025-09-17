@@ -1,0 +1,182 @@
+---
+title: "Cloud Onboarding"
+description: "Simplifying Complex Products for New Users - Revamped onboarding to make complex Grafana Cloud products more intuitive and informative, particularly for non-technical users struggling with product familiarity."
+publishDate: 2022-06-01
+category: grafana
+projectType: subproject
+parentProject: "grafana-overview"
+order: 4
+tags: ["onboarding", "ux-research", "content-strategy", "cloud", "user-experience"]
+heroImage: "/grafana-cloud-hero.jpg"
+heroImageAlt: "Grafana Cloud Onboarding interface"
+thumbnail: "https://i.postimg.cc/HLG97XCM/onboard-cover.png"
+github: "https://github.com/grafana/grafana"
+url: "https://grafana.com/products/cloud/"
+role: "Product Design, UX Research, Content Strategy"
+team: ["Multiple engineers", "1 PM", "1 Designer", "Content team"]
+timeline: "2022 - 2023"
+client: "Grafana Labs"
+technologies: ["Grafana Cloud", "Loki", "Mimir", "Tempo", "React", "TypeScript", "Figma"]
+architecture: "Cloud onboarding and product education platform"
+scale: "62% of users unfamiliar with key products"
+methodology: "design-thinking"
+researchMethods: ["User research analysis", "Data review", "Workshop facilitation", "User feedback iteration"]
+metrics:
+  userSatisfaction: "25% increased satisfaction"
+  conversionImprovement: "40% reduction in setup support"
+  performanceGains: "12% fewer login issues"
+  adoptionRate: "18% higher adoption rate"
+stakeholders: ["Product team", "Engineering", "Content team", "Support team", "Cloud users"]
+crossFunctionalTeam: true
+sections: ["problem", "research", "design", "development", "results"]
+keywords: ["grafana", "cloud", "onboarding", "loki", "mimir", "tempo", "user-education"]
+difficulty: "advanced"
+---
+
+import CompProjectHeader from '../../components/story/CompProjectHeader.astro';
+import CompText from '../../components/story/CompText.astro';
+import CompImageSingle from '../../components/story/CompImageSingle.astro';
+import CompImageGrid from '../../components/story/CompImageGrid.astro';
+import CompVideo from '../../components/story/CompVideo.astro';
+import CompMetrics from '../../components/story/CompMetrics.astro';
+
+<CompProjectHeader
+  title="Grafana Cloud Onboarding"
+  subtitle="Simplifying Complex Products for New Users"
+  description="In June 2022, Grafana Cloud's rapidly evolving product landscape posed a significant communication conundrum: as our suite of complex offerings grew, users were increasingly struggling to understand the value and purpose of each product. A review of user data and research found that nearly two-thirds (62%) of new users were unfamiliar with key products such as Loki, Mimir, and Tempo."
+  metadata={{
+    project: "CLOUD ONBOARDING",
+    role: "Product Design, UX Research, Content Strategy",
+    timeline: "2022 - 2023",
+    client: "Grafana Labs",
+    technologies: ["Grafana Cloud", "Loki", "Mimir", "Tempo", "React", "TypeScript"]
+  }}
+  accentColor="#ff6b00"
+/>
+
+<CompImageSingle
+  src="https://i.postimg.cc/HLG97XCM/onboard-cover.png"
+  alt="Project preview"
+  caption="Grafana Cloud onboarding experience redesign"
+/>
+
+<CompText>
+My analysis also identified a critical gap in our onboarding process: non-technical users often failed to engage with documentation, hindering their ability to effectively utilize these resources. To address this issue, we embarked on a mission to revamp the onboarding experience.
+
+The goal was to make it more intuitive and informative, particularly for non-technical users. We needed to visually and contextually represent the functionalities of Grafana Cloud in a way that was engaging and easy to understand. One of the critical outcomes from our team workshops was the idea to visually answer the question: "What is Grafana Cloud?"
+
+We decided to integrate key product information directly into the onboarding flow. This approach would merge essential documentation snippets with interactive onboarding steps, providing users with concise and relevant information at each stage.
+</CompText>
+
+<CompImageSingle
+  src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png"
+  alt="User feedback and research"
+  caption="User research findings and feedback analysis"
+/>
+
+<CompImageSingle
+  src="https://i.postimg.cc/pLY6QzDg/old-login.png"
+  alt="Old login screen"
+  caption="Old login screen - lacking context and guidance"
+/>
+
+<CompText>
+## Rebuilding the Login Screen Experience
+
+I redesigned the login screen to provide a clear and concise introduction to Grafana Cloud and its key components. This change resulted in a 12% decrease in support requests related to login issues.
+</CompText>
+
+<CompImageGrid
+  images={[
+    {
+      src: "https://i.postimg.cc/jjM3mT3c/proposed-login.png",
+      alt: "Proposed login screen design"
+    },
+    {
+      src: "https://i.postimg.cc/DwKNbBbr/proposed-login1.png",
+      alt: "Proposed login screen variation"
+    }
+  ]}
+  columns={2}
+/>
+
+<CompText>
+## Redesigning the Welcome Screen
+
+I explored various options for the welcome screen, ultimately developing a version that clearly introduced Grafana Cloud and its key features. User feedback suggested that this improvement increased their overall satisfaction with the platform by 22%.
+</CompText>
+
+<CompImageSingle
+  src="https://i.postimg.cc/ZK67ZpDC/cloud-1.png"
+  alt="Welcome screen option 1"
+/>
+
+<CompImageSingle
+  src="https://i.postimg.cc/NG3JWpD3/cloud-2.png"
+  alt="Welcome screen option 2"
+/>
+
+<CompImageSingle
+  src="https://i.postimg.cc/1Rn7CLG0/cloud-3.png"
+  alt="Welcome screen option 3"
+/>
+
+<CompVideo
+  src="https://www.youtube.com/embed/qj0o3uY8bHE?si=BCIipXb4UCJG482F"
+  title="Welcome screen demonstration"
+/>
+
+<CompText>
+## Integrating Documentation with Onboarding
+
+I merged essential information from our documentation into the onboarding process. Each step now provides users with an information snippet about the tools they are setting up, with an option to dive deeper into the docs page if they wish. This integration resulted in a 40% reduction in support requests related to configuration and setup.
+</CompText>
+
+<CompVideo
+  src="https://www.youtube.com/embed/QXZHoQk0ubA?si=si_E7fwgG70TNZZQ"
+  title="Documentation integration demo"
+/>
+
+<CompVideo
+  src="https://www.youtube.com/embed/ThLqQUa4IKc?si=-u_f4Uu_ROzRT6Jy"
+  title="Interactive onboarding flow"
+/>
+
+<CompText>
+## Interactive Tutorials and Tooltips
+
+I've also introduced interactive tutorials and tooltips that guide users through their initial setup and usage of Grafana Cloud products. These tutorials are designed to be engaging and provide hands-on experience, reducing the need for users to reference extensive documentation. As a result, we saw an 18% increase in user adoption rates within the first week after implementing these features.
+</CompText>
+
+<CompText>
+## User Feedback and Iteration
+
+Throughout the process, we continually sought user feedback to refine the onboarding experience. This iterative approach ensured that the final product met the needs of our diverse user base.
+</CompText>
+
+<CompText>
+## Results
+
+By rethinking the onboarding experience for Grafana Cloud, we aimed to lower the barrier of entry for new users, especially those who are non-technical. Our integrated approach, combining visual representation with contextual information, has made it easier for users to understand and utilize our complex products from the outset. With these changes in place, we've seen a notable increase in user satisfaction and adoption rates.
+</CompText>
+
+<CompMetrics
+  metrics={[
+    {
+      number: "40%",
+      label: "Reduction in Setup Support"
+    },
+    {
+      number: "12%",
+      label: "Fewer Login Issues"
+    },
+    {
+      number: "25%",
+      label: "Increased Satisfaction"
+    },
+    {
+      number: "18%",
+      label: "Higher Adoption Rate"
+    }
+  ]}
+/>

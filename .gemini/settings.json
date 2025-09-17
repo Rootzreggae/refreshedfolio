@@ -1,0 +1,14 @@
+{ ...file contains other config objects
+  "mcpServers": {
+    "serverName": {
+      "command": "http://127.0.0.1:3845/mcp",
+      "args": ["--arg1", "value1"],
+      "env": {
+        "API_KEY": "AIzaSyCG7BeNYM2cX-319RVV13HllwqCEZLVwdA"
+      },
+      "cwd": "./server-directory",
+      "timeout": 30000,
+      "trust": false
+    }
+  }
+}

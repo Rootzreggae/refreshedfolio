@@ -1,0 +1,47 @@
+---
+export interface Props {
+  backLink?: string;
+  backText?: string;
+}
+
+const { backLink = '/', backText = 'BACK TO WORK' } = Astro.props;
+---
+
+<div class="story-container">
+  <div class="comp-header">
+    <a href={backLink} class="back-nav">← {backText}</a>
+  </div>
+</div>
+
+<style>
+  .story-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .comp-header {
+    padding: 40px 0;
+    border-bottom: 1px solid #333;
+    margin-bottom: 80px;
+  }
+
+  .back-nav {
+    font-size: 16px;
+    color: #666666;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+  }
+
+  .back-nav:hover {
+    color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    .story-container {
+      padding: 0 30px;
+    }
+  }
+</style>
