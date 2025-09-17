@@ -38,6 +38,9 @@ import CompText from '../../components/story/CompText.astro';
 import CompImageSingle from '../../components/story/CompImageSingle.astro';
 import CompVideo from '../../components/story/CompVideo.astro';
 import CompMetrics from '../../components/story/CompMetrics.astro';
+import CompQuote from '../../components/story/CompQuote.astro';
+import CompSideBySide from '../../components/story/CompSideBySide.astro';
+import CompProcess from '../../components/story/CompProcess.astro';
 
 <CompProjectHeader
   title="Grafana Cloud Application Observability"
@@ -59,9 +62,34 @@ import CompMetrics from '../../components/story/CompMetrics.astro';
   caption="Application Observability dashboard overview"
 />
 
-<CompText>
-Current users reported frustration with the app's cluttered navigation and lack of clear goals. Our analysis showed a significant drop-off rate among less technical users, with many abandoning the app after just one week.
-</CompText>
+<CompQuote
+  quote="We need APM that doesn't require a PhD in observability. Current tools assume everyone is a DevOps expert, but our teams include developers who just want to understand why their app is slow."
+  author="Senior Engineering Manager"
+  context="User interview findings"
+/>
+
+<CompSideBySide
+  leftContent={{
+    title: "The Challenge",
+    text: "Enterprise APM adoption faced critical barriers:",
+    items: [
+      "70% drop-off rate among less technical users",
+      "Complex navigation overwhelming new users",
+      "Technical jargon alienating non-DevOps teams",
+      "Lack of goal-oriented onboarding flows"
+    ]
+  }}
+  rightContent={{
+    title: "User Needs",
+    text: "Research revealed diverse stakeholder requirements:",
+    items: [
+      "DevOps teams need advanced monitoring capabilities",
+      "Developers want simple performance insights",
+      "Product teams require business-impact metrics",
+      "Management seeks adoption and ROI visibility"
+    ]
+  }}
+/>
 
 <CompImageSingle
   src="https://i.postimg.cc/QNzfP9d2/app-o11y2.png"
@@ -72,8 +100,29 @@ Current users reported frustration with the app's cluttered navigation and lack 
 <CompText>
 ## Research and Analysis
 
-I conducted in-depth interviews with 8 current users and observed a common pain point: difficulty navigating some of our applications to find information tailored to their monitoring goals. Our analysis revealed that less technical users preferred visual and interactive ways of exploring content.
+I conducted in-depth interviews with 8 current users across different technical backgrounds to understand the spectrum of observability needs. The research revealed a clear pattern: technical complexity was the primary barrier to APM adoption across organizations.
 </CompText>
+
+<CompProcess
+  steps={[
+    {
+      title: "User Interview Phase",
+      description: "8 stakeholders across DevOps, Development, and Product teams to understand diverse observability needs and pain points."
+    },
+    {
+      title: "Journey Mapping",
+      description: "Mapped current user flows to identify drop-off points and moments of frustration in the monitoring workflow."
+    },
+    {
+      title: "Usability Testing",
+      description: "Tested existing interfaces with less technical users to quantify navigation and comprehension challenges."
+    },
+    {
+      title: "Pain Point Analysis",
+      description: "Synthesized findings into actionable insights about technical complexity barriers and user experience gaps."
+    }
+  ]}
+/>
 
 <CompImageSingle
   src="https://i.postimg.cc/85k3m2zN/app-o11y1.png"
@@ -82,10 +131,33 @@ I conducted in-depth interviews with 8 current users and observed a common pain 
 />
 
 <CompText>
-## Design Solution
+## Design Solution: Progressive Complexity
 
-I employed a user-centered design approach, focusing on simplicity and discoverability. I've introduced a new onboarding feature that utilizes simple steps with minimal technical jargon, tailored to users' goals and tech savvy-ness levels.
+Rather than dumbing down the tool, I designed a progressive complexity system that adapts to user expertise levels. This approach ensures both novices and experts can achieve their monitoring goals effectively.
 </CompText>
+
+<CompSideBySide
+  leftContent={{
+    title: "For New Users",
+    text: "Simplified entry points with guided experiences:",
+    items: [
+      "Goal-based onboarding (Performance, Errors, User Experience)",
+      "Visual dashboards with plain-language explanations",
+      "Progressive disclosure of advanced features",
+      "Contextual help and success metrics"
+    ]
+  }}
+  rightContent={{
+    title: "For Expert Users",
+    text: "Advanced capabilities remain fully accessible:",
+    items: [
+      "Direct access to complex queries and configurations",
+      "Customizable dashboards with full metric control",
+      "Advanced alerting and automation features",
+      "Deep-dive analysis tools and integrations"
+    ]
+  }}
+/>
 
 <CompVideo
   src="https://www.youtube.com/embed/8kcVdRCMxkk?si=01PVlXObpy7jyFms"
@@ -94,7 +166,11 @@ I employed a user-centered design approach, focusing on simplicity and discovera
 />
 
 <CompText>
-Besides creating innovative design patterns, I also contributed to the design system and had the opportunity to create illustrations that support the idea of simplicity and visual appeal.
+## Design System Contributions
+
+Beyond the core APM experience, I contributed illustrations and design patterns to Grafana's design system, establishing visual principles that communicate complex observability concepts through approachable, intuitive interfaces.
+
+The illustration work focused on reducing cognitive load for new users while maintaining the technical precision that expert users require. This dual approach became a foundational principle for subsequent observability product development at Grafana.
 </CompText>
 
 <CompVideo

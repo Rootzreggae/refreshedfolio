@@ -92,26 +92,3 @@ if (import.meta.env.DEV) {
   </ProjectLayout>
 )}
 
-<!-- Development debug panel -->
-{import.meta.env.DEV && (
-  <div style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #000;
-    color: #fff;
-    padding: 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-family: monospace;
-    z-index: 9999;
-    max-width: 300px;
-  ">
-    <strong>Debug Info:</strong><br/>
-    URL: {routeConfig.url}<br/>
-    Layout: {layoutType}<br/>
-    Type: {project.data.projectType}<br/>
-    Category: {project.data.category}<br/>
-    {relatedProjects && `Related: ${relatedProjects.length}`}
-  </div>
-)}
