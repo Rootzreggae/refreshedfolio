@@ -313,51 +313,89 @@
   height: 100%;
 }
 
-/* Floating Toolbar */
-.figma-toolbar {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  background: #2c2c2c;
-  border: 1px solid #3e3e3e;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  z-index: 10;
+/* Modern Figma Toolbar Styles */
+.toolbar-container {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c2c2c;
+    border-radius: 12px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    z-index: 100;
 }
 
-.tool-btn {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  color: #999;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 4px;
 }
 
-.tool-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+.toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: #3e3e3e;
+    margin: 0 4px;
 }
 
-.tool-btn.active {
-  background: #18a0fb;
-  color: #fff;
+.tool-button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
 }
 
-.tool-divider {
-  width: 1px;
-  height: 20px;
-  background: #3e3e3e;
+.tool-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.tool-button.active {
+    background: #0d99ff;
+    color: #fff;
+}
+
+.tool-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.has-dropdown::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    width: 0;
+    height: 0;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 3px solid currentColor;
+    opacity: 0.5;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    padding: 0 4px;
+}
+
+.toolbar-right .tool-button {
+    color: #6b7280;
 }
 
 /* Inspector */

@@ -2,8 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { generateUrl } from '../lib/routing';
-import PaperCorner from '../components/PaperCorner/PaperCorner.astro';
-import FigmaWorkspace from '../components/PaperCorner/FigmaWorkspace.astro';
+import EasterEgg from '../components/easter-egg/EasterEgg.tsx';
 
 // Get featured projects for navigation
 const projects = await getCollection('projects');
@@ -324,11 +323,16 @@ const projectUrls = featuredProjects.reduce((urls, project) => {
     }
   </style>
 
-  <main role="main" aria-label="Homepage">
+  <!-- Render Easter Egg FIRST (bottom layer) -->
+  <EasterEgg client:load />
+
+  <!-- Portfolio wrapper (middle layer with clip-path) -->
+  <div class="portfolio-wrapper">
+    <main role="main" aria-label="Homepage">
     <!-- Hero Text -->
     <section class="hero-text" aria-labelledby="hero-heading">
       <h1 id="hero-heading">
-        Nilson is building<br>
+        I'm currently building<br>
         tools at <a href="https://www.dynatrace.com/" class="underline" target="_blank" rel="noopener noreferrer" aria-label="Dynatrace website (opens in new tab)">Dynatrace.</a>
       </h1>
     </section>
@@ -360,8 +364,8 @@ const projectUrls = featuredProjects.reduce((urls, project) => {
       <a href="https://bluesky.app/profile/nilsongaspar.bsky.social" target="_blank" rel="noopener noreferrer" aria-label="Follow on Bluesky (opens in new tab)">Bluesky</a>
       <a href="https://github.com/nilsongaspar" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)">GitHub</a>
     </nav>
-  </main>
-
+    </main>
+  </div>
 
   <script>
     function animateCoordinates() {
@@ -430,10 +434,4 @@ const projectUrls = featuredProjects.reduce((urls, project) => {
     }
   </script>
 
-  <!-- Figma Workspace -->
-  <FigmaWorkspace />
-
-  <!-- Clean Paper Fold Easter Egg -->
-  <script src="/src/components/easter-egg/fold-controller.js" type="module"></script>
-  <link rel="stylesheet" href="/src/components/easter-egg/fold-corner.css">
 </BaseLayout>

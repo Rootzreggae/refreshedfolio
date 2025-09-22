@@ -23,6 +23,7 @@ export const FigmaUI: React.FC = () => {
 
   const [selectedLayer, setSelectedLayer] = useState<string>('frame-1');
   const [zoomLevel, setZoomLevel] = useState<string>('48%');
+  const [activeTool, setActiveTool] = useState<string>('move');
 
   const handleTabClick = (id: string) => {
     setTabs(tabs.map(tab => ({
@@ -173,23 +174,114 @@ export const FigmaUI: React.FC = () => {
             </div>
           </div>
 
-          {/* Floating Toolbar */}
-          <div className="figma-toolbar">
-            <button className="tool-btn active">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M4 2v12l4-4 4 4V2z"/>
-              </svg>
-            </button>
-            <div className="tool-divider"></div>
-            <button className="tool-btn">□</button>
-            <button className="tool-btn">△</button>
-            <button className="tool-btn">○</button>
-            <div className="tool-divider"></div>
-            <button className="tool-btn">✏</button>
-            <button className="tool-btn">T</button>
-            <div className="tool-divider"></div>
-            <button className="tool-btn">⊞</button>
-            <button className="tool-btn">💬</button>
+          {/* Modern Floating Toolbar */}
+          <div className="toolbar-container">
+              {/* Move tool - Active by default */}
+              <div className="toolbar-group">
+                  <button className={`tool-button ${activeTool === 'move' ? 'active' : ''}`} onClick={() => setActiveTool('move')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Frame tools */}
+              <div className="toolbar-group">
+                  <button className={`tool-button has-dropdown ${activeTool === 'frame' ? 'active' : ''}`} onClick={() => setActiveTool('frame')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="4" y="4" width="16" height="16" rx="2"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Shape tools */}
+              <div className="toolbar-group">
+                  <button className={`tool-button has-dropdown ${activeTool === 'rectangle' ? 'active' : ''}`} onClick={() => setActiveTool('rectangle')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="6" y="6" width="12" height="12"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Pen tool */}
+              <div className="toolbar-group">
+                  <button className={`tool-button has-dropdown ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => setActiveTool('pen')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Text tool */}
+              <div className="toolbar-group">
+                  <button className={`tool-button ${activeTool === 'text' ? 'active' : ''}`} onClick={() => setActiveTool('text')}>
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M5 4v3h5.5v12h3V7H19V4z"/>
+                      </svg>
+                  </button>
+              </div>
+
+              {/* Components */}
+              <div className="toolbar-group">
+                  <button className={`tool-button has-dropdown ${activeTool === 'components' ? 'active' : ''}`} onClick={() => setActiveTool('components')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <circle cx="12" cy="12" r="10"/>
+                          <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Hand tool */}
+              <div className="toolbar-group">
+                  <button className={`tool-button ${activeTool === 'hand' ? 'active' : ''}`} onClick={() => setActiveTool('hand')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0m0 0V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1m4 0v1m-4-1v3"/>
+                      </svg>
+                  </button>
+              </div>
+
+              {/* Comments */}
+              <div className="toolbar-group">
+                  <button className={`tool-button ${activeTool === 'comments' ? 'active' : ''}`} onClick={() => setActiveTool('comments')}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                      </svg>
+                  </button>
+              </div>
+
+              <div className="toolbar-divider"></div>
+
+              {/* Right side tools */}
+              <div className="toolbar-right">
+                  <button className="tool-button">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M6.5 7.5L16.5 16.5M16.5 7.5L6.5 16.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                      </svg>
+                  </button>
+                  <button className="tool-button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <rect x="8" y="3" width="8" height="4" rx="1"/>
+                          <path d="M10 7v4M14 7v4"/>
+                          <rect x="6" y="11" width="12" height="10" rx="1"/>
+                      </svg>
+                  </button>
+                  <button className="tool-button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                          <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
+                      </svg>
+                  </button>
+              </div>
           </div>
         </div>
 
