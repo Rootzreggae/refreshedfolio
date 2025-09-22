@@ -1,59 +1,69 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FigmaUI } from './FigmaUI';
+import './easter-egg.css';
 
 export const EasterEgg: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Check for figma layer visibility changes
-    const checkVisibility = () => {
-      const figmaWorkspace = document.getElementById('figma-workspace');
-      if (figmaWorkspace) {
-        const isShowing = !figmaWorkspace.classList.contains('hidden') &&
-                         window.getComputedStyle(figmaWorkspace).opacity !== '0';
-        setIsVisible(isShowing);
-      }
-    };
+    // Always initialize Figma in background
+    setIsInitialized(true);
+  }, []);
 
-    // Check initial state
-    checkVisibility();
+  const handleFoldClick = () => {
+    setIsRevealed(true);
+    document.body.classList.add('figma-revealed');
+  };
 
-    // Set up observer for changes
-    const observer = new MutationObserver(checkVisibility);
-    const figmaWorkspace = document.getElementById('figma-workspace');
+  const handleClose = () => {
+    setIsRevealed(false);
+    document.body.classList.remove('figma-revealed');
+  };
 
-    if (figmaWorkspace) {
-      observer.observe(figmaWorkspace, {
-        attributes: true,
-        attributeFilter: ['style', 'class']
-      });
-    }
+  return (
+    <>
+      {/* Figma UI - ALWAYS RENDERED, positioned behind portfolio */}
+      <div
+        id="figma-layer"
+        className={`figma-workspace ${isRevealed ? 'active' : 'hidden'}`}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 5, // Below portfolio
+          opacity: isInitialized ? 1 : 0,
+          pointerEvents: isRevealed ? 'auto' : 'none'
+        }}
+      >
+        {isInitialized && <FigmaUI />}
+      </div>
 
-    // Listen for fold interactions (if using custom events)
-    const handleReveal = () => setIsVisible(true);
-    const handleHide = () => setIsVisible(false);
+      {/* Fold Corner - Always visible unless Figma is fully revealed */}
+      {!isRevealed && (
+        <div
+          className="fold-corner"
+          onClick={handleFoldClick}
+          style={{ zIndex: 1000 }}
+        >
+          <div className="fold-corner-triangle" />
+        </div>
+      )}
 
-    window.addEventListener('figma-reveal', handleReveal);
-    window.addEventListener('figma-hide', handleHide);
-
-    // Track discovery for Context7
-    if (isVisible && (window as any).context7) {
-      (window as any).context7.store('easter-egg.figma-viewed', {
-        timestamp: Date.now(),
-        tabMessage: 'Design Is Not Just Pixels It\'s Problem Solving Magic'
-      });
-    }
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('figma-reveal', handleReveal);
-      window.removeEventListener('figma-hide', handleHide);
-    };
-  }, [isVisible]);
-
-  if (!isVisible) return null;
-
-  return <FigmaUI />;
+      {/* Close Button - Only when revealed */}
+      {isRevealed && (
+        <button
+          className="close-easter-egg"
+          onClick={handleClose}
+          style={{ zIndex: 10000 }}
+        >
+          ×
+        </button>
+      )}
+    </>
+  );
 };
 
 export default EasterEgg;

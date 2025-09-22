@@ -1,0 +1,203 @@
+/* easter-egg.css - Complete CSS structure */
+
+/* Ensure body has no interfering styles */
+body {
+  background: #0a0a0a;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Portfolio wrapper - MUST have clip-path */
+.portfolio-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #30302E;
+  z-index: 10; /* Above Figma (5) but below fold (1000) */
+
+  /* The critical clip-path */
+  clip-path: polygon(
+    0 0,
+    calc(100% - 160px) 0,
+    100% 160px,
+    100% 100%,
+    0 100%
+  );
+  -webkit-clip-path: polygon(
+    0 0,
+    calc(100% - 160px) 0,
+    100% 160px,
+    100% 100%,
+    0 100%
+  );
+
+  transition: transform 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+/* When Figma is revealed, animate portfolio away */
+body.figma-revealed .portfolio-wrapper {
+  transform: rotateZ(-30deg) rotateY(-90deg) translateX(-100%) scale(0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Figma workspace - always present */
+.figma-workspace {
+  background: #1c1c1c !important;
+  /* Remove any transitions that might interfere */
+  transition: none !important;
+}
+
+.figma-workspace.hidden {
+  /* Still rendered but not interactive */
+  pointer-events: none;
+}
+
+.figma-workspace.active {
+  pointer-events: auto;
+}
+
+/* Fold corner styling */
+.fold-corner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 10em;
+  height: 10em;
+  cursor: pointer;
+  z-index: 1000;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+.fold-corner-triangle {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 10em 10em 0;
+  border-color: transparent #1a1a1a transparent transparent;
+  box-shadow: -4px 4px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+  transition: border-width 0.3s ease;
+}
+
+.fold-corner:hover .fold-corner-triangle {
+  border-width: 0 11em 11em 0;
+}
+
+/* Close button styling */
+.close-easter-egg {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  will-change: transform, background;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1;
+}
+
+.close-easter-egg:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05) translateZ(0);
+}
+
+.close-easter-egg:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fold-corner {
+    width: 8em;
+    height: 8em;
+  }
+
+  .fold-corner-triangle {
+    border-width: 0 8em 8em 0;
+  }
+
+  .fold-corner:hover .fold-corner-triangle {
+    border-width: 0 9em 9em 0;
+  }
+
+  .close-easter-egg {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .portfolio-wrapper {
+    clip-path: polygon(
+      0 0,
+      calc(100% - 128px) 0,
+      100% 128px,
+      100% 100%,
+      0 100%
+    );
+    -webkit-clip-path: polygon(
+      0 0,
+      calc(100% - 128px) 0,
+      100% 128px,
+      100% 100%,
+      0 100%
+    );
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .fold-corner,
+  .fold-corner-triangle,
+  .portfolio-wrapper,
+  .close-easter-egg {
+    transition: none;
+    animation: none;
+  }
+
+  body.figma-revealed .portfolio-wrapper {
+    opacity: 0;
+    pointer-events: none;
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .fold-corner {
+    background-color: #000000;
+    border: 2px solid #ffffff;
+  }
+
+  .fold-corner-triangle {
+    border-color: transparent #ffffff transparent transparent;
+  }
+
+  .close-easter-egg {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+  }
+}
