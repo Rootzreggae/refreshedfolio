@@ -1,0 +1,311 @@
+/* Clean Paper Fold Easter Egg - CSS Implementation */
+
+/* Clean fold corner using border triangles */
+.fold-corner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 10em;
+  height: 10em;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  /* Performance optimizations */
+  will-change: transform, width, height;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Subtle shadow for depth */
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fold-corner-triangle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 10em 10em 0;
+  border-color: transparent #1a1a1a transparent transparent;
+  transition: border-width 0.3s ease;
+  /* Performance optimization */
+  will-change: border-width;
+  transform: translateZ(0);
+}
+
+/* Hover state - subtle grow */
+.fold-corner:hover {
+  width: 11em;
+  height: 11em;
+  box-shadow: -3px 3px 12px rgba(0, 0, 0, 0.4);
+}
+
+.fold-corner:hover .fold-corner-triangle {
+  border-width: 0 11em 11em 0;
+}
+
+/* Active state */
+.fold-corner:active {
+  transform: scale(0.95);
+}
+
+/* Hide animation */
+.fold-corner.hidden {
+  animation: foldSlideOut 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes foldSlideOut {
+  to {
+    transform: translate(150%, -150%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Portfolio wrapper for page-peel animation */
+.portfolio-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #30302E !important;
+  transform-origin: 100% 0;
+  z-index: 10;
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  /* CSS containment for better performance */
+  contain: layout style paint;
+}
+
+.portfolio-wrapper.revealing {
+  animation: pagePeelClean 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.portfolio-wrapper.hiding {
+  animation: pageUnpeelClean 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Clean page peel animation */
+@keyframes pagePeelClean {
+  0% {
+    transform: rotateZ(0deg) rotateY(0deg) translateZ(0);
+    opacity: 1;
+  }
+  25% {
+    transform: rotateZ(-3deg) rotateY(-10deg) translateX(-5%) translateZ(0);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateZ(-10deg) rotateY(-35deg) translateX(-25%) scale(0.95) translateZ(0);
+    opacity: 0.7;
+  }
+  75% {
+    transform: rotateZ(-20deg) rotateY(-60deg) translateX(-50%) scale(0.8) translateZ(0);
+    opacity: 0.3;
+  }
+  100% {
+    transform: rotateZ(-30deg) rotateY(-90deg) translateX(-100%) scale(0.5) translateZ(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@keyframes pageUnpeelClean {
+  from {
+    transform: rotateZ(-30deg) rotateY(-90deg) translateX(-100%) scale(0.5) translateZ(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  to {
+    transform: rotateZ(0deg) rotateY(0deg) translateZ(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* Glass-morphism close button */
+.close-easter-egg {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 28px;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 100000;
+  display: none !important;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  /* Performance optimizations */
+  will-change: transform, background;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Prevent text selection */
+  user-select: none;
+  -webkit-user-select: none;
+  line-height: 1;
+}
+
+.close-easter-egg.active {
+  display: flex !important;
+}
+
+.close-easter-egg:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05) translateZ(0);
+}
+
+.close-easter-egg:active {
+  transform: scale(0.95) translateZ(0);
+}
+
+/* Figma layer - existing workspace */
+#figma-workspace,
+.figma-workspace {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a1a;
+  z-index: 5; /* Below portfolio (10) but visible through clip-path cut */
+  transition: opacity 0.5s ease;
+  /* Performance optimizations */
+  will-change: opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  /* CSS containment */
+  contain: layout style paint;
+}
+
+/* Hidden state */
+#figma-workspace.hidden,
+.figma-workspace.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Visible state */
+#figma-workspace.visible,
+.figma-workspace.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Legacy support for other selectors */
+#figma-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a1a;
+  z-index: 5; /* Below portfolio (10) but visible through clip-path cut */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  /* Performance optimizations */
+  will-change: opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  /* CSS containment */
+  contain: layout style paint;
+}
+
+#figma-layer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fold-corner {
+    width: 8em;
+    height: 8em;
+  }
+
+  .fold-corner-triangle {
+    border-width: 0 8em 8em 0;
+  }
+
+  .fold-corner:hover {
+    width: 9em;
+    height: 9em;
+  }
+
+  .fold-corner:hover .fold-corner-triangle {
+    border-width: 0 9em 9em 0;
+  }
+
+  .close-easter-egg {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .fold-corner,
+  .fold-corner-triangle,
+  .portfolio-wrapper,
+  .close-easter-egg {
+    transition: none;
+    animation: none;
+  }
+
+  .fold-corner.hidden {
+    opacity: 0;
+    transform: none;
+  }
+
+  .portfolio-wrapper.revealing,
+  .portfolio-wrapper.hiding {
+    animation: none;
+  }
+
+  .portfolio-wrapper.revealing {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .portfolio-wrapper.hiding {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .fold-corner {
+    background-color: #000000;
+    border: 2px solid #ffffff;
+  }
+
+  .fold-corner-triangle {
+    border-color: transparent #ffffff transparent transparent;
+  }
+
+  .close-easter-egg {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+  }
+}

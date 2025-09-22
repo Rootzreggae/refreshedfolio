@@ -1,0 +1,508 @@
+/* FigmaUI.css */
+.figma-ui {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  font-size: 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+/* Tab Bar */
+.figma-tab-bar {
+  height: 40px;
+  background: #2c2c2c;
+  border-bottom: 1px solid #3e3e3e;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 1px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.figma-tab-bar::-webkit-scrollbar {
+  height: 0;
+}
+
+.figma-tab {
+  height: 32px;
+  padding: 0 12px;
+  background: #1a1a1a;
+  border-right: 1px solid #3e3e3e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  color: #999;
+  min-width: fit-content;
+}
+
+.figma-tab:hover {
+  background: #2a2a2a;
+}
+
+.figma-tab.active {
+  background: #0a0a0a;
+  color: #fff;
+}
+
+.tab-close {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.figma-tab:hover .tab-close {
+  opacity: 0.6;
+}
+
+.tab-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1 !important;
+}
+
+.share-button {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: #18a0fb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  margin-left: 12px;
+  font-weight: bold;
+}
+
+/* Main Content */
+.figma-main {
+  flex: 1;
+  display: flex;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.figma-sidebar {
+  width: 240px;
+  background: #2c2c2c;
+  border-right: 1px solid #3e3e3e;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 12px;
+  border-bottom: 1px solid #3e3e3e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-title {
+  font-weight: 500;
+  color: #fff;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.layers-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.layer-item {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #999;
+  transition: background 0.2s;
+}
+
+.layer-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.layer-item.selected {
+  background: #18a0fb;
+  color: white;
+}
+
+.layer-item.indent {
+  padding-left: 32px;
+}
+
+.layer-icon {
+  font-size: 10px;
+  width: 12px;
+}
+
+/* Canvas Container */
+.figma-canvas-container {
+  flex: 1;
+  position: relative;
+  display: flex;
+  background: #0a0a0a;
+}
+
+/* Rulers */
+.ruler {
+  position: absolute;
+  background: #2c2c2c;
+  color: #666;
+  font-size: 10px;
+  z-index: 1;
+}
+
+.ruler.horizontal {
+  top: 0;
+  left: 30px;
+  right: 0;
+  height: 30px;
+  border-bottom: 1px solid #3e3e3e;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+}
+
+.ruler.vertical {
+  left: 0;
+  top: 30px;
+  bottom: 0;
+  width: 30px;
+  border-right: 1px solid #3e3e3e;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.ruler-corner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 30px;
+  height: 30px;
+  background: #2c2c2c;
+  border-right: 1px solid #3e3e3e;
+  border-bottom: 1px solid #3e3e3e;
+  z-index: 2;
+}
+
+.ruler-mark {
+  position: absolute;
+  font-size: 9px;
+  color: #666;
+}
+
+/* Canvas */
+.figma-canvas {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+  background: #0a0a0a;
+}
+
+/* Frames */
+.figma-frame {
+  position: absolute;
+  width: 600px;
+  background: #000;
+  border: 1px solid #333;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+}
+
+.frame-header {
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid #333;
+  color: #999;
+  font-size: 11px;
+}
+
+.frame-content {
+  padding: 40px;
+  color: #fff;
+}
+
+.frame-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.frame-content h3 {
+  font-size: 18px;
+  margin: 30px 0 15px;
+  color: #fff;
+}
+
+.frame-content h4 {
+  font-size: 14px;
+  margin: 20px 0 10px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.frame-content p {
+  color: #999;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.section {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid #333;
+}
+
+/* Ruler Guides */
+.ruler-guide {
+  position: absolute;
+  background: rgba(255, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.ruler-guide.horizontal {
+  width: 100%;
+  height: 1px;
+}
+
+.ruler-guide.vertical {
+  width: 1px;
+  height: 100%;
+}
+
+/* Floating Toolbar */
+.figma-toolbar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #2c2c2c;
+  border: 1px solid #3e3e3e;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.tool-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.tool-btn.active {
+  background: #18a0fb;
+  color: #fff;
+}
+
+.tool-divider {
+  width: 1px;
+  height: 20px;
+  background: #3e3e3e;
+}
+
+/* Inspector */
+.figma-inspector {
+  width: 240px;
+  background: #2c2c2c;
+  border-left: 1px solid #3e3e3e;
+  display: flex;
+  flex-direction: column;
+}
+
+.inspector-header {
+  padding: 8px;
+  border-bottom: 1px solid #3e3e3e;
+  display: flex;
+  gap: 8px;
+}
+
+.inspector-btn {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.inspector-btn.active {
+  background: #18a0fb;
+  color: #fff;
+}
+
+.share-btn {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: #18a0fb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.inspector-tabs {
+  display: flex;
+  border-bottom: 1px solid #3e3e3e;
+}
+
+.inspector-tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.inspector-tab.active {
+  color: #fff;
+  border-bottom-color: #18a0fb;
+}
+
+.zoom-dropdown {
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border: 1px solid #3e3e3e;
+  color: #999;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.inspector-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.inspector-section {
+  margin-bottom: 24px;
+}
+
+.inspector-section label {
+  display: block;
+  margin-bottom: 8px;
+  color: #999;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.color-input {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #3e3e3e;
+}
+
+.color-input input {
+  flex: 1;
+  padding: 6px;
+  background: #1a1a1a;
+  border: 1px solid #3e3e3e;
+  color: #fff;
+  border-radius: 4px;
+}
+
+.color-input button {
+  padding: 6px;
+  background: transparent;
+  border: 1px solid #3e3e3e;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.add-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid #3e3e3e;
+  color: #999;
+  cursor: pointer;
+  border-radius: 4px;
+  float: right;
+}
+
+.help-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #3e3e3e;
+  color: #999;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

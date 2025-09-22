@@ -123,6 +123,10 @@ body {
   line-height: var(--line-height-normal);
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
+  /* EMERGENCY: Ensure body is always visible */
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* ========================================
@@ -323,4 +327,103 @@ body {
 
 .content-section-lg {
   margin-bottom: var(--space-32);
+}
+
+/* ========================================
+   EMERGENCY VISIBILITY FIXES
+   ======================================== */
+
+/* CRITICAL: Force homepage to always be visible on desktop */
+@media (min-width: 769px) {
+  body {
+    /* Ensure body is always visible */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #1a1a1a !important;
+    color: #ffffff !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+
+  main[role="main"] {
+    /* Force main content to be visible */
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    /* EMERGENCY: Much higher z-index to ensure visibility above paper corner */
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+    background: transparent !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+  }
+
+  /* Emergency override for any hidden states */
+  .hero-text,
+  .right-nav,
+  .bottom-left,
+  .bottom-right {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    /* EMERGENCY: Ensure content sections are above paper corner system */
+    z-index: 10001 !important;
+    position: relative;
+  }
+
+  /* Ensure any overlay systems don't interfere */
+  .paper-corner-system .portfolio-layer:not(.peeling) {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  .paper-corner-system .figma-layer:not(.visible) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
+  }
+
+  /* Safety net: If anything is still hidden, force it visible */
+  body *[style*="display: none"] {
+    display: block !important;
+  }
+
+  body *[style*="visibility: hidden"] {
+    visibility: visible !important;
+  }
+
+  body *[style*="opacity: 0"] {
+    opacity: 1 !important;
+  }
+
+  /* Exception: Keep the paper corner overlays properly hidden when not active */
+  .paper-corner-system .portfolio-layer[style*="opacity: 0"],
+  .paper-corner-system .figma-layer[style*="opacity: 0"] {
+    opacity: 0 !important;
+    display: none !important;
+  }
+}
+
+/* Mobile fallback - ensure content is always visible */
+@media (max-width: 768px) {
+  body,
+  main[role="main"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: static !important;
+    z-index: auto !important;
+  }
+
+  /* Hide paper corner system completely on mobile */
+  .paper-corner-system {
+    display: none !important;
+  }
 }
