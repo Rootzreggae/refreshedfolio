@@ -1,5 +1,5 @@
 // FigmaUI.tsx
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './FigmaUI.css';
 
 interface Tab {
@@ -25,6 +25,10 @@ export const FigmaUI: React.FC = () => {
   const [zoomLevel, setZoomLevel] = useState<string>('48%');
   const [activeTool, setActiveTool] = useState<string>('move');
 
+  // Ruler indicator refs
+  const hIndicatorRef = useRef<HTMLDivElement>(null);
+  const vIndicatorRef = useRef<HTMLDivElement>(null);
+
   const handleTabClick = (id: string) => {
     setTabs(tabs.map(tab => ({
       ...tab,
@@ -43,6 +47,29 @@ export const FigmaUI: React.FC = () => {
     const nextIndex = (currentIndex + 1) % levels.length;
     setZoomLevel(levels[nextIndex]);
   };
+
+  // Mouse tracking for ruler indicators
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const canvas = document.querySelector('.figma-canvas');
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Update ruler indicators
+      if (hIndicatorRef.current) {
+        hIndicatorRef.current.style.left = `${x}px`;
+      }
+      if (vIndicatorRef.current) {
+        vIndicatorRef.current.style.top = `${y}px`;
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   return (
     <div className="figma-ui">
@@ -109,22 +136,33 @@ export const FigmaUI: React.FC = () => {
 
         {/* Canvas with Rulers */}
         <div className="figma-canvas-container">
-          {/* Rulers */}
-          <div className="ruler horizontal">
-            {[3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000].map(val => (
-              <span key={val} className="ruler-mark" style={{ left: `${(val - 3250) / 10}px` }}>
-                {val}
-              </span>
-            ))}
+          {/* Figma Exact Replica Rulers */}
+          {/* Corner where rulers meet */}
+          <div className="ruler-corner" />
+
+          {/* Horizontal Ruler */}
+          <div className="ruler-horizontal">
+            <div className="ruler-numbers-horizontal">
+              {[0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500].map(num => (
+                <span key={num} className="ruler-number-h" style={{ left: `${num}px` }}>
+                  {num}
+                </span>
+              ))}
+            </div>
+            <div className="ruler-indicator-h" ref={hIndicatorRef} />
           </div>
-          <div className="ruler vertical">
-            {[-1000, -750, -500, -250, 0, 250, 500, 750, 1000].map(val => (
-              <span key={val} className="ruler-mark" style={{ top: `${(val + 1000) / 10}px` }}>
-                {val}
-              </span>
-            ))}
+
+          {/* Vertical Ruler */}
+          <div className="ruler-vertical">
+            <div className="ruler-numbers-vertical">
+              {[0, 100, 200, 300, 400, 500, 600, 700, 800].map(num => (
+                <span key={num} className="ruler-number-v" style={{ top: `${num}px` }}>
+                  {num}
+                </span>
+              ))}
+            </div>
+            <div className="ruler-indicator-v" ref={vIndicatorRef} />
           </div>
-          <div className="ruler-corner"></div>
 
           {/* Canvas */}
           <div className="figma-canvas">

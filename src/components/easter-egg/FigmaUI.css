@@ -182,53 +182,183 @@
   background: #0a0a0a;
 }
 
-/* Rulers */
-.ruler {
+/* Figma Exact Replica Rulers */
+
+/* Top Ruler */
+.ruler-horizontal {
   position: absolute;
+  top: 40px; /* Below the toolbar */
+  left: 240px; /* After sidebar */
+  right: 240px; /* Before properties panel */
+  height: 20px;
   background: #2c2c2c;
-  color: #666;
+  border-bottom: 1px solid #444;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  z-index: 10;
   font-size: 10px;
-  z-index: 1;
+  color: #808080;
+  font-family: "SF Mono", Monaco, monospace;
 }
 
-.ruler.horizontal {
-  top: 0;
-  left: 30px;
-  right: 0;
-  height: 30px;
-  border-bottom: 1px solid #3e3e3e;
-  display: flex;
-  align-items: center;
-  padding-left: 10px;
+/* Left Ruler */
+.ruler-vertical {
+  position: absolute;
+  top: 60px; /* Below toolbar and horizontal ruler */
+  left: 240px; /* After sidebar */
+  bottom: 20px; /* Above bottom bar */
+  width: 20px;
+  background: #2c2c2c;
+  border-right: 1px solid #444;
+  overflow: hidden;
+  z-index: 10;
+  font-size: 10px;
+  color: #808080;
+  font-family: "SF Mono", Monaco, monospace;
 }
 
-.ruler.vertical {
-  left: 0;
-  top: 30px;
-  bottom: 0;
-  width: 30px;
-  border-right: 1px solid #3e3e3e;
-  display: flex;
-  flex-direction: column;
-  padding-top: 10px;
-}
-
+/* Corner square where rulers meet */
 .ruler-corner {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 30px;
-  height: 30px;
+  top: 40px;
+  left: 240px;
+  width: 20px;
+  height: 20px;
   background: #2c2c2c;
-  border-right: 1px solid #3e3e3e;
-  border-bottom: 1px solid #3e3e3e;
-  z-index: 2;
+  border-right: 1px solid #444;
+  border-bottom: 1px solid #444;
+  z-index: 11;
 }
 
-.ruler-mark {
+/* Horizontal ruler tick marks - minor every 10px */
+.ruler-horizontal::before {
+  content: '';
   position: absolute;
-  font-size: 9px;
-  color: #666;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 9px,
+    #505050 9px,
+    #505050 10px
+  );
+}
+
+/* Horizontal ruler major marks every 50px */
+.ruler-horizontal::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 49px,
+    #606060 49px,
+    #606060 50px
+  );
+}
+
+/* Vertical ruler tick marks - minor every 10px */
+.ruler-vertical::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 9px,
+    #505050 9px,
+    #505050 10px
+  );
+}
+
+/* Vertical ruler major marks every 50px */
+.ruler-vertical::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 49px,
+    #606060 49px,
+    #606060 50px
+  );
+}
+
+/* Ruler numbers container */
+.ruler-numbers-horizontal {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ruler-number-h {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #808080;
+  line-height: 1;
+}
+
+.ruler-numbers-vertical {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  width: 100%;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.ruler-number-v {
+  position: absolute;
+  left: 2px;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  font-size: 10px;
+  color: #808080;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Blue position indicators */
+.ruler-indicator-h {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  background: #0d99ff;
+  pointer-events: none;
+  transition: none; /* Instant feedback */
+  z-index: 12;
+}
+
+.ruler-indicator-v {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #0d99ff;
+  pointer-events: none;
+  transition: none; /* Instant feedback */
+  z-index: 12;
 }
 
 /* Canvas */
