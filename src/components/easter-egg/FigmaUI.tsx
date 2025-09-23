@@ -1,5 +1,5 @@
 // FigmaUI.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import './FigmaUI.css';
 
 interface Tab {
@@ -10,24 +10,17 @@ interface Tab {
 
 export const FigmaUI: React.FC = () => {
   const [tabs, setTabs] = useState<Tab[]>([
-    { id: '1', name: 'Design', active: false },
-    { id: '2', name: 'Is', active: false },
-    { id: '3', name: 'Not', active: false },
-    { id: '4', name: 'Just', active: false },
-    { id: '5', name: 'Pixels', active: true },
-    { id: '6', name: "It's", active: false },
-    { id: '7', name: 'Problem', active: false },
-    { id: '8', name: 'Solving', active: false },
-    { id: '9', name: 'Magic', active: false },
+    { id: '1', name: 'product', active: false },
+    { id: '2', name: 'designer', active: true },
+    { id: '3', name: 'specializing', active: false },
+    { id: '4', name: 'in', active: false },
+    { id: '5', name: 'developer', active: false },
+    { id: '6', name: 'tools', active: false },
   ]);
 
-  const [selectedLayer, setSelectedLayer] = useState<string>('frame-1');
-  const [zoomLevel, setZoomLevel] = useState<string>('48%');
+  const [selectedLayer, setSelectedLayer] = useState<string>('about');
+  const [zoomLevel, setZoomLevel] = useState<string>('100%');
   const [activeTool, setActiveTool] = useState<string>('move');
-
-  // Ruler indicator refs
-  const hIndicatorRef = useRef<HTMLDivElement>(null);
-  const vIndicatorRef = useRef<HTMLDivElement>(null);
 
   const handleTabClick = (id: string) => {
     setTabs(tabs.map(tab => ({
@@ -41,335 +34,286 @@ export const FigmaUI: React.FC = () => {
     setTabs(tabs.filter(tab => tab.id !== id));
   };
 
-  const handleZoomChange = () => {
-    const levels = ['25%', '48%', '50%', '75%', '100%', '150%', '200%'];
+  const handleZoomIn = () => {
+    const levels = ['25%', '50%', '75%', '100%', '150%', '200%'];
     const currentIndex = levels.indexOf(zoomLevel);
-    const nextIndex = (currentIndex + 1) % levels.length;
-    setZoomLevel(levels[nextIndex]);
+    if (currentIndex < levels.length - 1) {
+      setZoomLevel(levels[currentIndex + 1]);
+    }
   };
 
-  // Mouse tracking for ruler indicators
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const canvas = document.querySelector('.figma-canvas');
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Update ruler indicators
-      if (hIndicatorRef.current) {
-        hIndicatorRef.current.style.left = `${x}px`;
-      }
-      if (vIndicatorRef.current) {
-        vIndicatorRef.current.style.top = `${y}px`;
-      }
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    return () => document.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  const handleZoomOut = () => {
+    const levels = ['25%', '50%', '75%', '100%', '150%', '200%'];
+    const currentIndex = levels.indexOf(zoomLevel);
+    if (currentIndex > 0) {
+      setZoomLevel(levels[currentIndex - 1]);
+    }
+  };
 
   return (
-    <div className="figma-ui">
-      {/* Tab Bar */}
-      <div className="figma-tab-bar">
-        {tabs.map(tab => (
-          <div
-            key={tab.id}
-            className={`figma-tab ${tab.active ? 'active' : ''}`}
-            onClick={() => handleTabClick(tab.id)}
-          >
-            <span>{tab.name}</span>
-            <button
-              className="tab-close"
-              onClick={(e) => handleTabClose(tab.id, e)}
-              aria-label="Close tab"
-            >
-              ×
-            </button>
+    <div className="figma-container">
+      {/* Top Bar */}
+      <div className="figma-topbar">
+        <div className="topbar-left">
+          <div className="menu-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="2" y="2" width="4" height="4" fill="#F24E1E"/>
+              <rect x="8" y="2" width="4" height="4" fill="#FF7262"/>
+              <rect x="2" y="8" width="4" height="4" fill="#A259FF"/>
+              <rect x="8" y="8" width="4" height="4" fill="#1ABCFE"/>
+            </svg>
           </div>
-        ))}
-        <button className="share-button">Share</button>
-        <div className="user-avatar">NG</div>
+
+          {/* Easter egg tabs */}
+          <div className="file-tabs">
+            {tabs.map(tab => (
+              <div
+                key={tab.id}
+                className={`file-tab ${tab.active ? 'active' : ''}`}
+                onClick={() => handleTabClick(tab.id)}
+              >
+                {tab.name}
+                <span
+                  className="tab-close"
+                  onClick={(e) => handleTabClose(tab.id, e)}
+                >
+                  ×
+                </span>
+              </div>
+            ))}
+            <div className="file-tab">+</div>
+          </div>
+        </div>
+
+        <div className="topbar-right">
+          <button className="share-button">Share</button>
+          <div className="play-button">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4 3L13 8L4 13V3Z"/>
+            </svg>
+          </div>
+          <div className="avatar"></div>
+        </div>
       </div>
 
       {/* Main Content */}
       <div className="figma-main">
         {/* Sidebar */}
         <div className="figma-sidebar">
-          <div className="sidebar-header">
-            <span className="sidebar-title">Layers</span>
-            <button className="collapse-btn" aria-label="Collapse">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M3 6L9 6" stroke="#999" strokeWidth="1.5"/>
-              </svg>
-            </button>
+          <div className="sidebar-tabs">
+            <div className="sidebar-tab active">Layers</div>
+            <div className="sidebar-tab">Assets</div>
           </div>
-          <div className="layers-list">
-            <div
-              className={`layer-item ${selectedLayer === 'page-1' ? 'selected' : ''}`}
-              onClick={() => setSelectedLayer('page-1')}
-            >
-              <span className="layer-icon">▼</span>
+          <div className="layers-panel">
+            <input className="search-box" type="text" placeholder="Search" />
+            <div className="page-item">
+              <span>▶</span>
+              <span>#</span>
               <span>Page 1</span>
             </div>
-            <div className="layer-group">
-              <div
-                className={`layer-item indent ${selectedLayer === 'frame-1' ? 'selected' : ''}`}
-                onClick={() => setSelectedLayer('frame-1')}
-              >
-                <span className="layer-icon">□</span>
-                <span>About</span>
+            <div
+              className={`page-item ${selectedLayer === 'about' ? 'active' : ''}`}
+              onClick={() => setSelectedLayer('about')}
+            >
+              <span>▼</span>
+              <span>#</span>
+              <span>About</span>
+            </div>
+            <div style={{paddingLeft: '20px'}}>
+              <div className="page-item">
+                <span>□</span>
+                <span>Frame 2</span>
               </div>
-              <div
-                className={`layer-item indent ${selectedLayer === 'frame-2' ? 'selected' : ''}`}
-                onClick={() => setSelectedLayer('frame-2')}
-              >
-                <span className="layer-icon">□</span>
-                <span>Homepage</span>
+              <div className="page-item">
+                <span>□</span>
+                <span>Frame 4</span>
               </div>
+            </div>
+            <div className="page-item">
+              <span>▶</span>
+              <span>#</span>
+              <span>Homepage</span>
             </div>
           </div>
         </div>
 
-        {/* Canvas with Rulers */}
-        <div className="figma-canvas-container">
-          {/* Figma Exact Replica Rulers */}
-          {/* Corner where rulers meet */}
-          <div className="ruler-corner" />
-
+        {/* Canvas Area */}
+        <div className="canvas-area">
           {/* Horizontal Ruler */}
-          <div className="ruler-horizontal">
-            <div className="ruler-numbers-horizontal">
-              {[0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500].map(num => (
-                <span key={num} className="ruler-number-h" style={{ left: `${num}px` }}>
-                  {num}
-                </span>
-              ))}
-            </div>
-            <div className="ruler-indicator-h" ref={hIndicatorRef} />
-          </div>
+          <div className="ruler-horizontal"></div>
 
-          {/* Vertical Ruler */}
-          <div className="ruler-vertical">
-            <div className="ruler-numbers-vertical">
-              {[0, 100, 200, 300, 400, 500, 600, 700, 800].map(num => (
-                <span key={num} className="ruler-number-v" style={{ top: `${num}px` }}>
-                  {num}
-                </span>
-              ))}
-            </div>
-            <div className="ruler-indicator-v" ref={vIndicatorRef} />
-          </div>
+          {/* Canvas Container */}
+          <div className="figma-canvas-container">
+            {/* Vertical Ruler */}
+            <div className="ruler-vertical"></div>
+            {/* Ruler Corner */}
+            <div className="ruler-corner"></div>
 
-          {/* Canvas */}
-          <div className="figma-canvas">
-            {/* Frame 1: About */}
-            <div className="figma-frame" style={{ left: '100px', top: '100px' }}>
-              <div className="frame-header">
-                <span>About</span>
-              </div>
-              <div className="frame-content">
-                <h2>Product Designer specializing in developer tools</h2>
-                <p>
-                  I design technical products that feel surprisingly human.
-                  My work focuses on making complex systems accessible without dumbing them down.
-                </p>
-                <div className="section">
-                  <h3>Why I Design for Technical Products</h3>
-                  <p>
-                    After years at Grafana Labs, I discovered that developers don't need their tools
-                    to be "simple" – they need them to be clear, powerful, and respectful of their expertise.
+            <div className="canvas-content">
+              {/* Hero Artboard */}
+              <div className="artboard artboard-hero">
+                <span className="artboard-label">About</span>
+                {/* Guidelines */}
+                <div className="guideline guideline-h" style={{top: '72px'}}></div>
+                <div className="guideline guideline-h" style={{bottom: '72px'}}></div>
+                <div className="guideline guideline-v" style={{left: '72px'}}></div>
+                <div className="guideline guideline-v" style={{right: '72px'}}></div>
+
+                <div className="intro-section">
+                  <div className="intro-label">ABOUT</div>
+                  <h1 className="intro-title">Nilson<br/>Gaspar</h1>
+                  <p className="intro-subtitle">
+                    I'm a product designer specializing in
+                    <span className="intro-highlight">developer tools</span> and
+                    <span className="intro-highlight">observability platforms</span>.
+                    My broad design background helps me create technical products
+                    that feel surprisingly human.
+                  </p>
+                </div>
+
+                <div className="quote-block">
+                  <p className="quote-text">
+                    "There's nothing quite like making a developer say 'finally, this makes sense!'"
                   </p>
                 </div>
               </div>
-              <div className="ruler-guide horizontal" style={{ top: '-5px' }}></div>
-              <div className="ruler-guide vertical" style={{ left: '-5px' }}></div>
+
+              {/* Right Column */}
+              <div className="column-right">
+                {/* Small Artboard */}
+                <div className="artboard artboard-small">
+                  <span className="artboard-label">Homepage</span>
+                  {/* Guidelines */}
+                  <div className="guideline guideline-h" style={{top: '40px'}}></div>
+                  <div className="guideline guideline-v" style={{left: '40px'}}></div>
+                  <div className="guideline guideline-v" style={{right: '40px'}}></div>
+
+                  <div className="section-number" style={{top: '-20px', right: '-20px'}}>01</div>
+
+                  <div className="section-content">
+                    <div className="section-header">WHY</div>
+                    <h2 className="section-title">Technical Products</h2>
+                    <p className="section-text">
+                      <strong>Complex problems energize me.</strong>
+                      Transforming observability data into actionable insights at Grafana taught me that the harder
+                      the technical challenge, the more impactful good design becomes.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Medium Artboard */}
+                <div className="artboard artboard-medium">
+                  <span className="artboard-label">Homepage</span>
+                  {/* Guidelines */}
+                  <div className="guideline guideline-h" style={{top: '48px'}}></div>
+                  <div className="guideline guideline-h" style={{bottom: '48px'}}></div>
+                  <div className="guideline guideline-v" style={{left: '48px'}}></div>
+
+                  <div className="section-number" style={{right: '-30px', top: '-30px', color: 'rgba(13, 153, 255, 0.06)'}}>02</div>
+
+                  <div className="point-item">
+                    <h3 className="point-title">Real-time impact at scale</h3>
+                    <p className="point-text">
+                      When I improved time-to-insight by
+                      <span className="impact-stat">20%</span><br/>
+                      on Grafana's APM tools, it meant thousands of engineers
+                      could identify and fix issues faster.
+                    </p>
+                  </div>
+
+                  <div className="point-item">
+                    <h3 className="point-title">Collaboration with brilliant minds</h3>
+                    <p className="point-text">
+                      Working closely with engineers has sharpened my thinking.
+                      I've learned to ask "what's technically possible?" before
+                      "what's ideal?" - finding elegant solutions within constraints.
+                    </p>
+                  </div>
+
+                  <div className="point-item">
+                    <h3 className="point-title">The perfect blend of art and science</h3>
+                    <p className="point-text">
+                      Designing dashboards that visualize millions of data points
+                      requires both aesthetic sensibility and deep understanding
+                      of how developers think.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Frame 2: Homepage */}
-            <div className="figma-frame" style={{ left: '750px', top: '100px' }}>
-              <div className="frame-header">
-                <span>Homepage</span>
-              </div>
-              <div className="frame-content">
-                <h2>API Key Management</h2>
-                <h4>The Problem</h4>
-                <p>
-                  Developers were struggling to manage API keys across multiple services,
-                  leading to security vulnerabilities and workflow interruptions.
-                </p>
-                <h4>The Solution</h4>
-                <p>
-                  A self-hosted, open-source solution that respects developer workflows
-                  while enforcing security best practices.
-                </p>
-              </div>
-              <div className="ruler-guide horizontal" style={{ top: '-5px' }}></div>
-              <div className="ruler-guide vertical" style={{ right: '-5px' }}></div>
+            {/* Floating Toolbar */}
+            <div className="floating-toolbar">
+              <button className={`tool-button ${activeTool === 'move' ? 'active' : ''}`} onClick={() => setActiveTool('move')} title="Move">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 2L12 6H9V10H13L9 14V11H7V7H4L8 3V2Z"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'frame' ? 'active' : ''}`} onClick={() => setActiveTool('frame')} title="Frame">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="3" y="3" width="10" height="10"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'rectangle' ? 'active' : ''}`} onClick={() => setActiveTool('rectangle')} title="Rectangle">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <rect x="3" y="5" width="10" height="6"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'ellipse' ? 'active' : ''}`} onClick={() => setActiveTool('ellipse')} title="Ellipse">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <ellipse cx="8" cy="8" rx="5" ry="3.5"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'polygon' ? 'active' : ''}`} onClick={() => setActiveTool('polygon')} title="Polygon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 3L13 7L11 13H5L3 7Z"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'star' ? 'active' : ''}`} onClick={() => setActiveTool('star')} title="Star">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 2L9.5 6.5L14 7L10.5 10L12 14L8 11.5L4 14L5.5 10L2 7L6.5 6.5Z"/>
+                </svg>
+              </button>
+              <div className="tool-divider"></div>
+              <button className={`tool-button ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => setActiveTool('pen')} title="Pen">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M3 13L10 6L13 9L6 16L3 13Z"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'text' ? 'active' : ''}`} onClick={() => setActiveTool('text')} title="Text">
+                <span style={{fontWeight: '600', fontSize: '14px'}}>T</span>
+              </button>
+              <div className="tool-divider"></div>
+              <button className={`tool-button ${activeTool === 'hand' ? 'active' : ''}`} onClick={() => setActiveTool('hand')} title="Hand">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M10 2V8L8 7V3L6 4V9L4 8V5L2 6V11L8 14L14 11V7L12 6V4L10 2Z"/>
+                </svg>
+              </button>
+              <button className={`tool-button ${activeTool === 'comment' ? 'active' : ''}`} onClick={() => setActiveTool('comment')} title="Comment">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M2 3H14V11H8L4 14V11H2V3Z"/>
+                </svg>
+              </button>
             </div>
-          </div>
-
-          {/* Modern Floating Toolbar */}
-          <div className="toolbar-container">
-              {/* Move tool - Active by default */}
-              <div className="toolbar-group">
-                  <button className={`tool-button ${activeTool === 'move' ? 'active' : ''}`} onClick={() => setActiveTool('move')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Frame tools */}
-              <div className="toolbar-group">
-                  <button className={`tool-button has-dropdown ${activeTool === 'frame' ? 'active' : ''}`} onClick={() => setActiveTool('frame')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="4" y="4" width="16" height="16" rx="2"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Shape tools */}
-              <div className="toolbar-group">
-                  <button className={`tool-button has-dropdown ${activeTool === 'rectangle' ? 'active' : ''}`} onClick={() => setActiveTool('rectangle')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="6" y="6" width="12" height="12"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Pen tool */}
-              <div className="toolbar-group">
-                  <button className={`tool-button has-dropdown ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => setActiveTool('pen')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-                          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Text tool */}
-              <div className="toolbar-group">
-                  <button className={`tool-button ${activeTool === 'text' ? 'active' : ''}`} onClick={() => setActiveTool('text')}>
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M5 4v3h5.5v12h3V7H19V4z"/>
-                      </svg>
-                  </button>
-              </div>
-
-              {/* Components */}
-              <div className="toolbar-group">
-                  <button className={`tool-button has-dropdown ${activeTool === 'components' ? 'active' : ''}`} onClick={() => setActiveTool('components')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <circle cx="12" cy="12" r="10"/>
-                          <circle cx="12" cy="12" r="3"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Hand tool */}
-              <div className="toolbar-group">
-                  <button className={`tool-button ${activeTool === 'hand' ? 'active' : ''}`} onClick={() => setActiveTool('hand')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M18 11v-1a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0m0 0V9a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v1m4 0v1m-4-1v3"/>
-                      </svg>
-                  </button>
-              </div>
-
-              {/* Comments */}
-              <div className="toolbar-group">
-                  <button className={`tool-button ${activeTool === 'comments' ? 'active' : ''}`} onClick={() => setActiveTool('comments')}>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                      </svg>
-                  </button>
-              </div>
-
-              <div className="toolbar-divider"></div>
-
-              {/* Right side tools */}
-              <div className="toolbar-right">
-                  <button className="tool-button">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M6.5 7.5L16.5 16.5M16.5 7.5L6.5 16.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-                      </svg>
-                  </button>
-                  <button className="tool-button">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="8" y="3" width="8" height="4" rx="1"/>
-                          <path d="M10 7v4M14 7v4"/>
-                          <rect x="6" y="11" width="12" height="10" rx="1"/>
-                      </svg>
-                  </button>
-                  <button className="tool-button">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>
-                      </svg>
-                  </button>
-              </div>
           </div>
         </div>
-
-        {/* Inspector */}
-        <div className="figma-inspector">
-          <div className="inspector-header">
-            <button className="inspector-btn active">N</button>
-            <button className="inspector-btn">▶</button>
-            <button className="share-btn">Share</button>
-          </div>
-
-          <div className="inspector-tabs">
-            <button className="inspector-tab active">Design</button>
-            <button className="inspector-tab">Prototype</button>
+        {/* Bottom Bar */}
+        <div className="bottom-bar">
+          <div className="zoom-controls">
             <button
-              className="zoom-dropdown"
-              onClick={handleZoomChange}
+              onClick={handleZoomOut}
+              style={{background: 'none', border: 'none', color: '#999', cursor: 'pointer'}}
             >
-              {zoomLevel} ▼
+              −
+            </button>
+            <span className="zoom-value">{zoomLevel}</span>
+            <button
+              onClick={handleZoomIn}
+              style={{background: 'none', border: 'none', color: '#999', cursor: 'pointer'}}
+            >
+              +
             </button>
           </div>
-
-          <div className="inspector-sections">
-            <div className="inspector-section">
-              <label>Page</label>
-              <div className="color-input">
-                <span className="color-preview" style={{ background: '#1E1E1E' }}></span>
-                <input type="text" value="1E1E1E" readOnly />
-                <input type="text" value="100%" readOnly />
-                <button>👁</button>
-              </div>
-            </div>
-
-            <div className="inspector-section">
-              <label>Variables</label>
-              <button className="add-btn">⊞</button>
-            </div>
-
-            <div className="inspector-section">
-              <label>Styles</label>
-              <button className="add-btn">+</button>
-            </div>
-
-            <div className="inspector-section">
-              <label>Export</label>
-              <button className="add-btn">+</button>
-            </div>
-          </div>
-
-          <button className="help-btn">?</button>
         </div>
       </div>
     </div>
