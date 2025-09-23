@@ -18,6 +18,7 @@ import ProjectLayout from '../../layouts/ProjectLayout.astro';
 import CategoryLayout from '../../layouts/CategoryLayout.astro';
 import ComponentCaseStudyLayout from '../../layouts/ComponentCaseStudyLayout.astro';
 import MarkdownCaseStudyLayout from '../../layouts/MarkdownCaseStudyLayout.astro';
+import UnifiedLayout from '../../layouts/UnifiedLayout.astro';
 import MarkdownStoryText from '../../components/story/MarkdownStoryText.astro';
 
 export async function getStaticPaths() {
@@ -66,6 +67,22 @@ if (import.meta.env.DEV) {
   <CategoryLayout category={project} subProjects={relatedProjects || []}>
     <Content />
   </CategoryLayout>
+)}
+
+{layoutType === 'story' && (
+  <UnifiedLayout
+    project={project}
+    layout="story"
+    containerSize="wide"
+    showHeader={true}
+    headerLayout="hero"
+    navigation={{
+      backLink: "/work",
+      backText: "Back to Work"
+    }}
+  >
+    <Content />
+  </UnifiedLayout>
 )}
 
 {layoutType === 'component-case-study' && (
