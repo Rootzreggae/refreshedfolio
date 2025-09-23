@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Dark background matching portfolio -->
+  <rect width="32" height="32" fill="#0a0a0a"/>
+  
+  <!-- Geometric N construction -->
+  <g fill="#00a8ff">
+    <!-- Left vertical stroke -->
+    <rect x="8" y="8" width="3" height="16" />
+    
+    <!-- Diagonal stroke -->
+    <path d="M11 8 L21 24 L24 24 L14 8 Z" />
+    
+    <!-- Right vertical stroke -->
+    <rect x="21" y="8" width="3" height="16" />
+    
+    <!-- Small accent dot representing continuous learning -->
+    <circle cx="26" cy="26" r="2" fill="#18a0fb" opacity="0.8"/>
+  </g>
+</svg>

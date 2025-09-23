@@ -21,7 +21,10 @@ const { title, description = '', image } = Astro.props;
     <title>{title}</title>
     {image && <meta property="og:image" content={image} />}
     <meta name="view-transition" content="same-origin" />
-    
+
+    <!-- Umami Analytics -->
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="17a602b8-56cc-4328-83d4-0f16fefc8fd9"></script>
+
     <!-- NB International Font -->
     <style>
       @font-face {

@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+    title="404 - Page Not Found - Nilson Gaspar"
+    description="The page you're looking for doesn't exist. Let's get you back on track."
+>
+
+    <style>
+        body {
+            background: #30302e;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+            line-height: 1.6;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container-404 {
+            text-align: center;
+            padding: 48px;
+            max-width: 600px;
+        }
+
+        .error-code {
+            font-size: 180px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.03);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        .error-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .error-title {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .error-message {
+            font-size: 20px;
+            color: #aaa;
+            margin-bottom: 48px;
+            line-height: 1.4;
+        }
+
+        .error-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .error-link {
+            color: #00a8ff;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 12px 32px;
+            border: 1px solid #00a8ff;
+            border-radius: 4px;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .error-link:hover {
+            background: rgba(0, 168, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .error-link.primary {
+            background: #00a8ff;
+            color: #000;
+        }
+
+        .error-link.primary:hover {
+            background: #0090e0;
+        }
+
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 120px;
+            }
+
+            .error-title {
+                font-size: 32px;
+            }
+
+            .error-message {
+                font-size: 18px;
+            }
+        }
+    </style>
+
+    <div class="error-code">404</div>
+
+    <div class="container-404">
+        <div class="error-content">
+            <h1 class="error-title">Page not found</h1>
+            <p class="error-message">
+                Looks like this page took a different path. Let's find what you're looking for.
+            </p>
+            <div class="error-links">
+                <a href="/" class="error-link primary">Back to Home</a>
+                <a href="/projects/keystrok" class="error-link">View Projects</a>
+            </div>
+        </div>
+    </div>
+
+</BaseLayout>

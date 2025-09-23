@@ -1,10 +1,42 @@
 ---
 /**
- * Unified Project Router
+ * DISABLED: Unified Project Router
  *
- * Handles all /work/* routes with consistent, predictable routing logic.
- * Uses centralized routing configuration for type safety and maintainability.
+ * This file handled content collection routes but has been disabled during migration
+ * to Astro page-based project structure. Projects are now handled as direct Astro pages
+ * in /src/pages/projects/ to eliminate content collection conflicts.
+ *
+ * Migration notes:
+ * - Individual project pages are now in /src/pages/projects/
+ * - Category pages use index.astro files in subdirectories
+ * - This eliminates the need for content collection routing
  */
+
+// File temporarily disabled - project routes now handled by direct Astro pages
+export async function getStaticPaths() {
+  return [];
+}
+
+// Fallback component (should not be reached)
+const { } = Astro.props;
+---
+
+<!-- This route is disabled - projects now use direct Astro pages -->
+<div>Route disabled - redirecting to projects</div>
+
+<script>
+  // Redirect any legacy /work/* URLs to /projects/*
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname;
+    if (path.startsWith('/work/')) {
+      const newPath = path.replace('/work/', '/projects/');
+      window.location.replace(newPath);
+    }
+  }
+</script>
+
+<!--
+Original implementation commented out:
 
 import { type CollectionEntry, getCollection } from 'astro:content';
 import {

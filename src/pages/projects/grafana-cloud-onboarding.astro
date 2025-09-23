@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Grafana Cloud Onboarding Redesign - Nilson Gaspar</title>
+<meta name="title" content="Grafana Cloud Onboarding Redesign - Nilson Gaspar">
+<meta name="description" content="Redesigning the Grafana Cloud onboarding experience with measurable impact. Login screen improvements and user experience optimization.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="Grafana Labs, onboarding redesign, user experience, login design, cloud platform">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/grafana-cloud-onboarding">
+<meta property="og:title" content="Grafana Cloud Onboarding Redesign - Nilson Gaspar">
+<meta property="og:description" content="Redesigning the Grafana Cloud onboarding experience with measurable impact. Login screen improvements and user experience optimization.">
+<meta property="og:image" content="https://i.postimg.cc/HW5wrDjc/app-o11y.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/grafana-cloud-onboarding">
+<meta property="twitter:title" content="Grafana Cloud Onboarding Redesign - Nilson Gaspar">
+<meta property="twitter:description" content="Redesigning the Grafana Cloud onboarding experience with measurable impact. Login screen improvements and user experience optimization.">
+<meta property="twitter:image" content="https://i.postimg.cc/HW5wrDjc/app-o11y.png">
+
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Spread */
+.hero-spread {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 0;
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero-left {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #30302e;
+  position: relative;
+}
+
+.hero-number {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 60px;
+  max-width: 500px;
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-number {
+  font-size: 48px;
+  font-weight: 200;
+  color: #fff;
+  line-height: 1;
+}
+
+.meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  width: 90%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #ff5f00;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Problem Section */
+.problem-spread {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 80px;
+  align-items: center;
+  margin: 80px 0;
+}
+
+.problem-content p {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 32px;
+}
+
+.problem-visual {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 32px;
+}
+
+.problem-visual img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.problem-caption {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px;
+  margin: 80px 0;
+}
+
+.stat-item {
+  background: #30302e;
+  padding: 48px 32px;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.stat-item:hover {
+  background: #262624;
+}
+
+.stat-value {
+  font-size: 48px;
+  font-weight: 200;
+  color: #ff5f00;
+  margin-bottom: 12px;
+}
+
+.stat-desc {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* Before/After Comparison */
+.comparison-section {
+  margin: 120px 0;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  margin: 80px 0;
+}
+
+.comparison-item {
+  position: relative;
+}
+
+.comparison-label {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(48, 48, 46, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  z-index: 10;
+}
+
+.comparison-label.before {
+  color: #888;
+}
+
+.comparison-label.after {
+  color: #ff5f00;
+}
+
+.comparison-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #1a1a1a;
+}
+
+/* Solution Showcase */
+.solution-showcase {
+  margin: 120px 0;
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  margin-top: 80px;
+}
+
+.showcase-item {
+  background: #262624;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.showcase-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.showcase-caption {
+  padding: 32px 48px;
+  font-size: 16px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+/* Video Section */
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1a1a1a;
+  margin: 48px 0;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Process Cards */
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+  margin: 80px 0;
+}
+
+.process-card {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+  border-left: 3px solid #ff5f00;
+}
+
+.process-number {
+  font-size: 48px;
+  font-weight: 100;
+  color: #ff5f00;
+  margin-bottom: 24px;
+}
+
+.process-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.process-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #aaa;
+}
+
+/* Results Section */
+.results-section {
+  background: #262624;
+  padding: 80px;
+  border-radius: 8px;
+  margin: 120px 0;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.results-title {
+  font-size: 48px;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 24px;
+}
+
+.results-subtitle {
+  font-size: 20px;
+  color: #aaa;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+}
+
+.result-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-label {
+  font-size: 18px;
+  color: #aaa;
+  max-width: 70%;
+}
+
+.result-value {
+  font-size: 32px;
+  font-weight: 300;
+  color: #ff5f00;
+}
+
+/* Full Width Image */
+.full-width-section {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 120px 48px;
+  background: #1a1a1a;
+  margin-top: 120px;
+  margin-bottom: 120px;
+}
+
+.full-width-content {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Quote */
+.quote-block {
+  padding: 80px;
+  text-align: center;
+  margin: 120px 0;
+}
+
+.quote-text {
+  font-size: 32px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.4;
+  color: #fff;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .problem-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .process-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .stats-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #ff5f00;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/projects/grafana" class="nav-link">← Back to Grafana Projects</a>
+  <div>
+    <span class="nav-link">Grafana Labs / 2022</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Spread -->
+  <section class="hero-spread">
+    <div class="hero-left">
+      <div class="hero-number">04</div>
+      <h1 class="hero-title">
+        Grafana Cloud<br>
+        Onboarding
+      </h1>
+      <p class="hero-subtitle">
+        Transforming a complex product landscape into an intuitive onboarding experience that reduced support
+        requests by 40% and increased user adoption by 25%.
+      </p>
+
+      <div class="hero-meta-grid">
+        <div class="meta-stat">
+          <div class="meta-number">62%</div>
+          <div class="meta-label">Users unfamiliar with key products</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">40%</div>
+          <div class="meta-label">Support request reduction</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">25%</div>
+          <div class="meta-label">Increase in satisfaction</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">18%</div>
+          <div class="meta-label">First-week adoption boost</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img src="https://i.postimg.cc/HLG97XCM/onboard-cover.png" alt="Grafana Cloud Onboarding" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01 — THE CHALLENGE</span>
+      <h2 class="section-title">Lost in Complexity</h2>
+    </div>
+
+    <div class="problem-spread">
+      <div class="problem-content">
+        <p>
+          In June 2022, Grafana Cloud's rapidly evolving product landscape posed a significant communication
+          conundrum: as our suite of complex offerings grew, users were increasingly struggling to understand
+          the value and purpose of each product.
+        </p>
+        <p>
+          A review of user data and research found that nearly two-thirds (62%) of new users were unfamiliar
+          with key products such as Loki, Mimir, and Tempo. Non-technical users often failed to engage with
+          documentation, hindering their ability to effectively utilize these resources.
+        </p>
+      </div>
+
+      <div class="problem-visual">
+        <img src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png" alt="User Feedback">
+        <p class="problem-caption">User feedback highlighting confusion with product offerings</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-value">62%</div>
+      <div class="stat-desc">Unfamiliar with Loki, Mimir, Tempo</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">3</div>
+      <div class="stat-desc">Key products causing confusion</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">40%</div>
+      <div class="stat-desc">Failed to engage with docs</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">1</div>
+      <div class="stat-desc">Critical question: "What is Grafana Cloud?"</div>
+    </div>
+  </div>
+
+  <!-- Approach Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 — THE APPROACH</span>
+      <h2 class="section-title">Merging Education with Experience</h2>
+      <p class="section-description">
+        To make the onboarding more intuitive and informative, particularly for non-technical users, we needed
+        to visually and contextually represent Grafana Cloud's functionalities in an engaging way. The critical
+        outcome from our team workshops was the idea to visually answer: "What is Grafana Cloud?"
+      </p>
+    </div>
+
+    <div class="process-grid">
+      <div class="process-card">
+        <div class="process-number">01</div>
+        <h3 class="process-title">Integrate Documentation</h3>
+        <p class="process-text">
+          Merge essential documentation snippets with interactive onboarding steps, providing users with
+          concise and relevant information at each stage.
+        </p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">02</div>
+        <h3 class="process-title">Visual Communication</h3>
+        <p class="process-text">
+          Create clear visual representations of complex products, making abstract concepts tangible
+          for non-technical users.
+        </p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">03</div>
+        <h3 class="process-title">Progressive Disclosure</h3>
+        <p class="process-text">
+          Introduce complexity gradually, allowing users to dive deeper into documentation when ready,
+          not when forced.
+        </p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">04</div>
+        <h3 class="process-title">Interactive Learning</h3>
+        <p class="process-text">
+          Replace passive documentation reading with hands-on tutorials and contextual tooltips that
+          guide users through actual tasks.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Login Screen Redesign -->
+  <section class="comparison-section">
+    <div class="section-header">
+      <span class="section-number">03 — REBUILDING THE LOGIN</span>
+      <h2 class="section-title">First Impressions Matter</h2>
+      <p class="section-description">
+        I redesigned the login screen to provide a clear and concise introduction to Grafana Cloud and its
+        key components. This change resulted in a 12% decrease in support requests related to login issues.
+      </p>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-item">
+        <span class="comparison-label before">Before</span>
+        <img src="https://i.postimg.cc/pLY6QzDg/old-login.png" alt="Old Login" class="comparison-image">
+      </div>
+      <div class="comparison-item">
+        <span class="comparison-label after">After</span>
+        <img src="https://i.postimg.cc/jjM3mT3c/proposed-login.png" alt="New Login" class="comparison-image">
+      </div>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <img src="https://i.postimg.cc/DwKNbBbr/proposed-login1.png" alt="Login Variation" style="width: 100%; height: auto; border-radius: 8px;">
+    </div>
+  </section>
+
+  <!-- Welcome Screen Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 — WELCOME EXPERIENCE</span>
+      <h2 class="section-title">Setting the Right Tone</h2>
+      <p class="section-description">
+        I explored various options for the welcome screen, ultimately developing a version that clearly
+        introduced Grafana Cloud and its key features. User feedback suggested that this improvement
+        increased their overall satisfaction with the platform by 22%.
+      </p>
+    </div>
+
+    <div class="solution-showcase">
+      <div class="showcase-grid">
+        <div class="showcase-item">
+          <img src="https://i.postimg.cc/ZK67ZpDC/cloud-1.png" alt="Welcome Screen 1">
+          <div class="showcase-caption">Initial exploration focusing on product ecosystem visualization</div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://i.postimg.cc/NG3JWpD3/cloud-2.png" alt="Welcome Screen 2">
+          <div class="showcase-caption">Iteration emphasizing clear navigation paths and product discovery</div>
+        </div>
+        <div class="showcase-item">
+          <img src="https://i.postimg.cc/1Rn7CLG0/cloud-3.png" alt="Welcome Screen 3">
+          <div class="showcase-caption">Final version with balanced information hierarchy and visual clarity</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/qj0o3uY8bHE?si=BCIipXb4UCJG482F"
+              title="Welcome Screen Demo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- Documentation Integration -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 — INTEGRATED LEARNING</span>
+      <h2 class="section-title">Documentation Meets Onboarding</h2>
+      <p class="section-description">
+        I merged essential information from our documentation into the onboarding process. Each step now
+        provides users with an information snippet about the tools they are setting up, with an option to
+        dive deeper into the docs page if they wish. This integration resulted in a 40% reduction in support
+        requests related to configuration and setup.
+      </p>
+    </div>
+
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/QXZHoQk0ubA?si=si_E7fwgG70TNZZQ"
+              title="Documentation Integration"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="video-container">
+      <iframe src="https://www.youtube.com/embed/ThLqQUa4IKc?si=-u_f4Uu_ROzRT6Jy"
+              title="Interactive Tutorials"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- Quote -->
+  <div class="quote-block">
+    <p class="quote-text">
+      "Interactive tutorials and tooltips guide users through their initial setup and usage of Grafana Cloud products.
+      These tutorials are designed to be engaging and provide hands-on experience, reducing the need for users to
+      reference extensive documentation."
+    </p>
+  </div>
+
+  <!-- Results Section -->
+  <div class="results-section">
+    <div class="results-header">
+      <h2 class="results-title">Measurable Impact</h2>
+      <p class="results-subtitle">
+        By rethinking the onboarding experience, we lowered the barrier of entry for new users,
+        especially those who are non-technical.
+      </p>
+    </div>
+
+    <div class="results-grid">
+      <div class="result-item">
+        <span class="result-label">Reduction in configuration support requests</span>
+        <span class="result-value">40%</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Decrease in login-related issues</span>
+        <span class="result-value">12%</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">Increase in overall user satisfaction</span>
+        <span class="result-value">25%</span>
+      </div>
+      <div class="result-item">
+        <span class="result-label">First-week adoption rate improvement</span>
+        <span class="result-value">18%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conclusion -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">06 — REFLECTION</span>
+      <h2 class="section-title">Iteration and Impact</h2>
+    </div>
+
+    <div style="max-width: 800px;">
+      <p class="section-description">
+        Throughout the process, we continually sought user feedback to refine the onboarding experience.
+        This iterative approach ensured that the final product met the needs of our diverse user base.
+      </p>
+      <p class="section-description" style="margin-top: 32px;">
+        Our integrated approach, combining visual representation with contextual information, has made it
+        easier for users to understand and utilize our complex products from the outset. With these changes
+        in place, we've seen a notable increase in user satisfaction and adoption rates, validating our
+        hypothesis that better onboarding drives better outcomes.
+      </p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

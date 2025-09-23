@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Keystrok: $2.3B Security Gap Solution - Nilson Gaspar</title>
+<meta name="title" content="Keystrok: $2.3B Security Gap Solution - Nilson Gaspar">
+<meta name="description" content="Self-hosted, open-source API key management that developers actually want to use. Reduced API key management time by 85% with 50+ beta testers.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="API key management, security, open source, developer tools, SaaS, product design, UX design, security gap">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/keystrok">
+<meta property="og:title" content="Keystrok: $2.3B Security Gap Solution - Nilson Gaspar">
+<meta property="og:description" content="Self-hosted, open-source API key management that developers actually want to use. Reduced API key management time by 85% with 50+ beta testers.">
+<meta property="og:image" content="https://i.postimg.cc/dtyCVfW3/SCR-20250430-rchp.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/keystrok">
+<meta property="twitter:title" content="Keystrok: $2.3B Security Gap Solution - Nilson Gaspar">
+<meta property="twitter:description" content="Self-hosted, open-source API key management that developers actually want to use. Reduced API key management time by 85% with 50+ beta testers.">
+<meta property="twitter:image" content="https://i.postimg.cc/dtyCVfW3/SCR-20250430-rchp.png">
+
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Spread */
+.hero-spread {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 0;
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero-left {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #30302e;
+  position: relative;
+}
+
+.hero-number {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 500px;
+}
+
+.hero-links {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.hero-links a {
+  color: #18a0fb;
+  text-decoration: none;
+  font-size: 16px;
+  transition: opacity 0.3s;
+}
+
+.hero-links a:hover {
+  opacity: 0.7;
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-number {
+  font-size: 48px;
+  font-weight: 200;
+  color: #fff;
+  line-height: 1;
+}
+
+.meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  width: 90%;
+  height: auto;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #18a0fb;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Problem Section */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin: 80px 0;
+}
+
+.problem-content h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.problem-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.problem-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.problem-content li {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+}
+
+.problem-content li strong {
+  color: #18a0fb;
+}
+
+.problem-sidebar {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+}
+
+.sidebar-title {
+  font-size: 24px;
+  margin-bottom: 32px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.sidebar-story {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Research Section */
+.research-visual {
+  margin: 80px 0;
+  position: relative;
+}
+
+.survey-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.image-caption {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px;
+  margin: 80px 0;
+}
+
+.stat-card {
+  background: #30302e;
+  padding: 48px 32px;
+  text-align: center;
+  transition: background 0.3s;
+}
+
+.stat-card:hover {
+  background: #262624;
+}
+
+.stat-value {
+  font-size: 64px;
+  font-weight: 200;
+  color: #18a0fb;
+  margin-bottom: 16px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* User Segments */
+.segments-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin: 80px 0;
+}
+
+.segment-card {
+  padding: 48px;
+  background: #262624;
+  border-left: 3px solid #18a0fb;
+  transition: transform 0.3s;
+}
+
+.segment-card:hover {
+  transform: translateX(8px);
+}
+
+.segment-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.segment-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #aaa;
+}
+
+/* Design Principles */
+.principles-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  margin: 120px 0;
+  align-items: start;
+}
+
+.principles-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.principle {
+  display: flex;
+  gap: 32px;
+  align-items: start;
+}
+
+.principle-number {
+  font-size: 48px;
+  font-weight: 200;
+  color: #18a0fb;
+  line-height: 1;
+  min-width: 60px;
+}
+
+.principle-content h4 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  font-weight: 400;
+  color: #fff;
+}
+
+.principle-content p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #aaa;
+}
+
+.design-decisions {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+}
+
+.design-decisions h3 {
+  font-size: 28px;
+  margin-bottom: 32px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.decision-item {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.decision-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.decision-item h4 {
+  font-size: 20px;
+  color: #18a0fb;
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+
+.decision-item p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #aaa;
+}
+
+.color-indicators {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.color-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.color-dot.red { background: #ff4444; }
+.color-dot.yellow { background: #ffaa00; }
+.color-dot.green { background: #44ff44; }
+
+/* Solution Gallery */
+.solution-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin: 80px 0;
+}
+
+.gallery-item {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.gallery-caption {
+  padding: 24px;
+  background: #1a1a1a;
+  font-size: 14px;
+  color: #888;
+}
+
+/* Quote Section */
+.quote-section {
+  padding: 120px 80px;
+  text-align: center;
+  background: #262624;
+  border-radius: 8px;
+  margin: 120px 0;
+  position: relative;
+}
+
+.large-quote {
+  font-size: 36px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.4;
+  color: #fff;
+  max-width: 900px;
+  margin: 0 auto 32px;
+}
+
+.quote-author {
+  font-size: 16px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Validation Results */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 80px;
+  margin: 80px 0;
+}
+
+.results-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-label {
+  font-size: 18px;
+  color: #aaa;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 300;
+  color: #18a0fb;
+}
+
+.results-impact {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+}
+
+.impact-list {
+  list-style: none;
+  padding: 0;
+}
+
+.impact-list li {
+  padding: 16px 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #aaa;
+}
+
+.impact-list strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Roadmap Timeline */
+.roadmap {
+  margin: 120px 0;
+}
+
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 60px 0;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-item {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 16px;
+  height: 16px;
+  background: #18a0fb;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-date {
+  font-size: 14px;
+  color: #18a0fb;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.timeline-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .problem-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .principles-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .segments-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .solution-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline {
+    flex-direction: column;
+    gap: 48px;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #18a0fb;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-link">← Back to Work</a>
+  <div>
+    <span class="nav-link">Keystrok / 2025</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Spread -->
+  <section class="hero-spread">
+    <div class="hero-left">
+      <div class="hero-number">01</div>
+      <h1 class="hero-title">
+        Keystrok: Identifying and Solving a $2.3B Security Gap
+      </h1>
+      <p class="hero-subtitle">
+        Self-hosted, open-source API key management that developers actually want to use
+      </p>
+
+      <div class="hero-links">
+        <a href="https://www.keystrok.dev/">View Live Demo →</a>
+        <a href="#">GitHub (Coming Soon) →</a>
+      </div>
+
+      <div class="hero-meta-grid">
+        <div class="meta-stat">
+          <div class="meta-number">73%</div>
+          <div class="meta-label">Security breaches from credentials</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">$50K+</div>
+          <div class="meta-label">Annual enterprise cost</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">4.2M</div>
+          <div class="meta-label">Underserved dev teams</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">85%</div>
+          <div class="meta-label">Time reduction achieved</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img src="https://i.postimg.cc/dtyCVfW3/SCR-20250430-rchp.png" alt="Keystrok Interface" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Executive Summary -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">EXECUTIVE SUMMARY</span>
+      <h2 class="section-title">From Observation to Opportunity</h2>
+      <p class="section-description">
+        I identified an underserved market need through direct developer feedback, designed and built a solution
+        that reduces API key management time by 85%, and validated it with 50+ potential users. This side project
+        demonstrates my ability to spot opportunities, execute end-to-end product design, and bridge technical
+        complexity with human-centered solutions.
+      </p>
+    </div>
+  </section>
+
+  <!-- Problem Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 — THE PROBLEM</span>
+      <h2 class="section-title">The $2.3B Problem Nobody Was Solving Right</h2>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-content">
+        <h3>Market Context</h3>
+        <ul>
+          <li>Security breaches involve compromised credentials <strong>73%</strong></li>
+          <li>Enterprise API management tools cost per year <strong>$50-200K</strong></li>
+          <li>Small development teams globally lack solutions <strong>4.2M</strong></li>
+          <li>Existing tools are overcomplicated and overpriced <strong>"Swiss army knives"</strong></li>
+        </ul>
+      </div>
+
+      <div class="problem-sidebar">
+        <h4 class="sidebar-title">The Human Cost</h4>
+        <p class="sidebar-story">
+          "During user research at a mid-sized SaaS company, I discovered their lead engineer spent 2 hours
+          tracking down a rate-limited API key across multiple platforms. Another company faced a security
+          incident when an expired key was unknowingly reused in production, costing them $50K in downtime."
+        </p>
+        <p class="sidebar-story" style="margin-top: 24px; font-style: normal; color: #fff;">
+          This wasn't a tooling problem.<br>
+          It was a design problem.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03 — RESEARCH & DISCOVERY</span>
+      <h2 class="section-title">Understanding Developer Pain</h2>
+    </div>
+
+    <div class="research-visual">
+      <img src="https://i.postimg.cc/TY2HB2S6/image.png" alt="Survey callout" class="survey-image">
+      <p class="image-caption">Engaging with user base across developer platforms</p>
+    </div>
+
+    <h3 style="font-size: 32px; margin-bottom: 32px;">Quantitative Research</h3>
+    <p class="section-description" style="margin-bottom: 48px;">
+      I surveyed 87 developers across Reddit, Lemmy, and professional networks:
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">68%</div>
+        <div class="stat-label">Manage keys in spreadsheets or sticky notes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">91%</div>
+        <div class="stat-label">Experienced security incidents from poor management</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">76%</div>
+        <div class="stat-label">Find existing solutions unnecessarily complex</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4hrs</div>
+        <div class="stat-label">Average monthly time spent per developer</div>
+      </div>
+    </div>
+
+    <h3 style="font-size: 32px; margin: 80px 0 32px;">Qualitative Insights</h3>
+    <p class="section-description" style="margin-bottom: 48px;">
+      Through 12 in-depth interviews, I identified three key user segments:
+    </p>
+
+    <div class="segments-grid">
+      <div class="segment-card">
+        <h4 class="segment-title">Solo Developers</h4>
+        <p class="segment-text">Need simple, free solutions without complexity overhead</p>
+      </div>
+      <div class="segment-card">
+        <h4 class="segment-title">Small Teams</h4>
+        <p class="segment-text">Want collaboration features without enterprise complexity</p>
+      </div>
+      <div class="segment-card">
+        <h4 class="segment-title">Security-Conscious Startups</h4>
+        <p class="segment-text">Require audit trails but can't afford enterprise tools</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Strategy Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 — DESIGN STRATEGY</span>
+      <h2 class="section-title">Security Through Simplicity</h2>
+    </div>
+
+    <div class="principles-spread">
+      <div class="principles-list">
+        <div class="principle">
+          <div class="principle-number">1</div>
+          <div class="principle-content">
+            <h4>10-Second Overview</h4>
+            <p>Critical information visible instantly. No drilling down through menus to understand system health.</p>
+          </div>
+        </div>
+
+        <div class="principle">
+          <div class="principle-number">2</div>
+          <div class="principle-content">
+            <h4>Progressive Disclosure</h4>
+            <p>Complexity available when needed, but never forced. Simple tasks stay simple.</p>
+          </div>
+        </div>
+
+        <div class="principle">
+          <div class="principle-number">3</div>
+          <div class="principle-content">
+            <h4>Proactive Security</h4>
+            <p>Guide users toward best practices through smart defaults and gentle nudges.</p>
+          </div>
+        </div>
+
+        <div class="principle">
+          <div class="principle-number">4</div>
+          <div class="principle-content">
+            <h4>Developer Aesthetics</h4>
+            <p>Dark mode first, information dense, terminal-inspired design that feels familiar.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="design-decisions">
+        <h3>Key Design Decisions</h3>
+
+        <div class="decision-item">
+          <h4>Visual Hierarchy Through Color</h4>
+          <p>This simple system reduced time-to-action by 85% in testing</p>
+          <div class="color-indicators">
+            <span class="color-indicator"><span class="color-dot red"></span> Expired (immediate action)</span>
+            <span class="color-indicator"><span class="color-dot yellow"></span> Expiring soon</span>
+            <span class="color-indicator"><span class="color-dot green"></span> Healthy</span>
+          </div>
+        </div>
+
+        <div class="decision-item">
+          <h4>Platform-Centric Organization</h4>
+          <p>Instead of a flat list, I grouped keys by platform (AWS, Stripe, GitHub) because developers think in terms of services, not individual keys.</p>
+        </div>
+
+        <div class="decision-item">
+          <h4>One-Click Actions</h4>
+          <p>Every key shows its most likely next action: Expired → Rotate, Expiring → Set reminder, Active → Copy to clipboard</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Solution Design Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 — SOLUTION DESIGN</span>
+      <h2 class="section-title">The Interface</h2>
+    </div>
+
+    <div class="solution-gallery">
+      <div class="gallery-item">
+        <img src="https://i.postimg.cc/JngP6hKQ/Frame.png" alt="Dashboard">
+        <div class="gallery-caption">Idle dashboard layout - 3 seconds to understand system health</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.postimg.cc/QN96BpxY/Frame1.png" alt="API Management">
+        <div class="gallery-caption">API key management interface with visual hierarchy</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.postimg.cc/T39Q80C1/Frame2.png" alt="Platform Addition">
+        <div class="gallery-caption">Adding a platform - progressive disclosure in action</div>
+      </div>
+      <div class="gallery-item">
+        <img src="https://i.postimg.cc/NjfmXckG/Frame4.png" alt="Key Inventory">
+        <div class="gallery-caption">Key inventory exploration with filtering options</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote Section -->
+  <div class="quote-section">
+    <blockquote class="large-quote">
+      "Finally, someone who understands we don't need another platform - just key management done right.
+      The visual hierarchy instantly shows me what needs attention. It's like Grafana for API keys."
+    </blockquote>
+    <cite class="quote-author">— Senior DevOps Engineer, Beta Tester</cite>
+  </div>
+
+  <!-- Validation Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">06 — VALIDATION & IMPACT</span>
+      <h2 class="section-title">Beta Testing Results</h2>
+      <p class="section-description">
+        50 developers tested the prototype over 4 weeks
+      </p>
+    </div>
+
+    <div class="results-grid">
+      <div class="results-metrics">
+        <div class="metric-item">
+          <span class="metric-label">Successfully added keys without documentation</span>
+          <span class="metric-value">96%</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Average setup time</span>
+          <span class="metric-value">5 min</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Time saved per developer monthly</span>
+          <span class="metric-value">3.4 hrs</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Net Promoter Score (Industry avg: 31)</span>
+          <span class="metric-value">72</span>
+        </div>
+      </div>
+
+      <div class="results-impact">
+        <h3 style="font-size: 24px; margin-bottom: 24px; color: #fff;">Business Validation</h3>
+        <ul class="impact-list">
+          <li><strong>15 companies</strong> expressed interest in enterprise features</li>
+          <li><strong>3 offers</strong> to sponsor open-source development</li>
+          <li><strong>500K+</strong> potential market of small development teams</li>
+          <li><strong>50+ active</strong> beta users continuing to use the prototype</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">07 — STRATEGIC VISION</span>
+      <h2 class="section-title">Roadmap & Business Model</h2>
+    </div>
+
+    <div class="roadmap">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">PHASE 1 - CURRENT</div>
+          <div class="timeline-title">Open Source Launch</div>
+          <div class="timeline-desc">Polish core features, security audit, documentation</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">PHASE 2 - Q2 2025</div>
+          <div class="timeline-title">Team Features</div>
+          <div class="timeline-desc">SSO, audit logs, compliance reporting (SOC2, ISO)</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">PHASE 3 - Q4 2025</div>
+          <div class="timeline-title">Enterprise Edition</div>
+          <div class="timeline-desc">Self-hosted option, SLA support, partner integrations</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Learnings Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">08 — OUTCOME</span>
+      <h2 class="section-title">Why This Matters</h2>
+      <p class="section-description">
+        Keystrok proves I don't just design interfaces - I identify problems worth solving, validate solutions
+        with real users, and execute with business impact in mind. This is what I bring to senior product design roles.
+      </p>
+    </div>
+
+    <div class="problem-grid" style="margin-top: 80px;">
+      <div class="problem-content">
+        <h3>Key Learnings</h3>
+        <p style="margin-bottom: 32px;">About Technical Product Design:</p>
+        <ul style="list-style: disc; padding-left: 24px;">
+          <li style="border: none; padding: 8px 0;">Developers value focus over features - Do one thing exceptionally well</li>
+          <li style="border: none; padding: 8px 0;">Visual design matters in DevTools - Good aesthetics improve adoption</li>
+          <li style="border: none; padding: 8px 0;">Open source builds trust - Transparency is crucial for security tools</li>
+        </ul>
+
+        <p style="margin: 32px 0;">About Building While Designing:</p>
+        <ul style="list-style: disc; padding-left: 24px;">
+          <li style="border: none; padding: 8px 0;">Implementation constraints improve design</li>
+          <li style="border: none; padding: 8px 0;">Real data exposes edge cases mockups miss</li>
+          <li style="border: none; padding: 8px 0;">Community feedback is gold</li>
+        </ul>
+      </div>
+
+      <div class="problem-sidebar">
+        <h4 class="sidebar-title">Personal Growth</h4>
+        <p class="sidebar-story" style="font-style: normal;">
+          Learned TypeScript and security best practices. Proved ability to identify market opportunities.
+          Demonstrated end-to-end product thinking from research to implementation.
+        </p>
+        <p style="margin-top: 24px; color: #18a0fb;">
+          The API management space is ripe for disruption. By focusing on the underserved majority,
+          Keystrok could capture significant market share.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

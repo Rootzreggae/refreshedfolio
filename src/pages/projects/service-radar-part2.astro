@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Service Radar Dashboard Design: Part 2 - Nilson Gaspar</title>
+<meta name="title" content="Service Radar Dashboard Design: Part 2 - Nilson Gaspar">
+<meta name="description" content="Designing the dashboard application for Service Radar. AI-assisted design, React development, and DevOps UX optimization.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="service radar, dashboard design, React development, AI-assisted design, DevOps UX">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/service-radar-part2">
+<meta property="og:title" content="Service Radar Dashboard Design: Part 2 - Nilson Gaspar">
+<meta property="og:description" content="Designing the dashboard application for Service Radar. AI-assisted design, React development, and DevOps UX optimization.">
+<meta property="og:image" content="https://i.postimg.cc/Kv19DsCP/SCR-20250430-qnjh.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/service-radar-part2">
+<meta property="twitter:title" content="Service Radar Dashboard Design: Part 2 - Nilson Gaspar">
+<meta property="twitter:description" content="Designing the dashboard application for Service Radar. AI-assisted design, React development, and DevOps UX optimization.">
+<meta property="twitter:image" content="https://i.postimg.cc/Kv19DsCP/SCR-20250430-qnjh.png">
+
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Spread */
+.hero-spread {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 0;
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero-left {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #30302e;
+  position: relative;
+}
+
+.hero-number {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title span {
+  display: block;
+  color: #00a8ff;
+  font-size: 0.6em;
+  margin-top: 12px;
+  font-weight: 400;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 60px;
+  max-width: 500px;
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.meta-value {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  width: 90%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #00a8ff;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Research Questions */
+.questions-section {
+  background: #262624;
+  padding: 80px;
+  border-radius: 8px;
+  margin: 80px 0;
+}
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+}
+
+.question-item {
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.question-item:last-child,
+.question-item:nth-last-child(2) {
+  border-bottom: none;
+}
+
+.question-text {
+  font-size: 18px;
+  color: #bbb;
+  line-height: 1.6;
+}
+
+.question-text::before {
+  content: '→';
+  color: #00a8ff;
+  margin-right: 16px;
+  font-weight: bold;
+}
+
+/* Phases Section */
+.phases-container {
+  margin: 120px 0;
+}
+
+.phase-block {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 80px;
+  margin-bottom: 120px;
+  align-items: start;
+}
+
+.phase-block:nth-child(even) {
+  grid-template-columns: 2fr 1fr;
+}
+
+.phase-block:nth-child(even) .phase-header {
+  order: 2;
+}
+
+.phase-block:nth-child(even) .phase-content {
+  order: 1;
+}
+
+.phase-header {
+  position: sticky;
+  top: 120px;
+}
+
+.phase-number {
+  font-size: 120px;
+  font-weight: 900;
+  color: rgba(0, 168, 255, 0.1);
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+.phase-title {
+  font-size: 32px;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.phase-goal {
+  font-size: 16px;
+  color: #00a8ff;
+  font-style: italic;
+}
+
+.phase-content {
+  background: #262624;
+  padding: 48px;
+  border-radius: 8px;
+}
+
+.phase-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.phase-content li {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 16px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+.phase-content li:last-child {
+  border-bottom: none;
+}
+
+/* Design Evolution */
+.evolution-showcase {
+  margin: 120px 0;
+}
+
+.evolution-stage {
+  margin-bottom: 80px;
+}
+
+.stage-title {
+  font-size: 28px;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 32px;
+}
+
+.stage-description {
+  font-size: 18px;
+  color: #bbb;
+  margin-bottom: 48px;
+  max-width: 800px;
+}
+
+.sketches-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
+.sketch-item {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.sketch-item:hover {
+  transform: scale(1.02);
+}
+
+.sketch-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sketch-caption {
+  padding: 24px;
+  font-size: 14px;
+  color: #888;
+}
+
+/* Wireframes Gallery */
+.wireframes-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin: 48px 0;
+}
+
+.wireframe-item {
+  background: #262624;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.wireframe-item:hover {
+  transform: translateY(-8px);
+}
+
+.wireframe-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.wireframe-caption {
+  padding: 24px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Considerations List */
+.considerations-section {
+  background: linear-gradient(135deg, #262624 0%, #1a1a1a 100%);
+  padding: 80px;
+  border-radius: 8px;
+  margin: 120px 0;
+}
+
+.considerations-title {
+  font-size: 36px;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.considerations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 48px;
+}
+
+.consideration-card {
+  text-align: center;
+}
+
+.consideration-number {
+  font-size: 48px;
+  font-weight: 100;
+  color: #00a8ff;
+  margin-bottom: 16px;
+}
+
+.consideration-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.consideration-text {
+  font-size: 16px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+/* Style Guide Preview */
+.style-guide-section {
+  margin: 120px 0;
+}
+
+.style-elements {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin: 48px 0;
+}
+
+.style-item {
+  background: #262624;
+  padding: 32px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.style-icon {
+  font-size: 48px;
+  color: #00a8ff;
+  margin-bottom: 16px;
+}
+
+.style-label {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.style-desc {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* CTA Section */
+.cta-section {
+  text-align: center;
+  padding: 120px 0;
+}
+
+.cta-title {
+  font-size: 48px;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 32px;
+}
+
+.cta-link {
+  display: inline-block;
+  padding: 16px 48px;
+  background: #00a8ff;
+  color: #000;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: opacity 0.3s;
+}
+
+.cta-link:hover {
+  opacity: 0.8;
+}
+
+/* Quote */
+.quote-block {
+  padding: 80px;
+  margin: 120px 0;
+  text-align: center;
+  background: #262624;
+  border-radius: 8px;
+}
+
+.quote-text {
+  font-size: 28px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.4;
+  color: #fff;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .phase-block {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .phase-block:nth-child(even) {
+    grid-template-columns: 1fr;
+  }
+
+  .questions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wireframes-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .sketches-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wireframes-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .style-elements {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #00a8ff;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/projects/service-radar" class="nav-link">← Back to Service Radar</a>
+  <div>
+    <span class="nav-link">Service Radar / 2025</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Spread -->
+  <section class="hero-spread">
+    <div class="hero-left">
+      <div class="hero-number">06</div>
+      <h1 class="hero-title">
+        Contributing to Open Source as a Product Designer
+        <span>Part 2: App Design for Distributed Network Monitoring</span>
+      </h1>
+      <p class="hero-subtitle">
+        Evolving from landing page to full application design, leveraging AI and modern development
+        practices to create an intuitive dashboard for DevOps and SRE professionals.
+      </p>
+
+      <div class="hero-meta-grid">
+        <div class="meta-stat">
+          <div class="meta-label">Project</div>
+          <div class="meta-value">Service Radar Dashboard</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Role</div>
+          <div class="meta-value">UI/UX Designer & Developer</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Timeline</div>
+          <div class="meta-value">April 2025</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Tech Stack</div>
+          <div class="meta-value">React, HTML/CSS/JS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img src="https://i.postimg.cc/Kv19DsCP/SCR-20250430-qnjh.png" alt="Service Radar Dashboard" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Introduction Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01 — EXPANDING THE SCOPE</span>
+      <h2 class="section-title">From Landing Page to Full Application</h2>
+      <p class="section-description">
+        Before starting the design process, it is essential to understand the requirements and constraints
+        of the project. This includes understanding the target audience, the features and functionality of
+        the app, and the technical requirements of the system.
+      </p>
+      <p class="section-description" style="margin-top: 24px;">
+        Michael has a proof of concept available on GitHub. My contribution to the project is to design
+        the landing page, user interface, and user experience for the app. I am working closely with
+        Michael to ensure that the design meets his vision and the technical requirements.
+      </p>
+    </div>
+  </section>
+
+  <!-- Research Questions -->
+  <div class="questions-section">
+    <h3 style="font-size: 32px; color: #fff; margin-bottom: 48px;">Key Questions Before Design</h3>
+    <div class="questions-grid">
+      <div class="question-item">
+        <p class="question-text">What are the key features and functionality of the app?</p>
+      </div>
+      <div class="question-item">
+        <p class="question-text">Who is the target audience for the app?</p>
+      </div>
+      <div class="question-item">
+        <p class="question-text">What are the technical requirements of the system?</p>
+      </div>
+      <div class="question-item">
+        <p class="question-text">What are the design constraints and limitations?</p>
+      </div>
+      <div class="question-item">
+        <p class="question-text">What are users trying to accomplish with the app?</p>
+      </div>
+      <div class="question-item">
+        <p class="question-text">Are there any solutions currently available solving the same problem?</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote Block -->
+  <div class="quote-block">
+    <p class="quote-text">
+      "My design process has evolved over time as I embraced AI for more repetitive tasks and focused
+      on creating a more intuitive and user-friendly interface. This newfound leverage allows me to
+      focus more of my time exploring new design ideas and experimenting with different approaches."
+    </p>
+  </div>
+
+  <!-- Phases Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 — STRUCTURED APPROACH</span>
+      <h2 class="section-title">Breaking Down the Problem</h2>
+      <p class="section-description">
+        I broke down the problem into phases and created a detailed plan for each phase, ensuring
+        a comprehensive approach to the dashboard design.
+      </p>
+    </div>
+
+    <div class="phases-container">
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">01</div>
+          <h3 class="phase-title">Foundational Requirements</h3>
+          <p class="phase-goal">Goal: Establish a clear understanding of core needs</p>
+        </div>
+        <div class="phase-content">
+          <ul>
+            <li>What's the typical daily workflow of a DevOps or SRE professional using the tool?</li>
+            <li>What are the essential pieces of information that this tool currently provides?</li>
+            <li>What types of new data or functionalities do we anticipate being added?</li>
+            <li>How might the initial dashboard design accommodate this growth?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">02</div>
+          <h3 class="phase-title">Information Architecture</h3>
+          <p class="phase-goal">Goal: Define structure and navigation</p>
+        </div>
+        <div class="phase-content">
+          <ul>
+            <li>Define high-level structure considering limited initial content and future expansion</li>
+            <li>Identify the most logical and essential top-level navigation items</li>
+            <li>Group information and widgets that provide immediate value to users</li>
+            <li>Consider common navigation patterns intuitive for DevOps professionals</li>
+            <li>Identify immediate 'quick actions' for direct access from dashboard</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-header">
+          <div class="phase-number">03</div>
+          <h3 class="phase-title">Layout & Element Definition</h3>
+          <p class="phase-goal">Goal: Establish foundational layout and key visual elements</p>
+        </div>
+        <div class="phase-content">
+          <ul>
+            <li>Place top-level navigation, key status indicators, and information groupings</li>
+            <li>Identify 2-3 most critical 'at-a-glance' status indicators for prominent display</li>
+            <li>Use visual hierarchy to draw attention to most important information first</li>
+            <li>Consider how dashboard adapts to different screen sizes and devices</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Evolution -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03 — DESIGN EVOLUTION</span>
+      <h2 class="section-title">From Sketches to High Fidelity</h2>
+    </div>
+
+    <div class="evolution-showcase">
+      <div class="evolution-stage">
+        <h3 class="stage-title">Initial Exploration</h3>
+        <p class="stage-description">
+          Starting with pen and paper allows me to quickly and freely sketch out ideas without worrying
+          about technical details or constraints. These initial explorations focused on the parameters
+          defined in the previous phases.
+        </p>
+
+        <div class="sketches-grid">
+          <div class="sketch-item">
+            <img src="https://i.postimg.cc/Vv3JKMtQ/PXL-20250408-102620836.png" alt="Quick Actions Sketch">
+            <div class="sketch-caption">Quick actions exploration</div>
+          </div>
+          <div class="sketch-item">
+            <img src="https://i.postimg.cc/qv772jSh/PXL-20250414-090623397.png" alt="Wireframe Sketches">
+            <div class="sketch-caption">Dashboard layout wireframes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="evolution-stage">
+        <h3 class="stage-title">Digital Wireframes</h3>
+        <p class="stage-description">
+          As my vision became clearer, I transferred the explorations into Figma to play with layouts
+          and basic element definitions more precisely.
+        </p>
+
+        <div class="wireframes-gallery">
+          <div class="wireframe-item">
+            <img src="https://i.postimg.cc/HL4PH9Wz/image-4.png" alt="Low-Fi Dashboard">
+            <div class="wireframe-caption">Low-fidelity dashboard layout</div>
+          </div>
+          <div class="wireframe-item">
+            <img src="https://i.postimg.cc/636wN3K7/image-2.png" alt="Navigation Structure">
+            <div class="wireframe-caption">Navigation structure</div>
+          </div>
+          <div class="wireframe-item">
+            <img src="https://i.postimg.cc/8znnCzLJ/image-24.png" alt="Component Details">
+            <div class="wireframe-caption">Component details</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="evolution-stage">
+        <h3 class="stage-title">High Fidelity Design</h3>
+        <p class="stage-description">
+          When I reached a stage I was happy with the layout and elements, I began refining based on
+          insights gained from the initial explorations.
+        </p>
+
+        <div style="margin-top: 48px;">
+          <img src="https://i.postimg.cc/02VVtyWW/SCR-20250414-jnpv.png" alt="High Fidelity Dashboard" style="width: 100%; height: auto; border-radius: 8px;">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Considerations Section -->
+  <div class="considerations-section">
+    <h2 class="considerations-title">Key Refinement Considerations</h2>
+    <div class="considerations-grid">
+      <div class="consideration-card">
+        <div class="consideration-number">1</div>
+        <h3 class="consideration-title">Consistency</h3>
+        <p class="consideration-text">Ensure layout and elements are consistent across all screens and devices</p>
+      </div>
+      <div class="consideration-card">
+        <div class="consideration-number">2</div>
+        <h3 class="consideration-title">Accessibility</h3>
+        <p class="consideration-text">Make sure the dashboard is accessible to users with disabilities</p>
+      </div>
+      <div class="consideration-card">
+        <div class="consideration-number">3</div>
+        <h3 class="consideration-title">Performance</h3>
+        <p class="consideration-text">Optimize for quick loading and smooth operation</p>
+      </div>
+      <div class="consideration-card">
+        <div class="consideration-number">4</div>
+        <h3 class="consideration-title">Responsiveness</h3>
+        <p class="consideration-text">Adapt seamlessly to different screen sizes and devices</p>
+      </div>
+      <div class="consideration-card">
+        <div class="consideration-number">5</div>
+        <h3 class="consideration-title">Usability</h3>
+        <p class="consideration-text">Ensure the dashboard is easy to use and understand</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Style Guide Preview -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 — DESIGN SYSTEM</span>
+      <h2 class="section-title">Early Style Guide Elements</h2>
+      <p class="section-description">
+        As the project is in very early stages, the style guide is still being developed and refined.
+        However, some key elements are already taking shape.
+      </p>
+    </div>
+
+    <div class="style-elements">
+      <div class="style-item">
+        <div class="style-icon">🎨</div>
+        <h4 class="style-label">Color Scheme</h4>
+        <p class="style-desc">Visually appealing and easy to read palette</p>
+      </div>
+      <div class="style-item">
+        <div class="style-icon">📝</div>
+        <h4 class="style-label">Typography</h4>
+        <p class="style-desc">Clear, readable fonts matching the dashboard style</p>
+      </div>
+      <div class="style-item">
+        <div class="style-icon">🎯</div>
+        <h4 class="style-label">Icons</h4>
+        <p class="style-desc">Intuitive icons for actions and features</p>
+      </div>
+      <div class="style-item">
+        <div class="style-icon">📐</div>
+        <h4 class="style-label">Layout</h4>
+        <p class="style-desc">Organized for easy navigation and understanding</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reflection Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 — EMBRACING CHANGE</span>
+      <h2 class="section-title">The Evolving Role of Design</h2>
+    </div>
+
+    <div style="max-width: 800px;">
+      <p class="section-description">
+        In my personal view, the Product Designer role is changing rapidly, and it is essential that
+        my skills and knowledge also evolve. I've decided to leverage my knowledge of HTML, CSS, and
+        JavaScript to create a responsive and accessible prototype that goes beyond what I could've
+        done with Figma alone.
+      </p>
+      <p class="section-description" style="margin-top: 32px;">
+        One of the benefits of working in open source companies/projects is the access to a vast
+        community of users who can provide feedback and suggestions. It will be interesting to see
+        how the community responds to the prototype and what suggestions they have for improvement.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <h2 class="cta-title">View the Live Prototype</h2>
+    <a href="https://storied-semolina-e5286f.netlify.app/" target="_blank" class="cta-link">
+      Launch React Prototype →
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

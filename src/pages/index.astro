@@ -1,20 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { generateUrl } from '../lib/routing';
 import EasterEgg from '../components/easter-egg/EasterEgg.tsx';
 
-// Get featured projects for navigation
-const projects = await getCollection('projects');
-const featuredProjects = projects
-  .filter(project => project.data.featured)
-  .sort((a, b) => a.data.order - b.data.order);
-
-// Generate URLs for each featured project
-const projectUrls = featuredProjects.reduce((urls, project) => {
-  urls[project.data.category] = generateUrl(project);
-  return urls;
-}, {} as Record<string, string>);
+// Direct project data structure replacing content collections
+// This maps to the actual Astro pages in /src/pages/projects/
+const projectUrls = {
+  keystrok: '/projects/keystrok',
+  opensource: '/projects/service-radar', // Using service-radar as opensource project
+  grafana: '/projects/grafana',
+  jungleai: '/projects/keystrok', // Fallback to keystrok for now
+} as const;
 ---
 
 <BaseLayout
@@ -341,10 +336,10 @@ const projectUrls = featuredProjects.reduce((urls, project) => {
     <nav class="right-nav" aria-label="Past work navigation">
       <h2 class="nav-title">Past Work</h2>
       <ul class="nav-links" role="list">
-        <li><a href={projectUrls.keystrok || '/work/keystrok-main'} aria-label="View Keystrok project">Keystrok</a></li>
-        <li><a href={projectUrls.opensource || '/work/opensource'} aria-label="View Open Source projects">Open Source</a></li>
-        <li><a href={projectUrls.grafana || '/work/grafana'} aria-label="View Grafana Labs projects">Grafana Labs</a></li>
-        <li><a href={projectUrls.jungleai || '/work/jungleai-main'} aria-label="View Jungle AI project">Jungle AI</a></li>
+        <li><a href={projectUrls.keystrok} aria-label="View Keystrok project">Keystrok</a></li>
+        <li><a href={projectUrls.opensource} aria-label="View Open Source projects">Open Source</a></li>
+        <li><a href={projectUrls.grafana} aria-label="View Grafana Labs projects">Grafana Labs</a></li>
+        <li><a href={projectUrls.jungleai} aria-label="View Jungle AI project">Jungle AI</a></li>
         <li><span class="dimmed" aria-label="More projects coming soon">More</span></li>
       </ul>
     </nav>

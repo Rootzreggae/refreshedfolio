@@ -1377,7 +1377,7 @@
       // Also handle clicks on the peek window specifically
       const peekWindow = this.elements.foldCorner.querySelector('.fold-peek-window');
       if (peekWindow) {
-        peekWindow.addEventListener('click', this.handleFoldClick.bind(this));
+        (peekWindow as HTMLElement).addEventListener('click', this.handleFoldClick.bind(this));
       }
 
       // Close button

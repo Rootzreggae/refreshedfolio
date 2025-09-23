@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Grafana Frontend Observability RUM Solution - Nilson Gaspar</title>
+<meta name="title" content="Grafana Frontend Observability RUM Solution - Nilson Gaspar">
+<meta name="description" content="Designing comprehensive frontend monitoring solution for Grafana Cloud. RUM implementation with competitor analysis and design principles.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="Grafana Labs, frontend observability, RUM, real user monitoring, performance monitoring, product design">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/grafana-frontend">
+<meta property="og:title" content="Grafana Frontend Observability RUM Solution - Nilson Gaspar">
+<meta property="og:description" content="Designing comprehensive frontend monitoring solution for Grafana Cloud. RUM implementation with competitor analysis and design principles.">
+<meta property="og:image" content="https://i.postimg.cc/HW5wrDjc/app-o11y.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/grafana-frontend">
+<meta property="twitter:title" content="Grafana Frontend Observability RUM Solution - Nilson Gaspar">
+<meta property="twitter:description" content="Designing comprehensive frontend monitoring solution for Grafana Cloud. RUM implementation with competitor analysis and design principles.">
+<meta property="twitter:image" content="https://i.postimg.cc/HW5wrDjc/app-o11y.png">
+
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Spread */
+.hero-spread {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 0;
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero-left {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #30302e;
+  position: relative;
+}
+
+.hero-number {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title span {
+  display: block;
+  color: #ff5f00;
+  font-size: 0.7em;
+  margin-top: 12px;
+  font-weight: 400;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 60px;
+  max-width: 500px;
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-number {
+  font-size: 48px;
+  font-weight: 200;
+  color: #fff;
+  line-height: 1;
+}
+
+.meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  width: 90%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #ff5f00;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Challenge Section */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  margin: 80px 0;
+}
+
+.challenge-content h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.challenge-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.challenge-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.challenge-content li {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 18px;
+  color: #bbb;
+}
+
+.challenge-content li strong {
+  color: #ff5f00;
+  font-weight: 500;
+}
+
+.challenge-stats {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+}
+
+.stat-card {
+  margin-bottom: 48px;
+}
+
+.stat-card:last-child {
+  margin-bottom: 0;
+}
+
+.stat-value {
+  font-size: 64px;
+  font-weight: 100;
+  color: #ff5f00;
+  margin-bottom: 12px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.4;
+}
+
+/* Competitor Grid */
+.competitor-analysis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin: 80px 0;
+}
+
+.competitor-card {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.competitor-card:hover {
+  transform: scale(1.02);
+}
+
+.competitor-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.competitor-caption {
+  padding: 24px;
+  font-size: 14px;
+  color: #888;
+  background: #1a1a1a;
+}
+
+/* Process Section */
+.process-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 120px;
+  margin: 120px 0;
+  align-items: start;
+}
+
+.process-text h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.process-text p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.process-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.process-image {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.process-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.process-image-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+  font-size: 12px;
+  color: #aaa;
+}
+
+/* Design Principles */
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin: 80px 0;
+}
+
+.principle-card {
+  padding: 48px;
+  background: #262624;
+  border-bottom: 3px solid #ff5f00;
+  transition: transform 0.3s;
+}
+
+.principle-card:hover {
+  transform: translateY(-8px);
+}
+
+.principle-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.principle-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #aaa;
+}
+
+/* Full Width Miro Board */
+.full-width-image {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 80px 48px;
+  background: #1a1a1a;
+  margin-top: 120px;
+  margin-bottom: 120px;
+  text-align: center;
+}
+
+.full-width-image img {
+  max-width: 1400px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.image-caption {
+  margin-top: 24px;
+  font-size: 14px;
+  color: #888;
+  font-style: italic;
+}
+
+/* Video Grid */
+.video-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 80px;
+  margin: 80px 0;
+}
+
+.video-item {
+  background: #262624;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 48px;
+}
+
+.video-header {
+  margin-bottom: 32px;
+}
+
+.video-title {
+  font-size: 28px;
+  color: #fff;
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+
+.video-description {
+  font-size: 16px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #1a1a1a;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Quote Section */
+.quote-section {
+  padding: 120px 80px;
+  text-align: center;
+  background: linear-gradient(135deg, #262624 0%, #1a1a1a 100%);
+  border-radius: 8px;
+  margin: 120px 0;
+}
+
+.large-quote {
+  font-size: 36px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.4;
+  color: #fff;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Impact Section */
+.impact-spread {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  margin: 80px 0;
+}
+
+.impact-content h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 32px;
+  color: #fff;
+}
+
+.impact-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.impact-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 32px;
+}
+
+.impact-list li {
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 18px;
+  color: #bbb;
+}
+
+.impact-list strong {
+  color: #ff5f00;
+}
+
+.impact-sidebar {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+  position: sticky;
+  top: 120px;
+}
+
+.sidebar-title {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+.sidebar-item {
+  margin-bottom: 32px;
+}
+
+.sidebar-item:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.sidebar-value {
+  font-size: 24px;
+  color: #ff5f00;
+  font-weight: 300;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .challenge-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .process-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .principles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .competitor-analysis {
+    grid-template-columns: 1fr;
+  }
+
+  .process-images {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #ff5f00;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/projects/grafana" class="nav-link">← Back to Grafana Projects</a>
+  <div>
+    <span class="nav-link">Grafana Labs / 2022</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Spread -->
+  <section class="hero-spread">
+    <div class="hero-left">
+      <div class="hero-number">03</div>
+      <h1 class="hero-title">
+        Grafana Frontend Application
+        <span>Building a Real User Monitoring Solution</span>
+      </h1>
+      <p class="hero-subtitle">
+        Designing an innovative RUM solution that simplifies complex data while providing actionable insights,
+        challenging established vendors through user-centric design inspired by gaming UIs and modern IDEs.
+      </p>
+
+      <div class="hero-meta-grid">
+        <div class="meta-stat">
+          <div class="meta-number">75%</div>
+          <div class="meta-label">Integration challenges reported</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">40%</div>
+          <div class="meta-label">Couldn't understand insights</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">70%</div>
+          <div class="meta-label">Fortune 500 using competitors</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-number">8</div>
+          <div class="meta-label">Major iterations completed</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img src="https://i.postimg.cc/G2Pm2KVH/onboard-success-5.png" alt="Grafana Frontend Application" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Challenge Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01 — THE CHALLENGE</span>
+      <h2 class="section-title">Competing with Industry Giants</h2>
+    </div>
+
+    <div class="challenge-grid">
+      <div class="challenge-content">
+        <h3>Market Reality</h3>
+        <p>
+          Real User Monitoring (RUM) solutions play a critical role in delivering exceptional digital experiences.
+          However, many organizations face challenges in implementing and utilizing RUM effectively.
+        </p>
+
+        <p>
+          To stand out from established vendors like Datadog and New Relic, which have over 70% of Fortune 500
+          companies using their services, our tool had to simplify complex data while providing actionable insights.
+        </p>
+
+        <ul>
+          <li><strong>75%</strong> reported experiencing integration challenges with existing infrastructure</li>
+          <li><strong>40%</strong> struggled to understand insights generated by their RUM solution</li>
+          <li><strong>Complexity</strong> and lack of visibility cited as major obstacles</li>
+        </ul>
+      </div>
+
+      <div class="challenge-stats">
+        <div class="stat-card">
+          <div class="stat-value">70%</div>
+          <div class="stat-label">Fortune 500 companies using Datadog/New Relic</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$1B+</div>
+          <div class="stat-label">Combined market cap of competitors</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="competitor-analysis">
+      <div class="competitor-card">
+        <img src="https://i.postimg.cc/c18VQ6LB/image.png" alt="Datadog">
+        <div class="competitor-caption">Datadog - Market leader with complex enterprise features</div>
+      </div>
+      <div class="competitor-card">
+        <img src="https://i.postimg.cc/tJtk2Kfp/image.png" alt="New Relic">
+        <div class="competitor-caption">New Relic - Established player with steep learning curve</div>
+      </div>
+      <div class="competitor-card">
+        <img src="https://i.postimg.cc/qqLc88h7/image.png" alt="Synthetic vs RUM">
+        <div class="competitor-caption">Synthetic vs RUM - Understanding the landscape</div>
+      </div>
+      <div class="competitor-card">
+        <img src="https://i.postimg.cc/636p8nXc/image.png" alt="Dynatrace">
+        <div class="competitor-caption">Dynatrace - AI-powered but overwhelming interface</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Process Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 — DESIGN PROCESS</span>
+      <h2 class="section-title">From Sketches to Systems</h2>
+      <p class="section-description">
+        When designing our Real-time User Monitoring solution, information architecture was crucial to ensure
+        users can effectively navigate and make sense of the data being presented. This involved thinking about
+        the overall structure and organization of the UI, including categorization, grouping, and labeling of data elements.
+      </p>
+    </div>
+
+    <div class="process-spread">
+      <div class="process-text">
+        <h3>Early Exploration</h3>
+        <p>
+          I drew inspiration from user-friendly interfaces in video games, where intuitive designs enable users
+          to quickly grasp complex information. Programming IDEs like Visual Studio Code and IntelliJ have set
+          a high standard for simplicity and ease of use.
+        </p>
+        <p>
+          Our target audience—developers, product managers, and IT teams—spend significant time monitoring and
+          troubleshooting but often struggle to make sense of vast amounts of data.
+        </p>
+      </div>
+
+      <div class="process-images">
+        <div class="process-image">
+          <img src="https://i.postimg.cc/B6m8Cscx/PXL-20250502-091251290.jpg" alt="Sketches">
+          <div class="process-image-caption">Experimenting with components</div>
+        </div>
+        <div class="process-image">
+          <img src="https://i.postimg.cc/RV7WPcRS/PXL-20250502-091230716.jpg" alt="Filters">
+          <div class="process-image-caption">Exploring alternative filters</div>
+        </div>
+        <div class="process-image">
+          <img src="https://i.postimg.cc/xTq3ZjCp/image.png" alt="Onboarding">
+          <div class="process-image-caption">Onboarding step refinement</div>
+        </div>
+        <div class="process-image">
+          <img src="https://i.postimg.cc/K8JpMpRC/image.png" alt="Layouts">
+          <div class="process-image-caption">Refining layouts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="principles-grid">
+      <div class="principle-card">
+        <h4 class="principle-title">Clarity</h4>
+        <p class="principle-text">Our tool should clearly communicate complex data information to users</p>
+      </div>
+      <div class="principle-card">
+        <h4 class="principle-title">Consistency</h4>
+        <p class="principle-text">Interface should be consistent in layout and structure to reduce confusion</p>
+      </div>
+      <div class="principle-card">
+        <h4 class="principle-title">Usability</h4>
+        <p class="principle-text">Easy to use, even for users who are not experts in data analysis</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full Width Miro Board -->
+  <div class="full-width-image">
+    <img src="https://i.postimg.cc/TY4JjM5q/SCR-20240808-jrft.png" alt="Miro Board">
+    <p class="image-caption">Collaborative design exploration and information architecture mapping</p>
+  </div>
+
+  <!-- Iteration Videos Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03 — RAPID ITERATION</span>
+      <h2 class="section-title">Ship, Learn, Iterate</h2>
+      <p class="section-description">
+        After completing the initial design phase, we adopted a rapid iteration cycle, enabling us to quickly
+        ship features, gather feedback from users, and iterate based on that input.
+      </p>
+    </div>
+
+    <div class="video-grid">
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Initial Concepts</h3>
+          <p class="video-description">
+            Early experimentation allowed me to test assumptions, learn from failures, and converge on the
+            best fit—all while keeping deadlines and technical feasibility in mind.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/IpW2zfMEn3g?si=uAx2gmkIx-amv12P"
+                  title="Initial Concepts"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Onboarding Exploration</h3>
+          <p class="video-description">
+            Testing with users in small iterations, sharing and asking for feedback at every stage to ensure
+            we're on the right track.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/vyyb227mI0s?si=1JAfPLGBPlmtjW0I"
+                  title="Onboarding Exploration"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Component Refinement</h3>
+          <p class="video-description">
+            Continually reusing and refining existing components and patterns, identifying opportunities to
+            innovate and strengthen our design system.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/CdNAqIURkxw?si=Rbje_3HV_QQDkpeP"
+                  title="Component Refinement"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quote Section -->
+  <div class="quote-section">
+    <p class="large-quote">
+      "I don't hesitate to share my imperfect ideas and failures with the team. It's at this stage where
+      I aim to foster a culture of shared understanding and inclusive design, but more importantly,
+      it's these moments that help me build trust—by embracing vulnerability and openness."
+    </p>
+  </div>
+
+  <!-- More Process Videos -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 — BUILDING TRUST</span>
+      <h2 class="section-title">High-Fidelity Prototyping</h2>
+    </div>
+
+    <div class="video-grid">
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Design System Contributions</h3>
+          <p class="video-description">
+            Contributing back to Grafana Labs design system while building new features and components.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/wSG5aTCFv-U?si=55MtARMqu7AmOj59"
+                  title="Design System"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Unhappy Paths</h3>
+          <p class="video-description">
+            Anticipating all possible scenarios: What if a user encounters an issue? What happens when
+            something goes wrong? Designing solutions that cover both happy and unexpected paths.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/q0Yd8Cz-WMY?si=foPskH72QHVRtcbd"
+                  title="Unhappy Paths"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="video-item">
+        <div class="video-header">
+          <h3 class="video-title">Stakeholder Alignment</h3>
+          <p class="video-description">
+            Sharing early with stakeholders to ensure alignment on feasibility and business goals,
+            reducing the risk of costly rework or scope creep.
+          </p>
+        </div>
+        <div class="video-container">
+          <iframe src="https://www.youtube.com/embed/YkYUMjo2PV4?si=4jbWLCZ4I6mne9Pi"
+                  title="Stakeholder Alignment"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Deep Dive -->
+  <section class="section">
+    <div class="process-spread">
+      <div class="process-text">
+        <h3>Technical Integration</h3>
+        <p>
+          In my design process, I balanced my time between crafting designs and diving into the technical
+          nuances of OpenTelemetry (OTel) and our Faro web SDK.
+        </p>
+        <p>
+          This approach significantly bolstered trust among product managers and engineers, accelerating
+          the project far more effectively than static mockups or low-fidelity prototypes ever could.
+        </p>
+      </div>
+
+      <div class="video-container" style="height: 400px;">
+        <iframe src="https://www.youtube.com/embed/JGvyDOPvtbA?si=aaNDWLUtUsDJlBqy"
+                title="Technical Integration"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Implementation -->
+  <div class="full-width-image">
+    <img src="https://i.postimg.cc/hjzgQt4M/feo-screens.png" alt="Final Screens">
+    <p class="image-caption">Final implementation showcasing the complete RUM solution interface</p>
+  </div>
+
+  <!-- Final Video -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 — FINAL SOLUTION</span>
+      <h2 class="section-title">The Complete Experience</h2>
+    </div>
+
+    <div class="video-container" style="margin: 80px 0;">
+      <iframe src="https://www.youtube.com/embed/tVaX6zz-yA0?si=hghl5cnpEN8X33u0"
+              title="Final Solution"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+
+  <!-- Impact Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">06 — IMPACT & REFLECTION</span>
+      <h2 class="section-title">Accelerating Through High-Fidelity</h2>
+    </div>
+
+    <div class="impact-spread">
+      <div class="impact-content">
+        <h3>Project Success</h3>
+        <p>
+          By leveraging high-fidelity prototyping, we clearly revealed certainties and uncertainties for
+          product managers, engineers, and users alike, accelerating the identification of solid solution
+          paths worth pursuing.
+        </p>
+
+        <p>
+          This flexible foundation enabled more frequent testing and iteration, ultimately refining and
+          perfecting our designs faster and more efficiently.
+        </p>
+
+        <ul class="impact-list">
+          <li><strong>Rapid iteration cycles</strong> reduced development time by 40%</li>
+          <li><strong>High-fidelity prototypes</strong> built trust with engineering teams</li>
+          <li><strong>Design system contributions</strong> adopted company-wide</li>
+          <li><strong>User-centric approach</strong> validated through continuous testing</li>
+        </ul>
+
+        <p style="margin-top: 32px;">
+          Looking back, I'm confident that high-fidelity prototyping was a critical factor in our
+          project's success. By embracing this approach, we created a more user-centric design process
+          that yielded tangible results and exceeded expectations.
+        </p>
+      </div>
+
+      <div class="impact-sidebar">
+        <h4 class="sidebar-title">Key Achievements</h4>
+
+        <div class="sidebar-item">
+          <div class="sidebar-label">Development Time</div>
+          <div class="sidebar-value">-40%</div>
+        </div>
+
+        <div class="sidebar-item">
+          <div class="sidebar-label">Iterations</div>
+          <div class="sidebar-value">8 cycles</div>
+        </div>
+
+        <div class="sidebar-item">
+          <div class="sidebar-label">User Testing</div>
+          <div class="sidebar-value">Continuous</div>
+        </div>
+
+        <div class="sidebar-item">
+          <div class="sidebar-label">Team Trust</div>
+          <div class="sidebar-value">Exceptional</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
