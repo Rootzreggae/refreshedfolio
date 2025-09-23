@@ -47,7 +47,7 @@ const seoTitle = project ? `${pageTitle} - Portfolio` : pageTitle;
 const metadata = project ? {
   Project: project.data.title,
   Role: project.data.role,
-  Timeline: project.data.duration,
+  Timeline: project.data.timeline || project.data.duration,
   ...(project.data.technologies && { Technologies: project.data.technologies }),
   ...(project.data.team && { Team: project.data.team }),
   ...(project.data.client && { Client: project.data.client })

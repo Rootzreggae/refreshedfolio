@@ -10,7 +10,7 @@ import type { CollectionEntry } from 'astro:content';
 // === TYPE DEFINITIONS ===
 
 export type ProjectType = 'single' | 'category' | 'subproject';
-export type LayoutType = 'component-case-study' | 'markdown-case-study' | 'project' | 'category';
+export type LayoutType = 'component-case-study' | 'markdown-case-study' | 'project' | 'category' | 'story';
 
 export interface RouteConfig {
   url: string;
@@ -37,9 +37,9 @@ export interface ProjectMetadata {
  */
 const LAYOUT_MAPPING: Record<string, (project: ProjectMetadata) => LayoutType> = {
   single: (project) => {
-    // MDX files with component imports use ComponentCaseStudyLayout
+    // MDX files with component imports use UnifiedLayout with story mode
     if (project.fileExtension === 'mdx') {
-      return 'component-case-study';
+      return 'story';
     }
 
     // Special handling for certain categories that prefer markdown layout
@@ -54,9 +54,9 @@ const LAYOUT_MAPPING: Record<string, (project: ProjectMetadata) => LayoutType> =
   category: () => 'category',
 
   subproject: (project) => {
-    // Subprojects with MDX get component case study layout
+    // Subprojects with MDX get story layout via UnifiedLayout
     if (project.fileExtension === 'mdx') {
-      return 'component-case-study';
+      return 'story';
     }
 
     // Fallback to project layout
