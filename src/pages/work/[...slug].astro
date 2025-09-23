@@ -1,111 +1,36 @@
 ---
 /**
- * Unified Project Router
+ * DISABLED: Unified Project Router
  *
- * Handles all /work/* routes with consistent, predictable routing logic.
- * Uses centralized routing configuration for type safety and maintainability.
+ * This file handled content collection routes but has been disabled during migration
+ * to Astro page-based project structure. Projects are now handled as direct Astro pages
+ * in /src/pages/projects/ to eliminate content collection conflicts.
+ *
+ * Migration notes:
+ * - Individual project pages are now in /src/pages/projects/
+ * - Category pages use index.astro files in subdirectories
+ * - This eliminates the need for content collection routing
  */
 
-import { type CollectionEntry, getCollection } from 'astro:content';
-import {
-  generateStaticPaths as generatePaths,
-  type RouteConfig,
-  validateProjectRouting
-} from '../../lib/routing';
-
-// Layout imports
-import ProjectLayout from '../../layouts/ProjectLayout.astro';
-import CategoryLayout from '../../layouts/CategoryLayout.astro';
-import ComponentCaseStudyLayout from '../../layouts/ComponentCaseStudyLayout.astro';
-import MarkdownCaseStudyLayout from '../../layouts/MarkdownCaseStudyLayout.astro';
-import UnifiedLayout from '../../layouts/UnifiedLayout.astro';
-import MarkdownStoryText from '../../components/story/MarkdownStoryText.astro';
-
+// File temporarily disabled - project routes now handled by direct Astro pages
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-
-  // Validate routing configuration in development
-  if (import.meta.env.DEV) {
-    const validation = validateProjectRouting(projects);
-    if (!validation.valid) {
-      console.error('❌ Routing Validation Failed:');
-      validation.errors.forEach(error => console.error(`  - ${error}`));
-      throw new Error('Project routing configuration is invalid');
-    } else {
-      console.log('✅ Project routing validation passed');
-    }
-  }
-
-  return generatePaths(projects);
+  return [];
 }
 
-// TypeScript interface for props
-interface Props {
-  project: CollectionEntry<'projects'>;
-  routeConfig: RouteConfig;
-  relatedProjects?: CollectionEntry<'projects'>[];
-}
-
-// Extract props
-const { project, routeConfig, relatedProjects } = Astro.props;
-const { Content } = await project.render();
-
-// Layout selection based on centralized configuration
-const layoutType = routeConfig.layout;
-
-// Debug info for development
-if (import.meta.env.DEV) {
-  console.log(`📄 Rendering: ${project.data.title}`);
-  console.log(`🔗 URL: ${routeConfig.url}`);
-  console.log(`🎨 Layout: ${layoutType}`);
-  console.log(`📁 Type: ${project.data.projectType}`);
-}
+// Fallback component (should not be reached)
+const { } = Astro.props;
 ---
 
-<!-- Render appropriate layout based on configuration -->
-{layoutType === 'category' && (
-  <CategoryLayout category={project} subProjects={relatedProjects || []}>
-    <Content />
-  </CategoryLayout>
-)}
+<!-- This route is disabled - projects now use direct Astro pages -->
+<div>Route disabled - redirecting to projects</div>
 
-{layoutType === 'story' && (
-  <UnifiedLayout
-    project={project}
-    layout="story"
-    containerSize="wide"
-    showHeader={true}
-    headerLayout="hero"
-    navigation={{
-      backLink: "/work",
-      backText: "Back to Work"
-    }}
-  >
-    <Content />
-  </UnifiedLayout>
-)}
-
-{layoutType === 'component-case-study' && (
-  <ComponentCaseStudyLayout project={project}>
-    <Content />
-  </ComponentCaseStudyLayout>
-)}
-
-{layoutType === 'markdown-case-study' && (
-  <MarkdownCaseStudyLayout project={project}>
-    <MarkdownStoryText>
-      <Content />
-    </MarkdownStoryText>
-  </MarkdownCaseStudyLayout>
-)}
-
-{layoutType === 'project' && (
-  <ProjectLayout
-    project={project}
-    pageType={project.data.projectType}
-    subProjects={relatedProjects}
-  >
-    <Content />
-  </ProjectLayout>
-)}
-
+<script>
+  // Redirect any legacy /work/* URLs to /projects/*
+  if (typeof window !== 'undefined') {
+    const path = window.location.pathname;
+    if (path.startsWith('/work/')) {
+      const newPath = path.replace('/work/', '/projects/');
+      window.location.replace(newPath);
+    }
+  }
+</script>

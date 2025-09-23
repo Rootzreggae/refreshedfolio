@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Open Source Design Contribution: Service Radar Part 1 - Nilson Gaspar</title>
+<meta name="title" content="Open Source Design Contribution: Service Radar Part 1 - Nilson Gaspar">
+<meta name="description" content="Finding the design gap in open source distributed network monitoring. UX research, community building, and design strategy.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="open source, service radar, UX research, community building, design strategy, network monitoring">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/service-radar-part1">
+<meta property="og:title" content="Open Source Design Contribution: Service Radar Part 1 - Nilson Gaspar">
+<meta property="og:description" content="Finding the design gap in open source distributed network monitoring. UX research, community building, and design strategy.">
+<meta property="og:image" content="https://i.postimg.cc/pL2D4VWx/SCR-20250411-iunz.png">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/service-radar-part1">
+<meta property="twitter:title" content="Open Source Design Contribution: Service Radar Part 1 - Nilson Gaspar">
+<meta property="twitter:description" content="Finding the design gap in open source distributed network monitoring. UX research, community building, and design strategy.">
+<meta property="twitter:image" content="https://i.postimg.cc/pL2D4VWx/SCR-20250411-iunz.png">
+
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Spread */
+.hero-spread {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 0;
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero-left {
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #30302e;
+  position: relative;
+}
+
+.hero-number {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  font-size: 180px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title span {
+  display: block;
+  color: #00a8ff;
+  font-size: 0.6em;
+  margin-top: 12px;
+  font-weight: 400;
+}
+
+.hero-subtitle {
+  font-size: 20px;
+  font-weight: 300;
+  color: #aaa;
+  line-height: 1.5;
+  margin-bottom: 60px;
+  max-width: 500px;
+}
+
+.hero-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.meta-value {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.hero-right {
+  position: relative;
+  overflow: hidden;
+  background: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-image {
+  width: 90%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #00a8ff;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Motivation Section */
+.motivation-spread {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  margin: 80px 0;
+  align-items: start;
+}
+
+.motivation-text {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+}
+
+.motivation-text p {
+  margin-bottom: 32px;
+}
+
+.highlight-box {
+  background: #262624;
+  padding: 48px;
+  border-left: 3px solid #00a8ff;
+  border-radius: 4px;
+}
+
+.quote {
+  font-size: 18px;
+  font-style: italic;
+  color: #aaa;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.quote-author {
+  font-size: 14px;
+  color: #666;
+  text-align: right;
+}
+
+/* Discovery Grid */
+.discovery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin: 80px 0;
+}
+
+.discovery-image {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.discovery-image:hover {
+  transform: scale(1.02);
+}
+
+.discovery-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.discovery-caption {
+  padding: 24px;
+  font-size: 14px;
+  color: #888;
+  background: #1a1a1a;
+}
+
+/* Process Section */
+.process-timeline {
+  position: relative;
+  margin: 80px 0;
+  padding-left: 60px;
+}
+
+.process-timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-step {
+  position: relative;
+  margin-bottom: 60px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.timeline-step:last-child {
+  border-bottom: none;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -50px;
+  top: 8px;
+  width: 20px;
+  height: 20px;
+  background: #00a8ff;
+  border-radius: 50%;
+  border: 4px solid #30302e;
+}
+
+.timeline-title {
+  font-size: 28px;
+  font-weight: 400;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.timeline-content {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+}
+
+/* Design Exploration */
+.exploration-showcase {
+  margin: 80px 0;
+}
+
+.sketch-container {
+  background: #1a1a1a;
+  padding: 48px;
+  border-radius: 8px;
+  margin-bottom: 48px;
+}
+
+.sketch-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.exploration-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin: 48px 0;
+}
+
+.exploration-item {
+  background: #262624;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.exploration-item:hover {
+  transform: translateY(-8px);
+}
+
+.exploration-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.exploration-caption {
+  padding: 24px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Accessibility Focus */
+.accessibility-section {
+  background: #262624;
+  padding: 80px;
+  border-radius: 8px;
+  margin: 120px 0;
+  text-align: center;
+}
+
+.accessibility-title {
+  font-size: 36px;
+  font-weight: 300;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.accessibility-text {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #bbb;
+  max-width: 800px;
+  margin: 0 auto 48px;
+}
+
+.wcag-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+/* Final Results */
+.results-spread {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin: 120px 0;
+  align-items: center;
+}
+
+.results-text h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.results-text p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 32px;
+}
+
+.results-links {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.results-links a {
+  color: #00a8ff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: opacity 0.3s;
+}
+
+.results-links a:hover {
+  opacity: 0.7;
+}
+
+.results-visual {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.results-visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Full Width Images */
+.full-width-showcase {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 80px 48px;
+  background: #1a1a1a;
+  margin-top: 120px;
+  margin-bottom: 120px;
+}
+
+.showcase-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.showcase-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.showcase-caption {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  font-style: italic;
+}
+
+/* Key Questions */
+.questions-list {
+  background: #262624;
+  padding: 48px;
+  border-radius: 8px;
+  margin: 48px 0;
+}
+
+.questions-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.questions-list li {
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 18px;
+  color: #bbb;
+}
+
+.questions-list li:last-child {
+  border-bottom: none;
+}
+
+.questions-list li::before {
+  content: '→';
+  color: #00a8ff;
+  margin-right: 16px;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-spread {
+    grid-template-columns: 1fr;
+  }
+
+  .motivation-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .results-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .exploration-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .discovery-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #00a8ff;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/projects/service-radar" class="nav-link">← Back to Service Radar</a>
+  <div>
+    <span class="nav-link">Service Radar / 2025</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Spread -->
+  <section class="hero-spread">
+    <div class="hero-left">
+      <div class="hero-number">05</div>
+      <h1 class="hero-title">
+        Contributing to Open Source as a Product Designer
+        <span>Part 1: Service Radar</span>
+      </h1>
+      <p class="hero-subtitle">
+        Bridging the design gap in open source by contributing UX expertise to a distributed network
+        monitoring system, transforming complex technical interfaces into intuitive experiences.
+      </p>
+
+      <div class="hero-meta-grid">
+        <div class="meta-stat">
+          <div class="meta-label">Project</div>
+          <div class="meta-value">Service Radar</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Role</div>
+          <div class="meta-value">Design Contributor</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Timeline</div>
+          <div class="meta-value">2025 - Ongoing</div>
+        </div>
+        <div class="meta-stat">
+          <div class="meta-label">Type</div>
+          <div class="meta-value">Open Source Contribution</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img src="https://i.postimg.cc/XvBxjQYH/pexels-realtoughcandy-11035358.jpg" alt="Open Source Development" class="hero-image">
+    </div>
+  </section>
+
+  <!-- Motivation Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01 — MOTIVATION</span>
+      <h2 class="section-title">Finding the Design Gap</h2>
+    </div>
+
+    <div class="motivation-spread">
+      <div class="motivation-text">
+        <p>
+          My passion lies at the intersection of product design and the collaborative spirit of open source.
+          While I admire the community-driven nature and the 'no guard rails' innovation often found in
+          open source projects, my experience working alongside talented engineers highlighted an observation:
+          many contribute powerful code, but dedicated design contributors seemed less common within my
+          professional network.
+        </p>
+        <p>
+          Seeing this gap as an opportunity, I set a personal goal: to become a designer actively contributing
+          to an open source project. I began searching platforms like GitHub, Lemmy, and Reddit for a project
+          that resonated with my interests and where design could potentially add significant value.
+        </p>
+      </div>
+
+      <div class="highlight-box">
+        <p class="quote">
+          "ServiceRadar is a distributed network monitoring system designed to keep an eye on internal
+          services while delivering cloud-based alerting. It aims to tackle the complexities of modern
+          infrastructure monitoring."
+        </p>
+        <p class="quote-author">— Michael, Service Radar Creator</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Discovery Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 — DISCOVERY</span>
+      <h2 class="section-title">Understanding the Landscape</h2>
+      <p class="section-description">
+        Intrigued by the project's ambition, I explored the documentation and experimented with the current
+        iteration. While functionally promising, my initial analysis suggested opportunities to enhance the
+        user experience—particularly around the clarity of information presented and the ease with which
+        new users could understand their system's status at a glance.
+      </p>
+    </div>
+
+    <div class="discovery-grid">
+      <div class="discovery-image">
+        <img src="https://i.postimg.cc/T3K9SdkY/image.png" alt="Service Radar Demo">
+        <div class="discovery-caption">Current Service Radar interface showing monitoring dashboard</div>
+      </div>
+      <div class="discovery-image">
+        <img src="https://i.postimg.cc/tJRJcgNr/image.png" alt="Pollers View">
+        <div class="discovery-caption">Pollers configuration interface</div>
+      </div>
+      <div class="discovery-image">
+        <img src="https://i.postimg.cc/Qd7805r8/image.png" alt="Onboarding">
+        <div class="discovery-caption">Existing onboarding step</div>
+      </div>
+      <div class="discovery-image">
+        <img src="https://i.postimg.cc/2jJNM6GV/image.png" alt="Dashboard">
+        <div class="discovery-caption">Service monitoring dashboard</div>
+      </div>
+    </div>
+
+    <div class="questions-list">
+      <h3 style="font-size: 24px; color: #fff; margin-bottom: 24px;">Key Questions Before Contributing</h3>
+      <ul>
+        <li>What is the specific target audience beyond DevOps/SREs?</li>
+        <li>How does Service Radar position itself in the competitive landscape?</li>
+        <li>What is the long-term vision for the project?</li>
+        <li>Are there existing design guidelines or branding considerations?</li>
+        <li>How can my skills (design + HTML/CSS/JS) best integrate with the project?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Process Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03 — COLLABORATION BEGINS</span>
+      <h2 class="section-title">From Analysis to Action</h2>
+    </div>
+
+    <div class="process-timeline">
+      <div class="timeline-step">
+        <div class="timeline-dot"></div>
+        <h3 class="timeline-title">Initial Contact</h3>
+        <p class="timeline-content">
+          With prepared questions and initial observations, I contacted Michael. Our chat was insightful—I
+          learned more about his vision for Service Radar and confirmed that he hadn't collaborated closely
+          with a dedicated designer before, presenting a learning opportunity for both of us.
+        </p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-dot"></div>
+        <h3 class="timeline-title">UX Audit</h3>
+        <p class="timeline-content">
+          I shared my initial observations and a preliminary UX audit, outlining concrete ways design
+          thinking could support the project's development. The audit focused on information hierarchy,
+          visual clarity, and user journey optimization.
+        </p>
+      </div>
+
+      <div class="timeline-step">
+        <div class="timeline-dot"></div>
+        <h3 class="timeline-title">Defining Scope</h3>
+        <p class="timeline-content">
+          After discussing possibilities based on my findings, we agreed that focusing first on improving
+          the clarity and usability of the main status dashboard and visual hierarchy of critical alerts
+          would be a valuable and impactful starting point.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design Process Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 — DESIGN EXPLORATION</span>
+      <h2 class="section-title">From Sketches to Systems</h2>
+    </div>
+
+    <div class="sketch-container">
+      <img src="https://i.postimg.cc/wMSLbGGY/PXL-20250406-094654266.jpg" alt="Wireframe Sketches" class="sketch-image">
+      <p style="margin-top: 24px; text-align: center; color: #888; font-size: 14px; font-style: italic;">
+        Initial wireframe sketches exploring dashboard layout and information hierarchy
+      </p>
+    </div>
+
+    <p class="section-description" style="margin-bottom: 48px;">
+      To tackle the challenge of presenting complex monitoring information intuitively, I began exploring
+      design directions that emphasized clarity and scannability. An isometric style emerged as a promising
+      direction, potentially offering a way to visually distinguish different monitored services or system
+      components clearly within the dashboard interface.
+    </p>
+
+    <div class="exploration-grid">
+      <div class="exploration-item">
+        <img src="https://i.postimg.cc/4yBNY7pL/SCR-20250326-lzcs.jpg" alt="Isometric Exploration 1">
+        <div class="exploration-caption">Initial isometric style exploration</div>
+      </div>
+      <div class="exploration-item">
+        <img src="https://i.postimg.cc/QM18pnpW/SCR-20250404-rnbp.png" alt="Isometric Exploration 2">
+        <div class="exploration-caption">Refined component visualization</div>
+      </div>
+      <div class="exploration-item">
+        <img src="https://i.postimg.cc/ydT7Ggp1/SCR-20250328-nnim.png" alt="Isometric Exploration 3">
+        <div class="exploration-caption">Dashboard layout with isometric elements</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Accessibility Focus -->
+  <div class="accessibility-section">
+    <h2 class="accessibility-title">Accessibility First, Not Afterthought</h2>
+    <p class="accessibility-text">
+      Throughout the visual exploration, accessibility was a core principle. As I experimented with
+      layouts and potential color palettes inspired by the isometric approach, I actively used Figma's
+      built-in tools to ensure adherence to WCAG contrast requirements. The goal was to create a
+      visually engaging and universally usable interface from the outset.
+    </p>
+    <img src="https://i.postimg.cc/XJJkXhG9/SCR-20250406-jwsb.png" alt="WCAG Testing in Figma" class="wcag-image">
+  </div>
+
+  <!-- Responsive Design -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 — RESPONSIVE SOLUTIONS</span>
+      <h2 class="section-title">Designing for Every Screen</h2>
+      <p class="section-description">
+        To ensure the proposed solution would function effectively across different user environments,
+        I developed responsive designs, considering layouts for three key breakpoints (desktop, tablet, and mobile).
+      </p>
+    </div>
+
+    <img src="https://i.postimg.cc/x8HPvm0R/SCR-20250406-kcmf.jpg" alt="Responsive Breakpoints" style="width: 100%; height: auto; border-radius: 8px; margin: 48px 0;">
+  </section>
+
+  <!-- Full Width Showcase -->
+  <div class="full-width-showcase">
+    <div class="showcase-container">
+      <img src="https://i.postimg.cc/Y28DWby6/SCR-20250412-jfoh.png" alt="Full Page Design">
+      <p class="showcase-caption">Complete redesigned landing page with improved information hierarchy and visual clarity</p>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">06 — FROM DESIGN TO CODE</span>
+      <h2 class="section-title">Making It Real</h2>
+    </div>
+
+    <div class="results-spread">
+      <div class="results-text">
+        <h3>Iterative Refinement</h3>
+        <p>
+          Through an iterative process, I shared concepts with Michael, gathering feedback on how
+          effectively the new layouts surfaced critical information compared to the existing setup.
+          This collaborative loop allowed us to quickly pinpoint areas for improvement and refine
+          the visual language and information hierarchy.
+        </p>
+        <p>
+          The iterative design and feedback cycle brought us closer to a concept that significantly
+          improves upon the previous version in terms of usability and clarity. The next logical
+          step involves translating these refined designs into functional code.
+        </p>
+
+        <div class="results-links">
+          <a href="https://cozy-pasca-0ab03a.netlify.app/" target="_blank">View Coded Version →</a>
+          <a href="https://docs.serviceradar.cloud/" target="_blank">Service Radar Docs →</a>
+        </div>
+      </div>
+
+      <div class="results-visual">
+        <img src="https://i.postimg.cc/pL2D4VWx/SCR-20250411-iunz.png" alt="Coded Implementation">
+      </div>
+    </div>
+  </section>
+
+  <!-- Reflection -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">07 — ONGOING JOURNEY</span>
+      <h2 class="section-title">The Impact of Design in Open Source</h2>
+    </div>
+
+    <div style="max-width: 800px;">
+      <p class="section-description">
+        This collaboration marks just the beginning of my journey as a product designer contributing
+        to open source projects. The experience reinforced my belief that dedicated design thinking
+        can significantly enhance open source tools, making them more accessible and user-friendly
+        while maintaining their technical power.
+      </p>
+      <p class="section-description" style="margin-top: 32px;">
+        By bridging the gap between engineering excellence and user experience, we can help open
+        source projects reach broader audiences and have greater impact. The work continues as
+        Service Radar evolves, with design now integrated as a core consideration in its development.
+      </p>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>

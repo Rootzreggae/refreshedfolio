@@ -22,23 +22,71 @@ export const FigmaUI: React.FC = () => {
   const [zoomLevel, setZoomLevel] = useState<string>('100%');
   const [activeTool, setActiveTool] = useState<string>('move');
 
+  const handleToolChange = (tool: string) => {
+    if (tool === activeTool) return; // Don't track clicking the same tool
+
+    setActiveTool(tool);
+
+    // Track tool changes
+    if (typeof window !== 'undefined' && window.umami) {
+      window.umami.track('Figma Tool Changed', {
+        component: 'FigmaUI',
+        action: 'tool_select',
+        from: activeTool,
+        to: tool
+      });
+    }
+  };
+
   const handleTabClick = (id: string) => {
     setTabs(tabs.map(tab => ({
       ...tab,
       active: tab.id === id
     })));
+
+    // Track tab interactions
+    if (typeof window !== 'undefined' && window.umami) {
+      window.umami.track('Figma Tab Clicked', {
+        component: 'FigmaUI',
+        action: 'tab_click',
+        tab_id: id,
+        tab_name: tabs.find(tab => tab.id === id)?.name || 'unknown'
+      });
+    }
   };
 
   const handleTabClose = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    const tabToClose = tabs.find(tab => tab.id === id);
     setTabs(tabs.filter(tab => tab.id !== id));
+
+    // Track tab close interactions
+    if (typeof window !== 'undefined' && window.umami) {
+      window.umami.track('Figma Tab Closed', {
+        component: 'FigmaUI',
+        action: 'tab_close',
+        tab_id: id,
+        tab_name: tabToClose?.name || 'unknown'
+      });
+    }
   };
 
   const handleZoomIn = () => {
     const levels = ['25%', '50%', '75%', '100%', '150%', '200%'];
     const currentIndex = levels.indexOf(zoomLevel);
     if (currentIndex < levels.length - 1) {
-      setZoomLevel(levels[currentIndex + 1]);
+      const newLevel = levels[currentIndex + 1];
+      setZoomLevel(newLevel);
+
+      // Track zoom interactions
+      if (typeof window !== 'undefined' && window.umami) {
+        window.umami.track('Figma Zoom Changed', {
+          component: 'FigmaUI',
+          action: 'zoom_in',
+          from: zoomLevel,
+          to: newLevel
+        });
+      }
     }
   };
 
@@ -46,7 +94,18 @@ export const FigmaUI: React.FC = () => {
     const levels = ['25%', '50%', '75%', '100%', '150%', '200%'];
     const currentIndex = levels.indexOf(zoomLevel);
     if (currentIndex > 0) {
-      setZoomLevel(levels[currentIndex - 1]);
+      const newLevel = levels[currentIndex - 1];
+      setZoomLevel(newLevel);
+
+      // Track zoom interactions
+      if (typeof window !== 'undefined' && window.umami) {
+        window.umami.track('Figma Zoom Changed', {
+          component: 'FigmaUI',
+          action: 'zoom_out',
+          from: zoomLevel,
+          to: newLevel
+        });
+      }
     }
   };
 
@@ -244,52 +303,52 @@ export const FigmaUI: React.FC = () => {
 
             {/* Floating Toolbar */}
             <div className="floating-toolbar">
-              <button className={`tool-button ${activeTool === 'move' ? 'active' : ''}`} onClick={() => setActiveTool('move')} title="Move">
+              <button className={`tool-button ${activeTool === 'move' ? 'active' : ''}`} onClick={() => handleToolChange('move')} title="Move">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 2L12 6H9V10H13L9 14V11H7V7H4L8 3V2Z"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'frame' ? 'active' : ''}`} onClick={() => setActiveTool('frame')} title="Frame">
+              <button className={`tool-button ${activeTool === 'frame' ? 'active' : ''}`} onClick={() => handleToolChange('frame')} title="Frame">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <rect x="3" y="3" width="10" height="10"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'rectangle' ? 'active' : ''}`} onClick={() => setActiveTool('rectangle')} title="Rectangle">
+              <button className={`tool-button ${activeTool === 'rectangle' ? 'active' : ''}`} onClick={() => handleToolChange('rectangle')} title="Rectangle">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <rect x="3" y="5" width="10" height="6"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'ellipse' ? 'active' : ''}`} onClick={() => setActiveTool('ellipse')} title="Ellipse">
+              <button className={`tool-button ${activeTool === 'ellipse' ? 'active' : ''}`} onClick={() => handleToolChange('ellipse')} title="Ellipse">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <ellipse cx="8" cy="8" rx="5" ry="3.5"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'polygon' ? 'active' : ''}`} onClick={() => setActiveTool('polygon')} title="Polygon">
+              <button className={`tool-button ${activeTool === 'polygon' ? 'active' : ''}`} onClick={() => handleToolChange('polygon')} title="Polygon">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 3L13 7L11 13H5L3 7Z"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'star' ? 'active' : ''}`} onClick={() => setActiveTool('star')} title="Star">
+              <button className={`tool-button ${activeTool === 'star' ? 'active' : ''}`} onClick={() => handleToolChange('star')} title="Star">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 2L9.5 6.5L14 7L10.5 10L12 14L8 11.5L4 14L5.5 10L2 7L6.5 6.5Z"/>
                 </svg>
               </button>
               <div className="tool-divider"></div>
-              <button className={`tool-button ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => setActiveTool('pen')} title="Pen">
+              <button className={`tool-button ${activeTool === 'pen' ? 'active' : ''}`} onClick={() => handleToolChange('pen')} title="Pen">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M3 13L10 6L13 9L6 16L3 13Z"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'text' ? 'active' : ''}`} onClick={() => setActiveTool('text')} title="Text">
+              <button className={`tool-button ${activeTool === 'text' ? 'active' : ''}`} onClick={() => handleToolChange('text')} title="Text">
                 <span style={{fontWeight: '600', fontSize: '14px'}}>T</span>
               </button>
               <div className="tool-divider"></div>
-              <button className={`tool-button ${activeTool === 'hand' ? 'active' : ''}`} onClick={() => setActiveTool('hand')} title="Hand">
+              <button className={`tool-button ${activeTool === 'hand' ? 'active' : ''}`} onClick={() => handleToolChange('hand')} title="Hand">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M10 2V8L8 7V3L6 4V9L4 8V5L2 6V11L8 14L14 11V7L12 6V4L10 2Z"/>
                 </svg>
               </button>
-              <button className={`tool-button ${activeTool === 'comment' ? 'active' : ''}`} onClick={() => setActiveTool('comment')} title="Comment">
+              <button className={`tool-button ${activeTool === 'comment' ? 'active' : ''}`} onClick={() => handleToolChange('comment')} title="Comment">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M2 3H14V11H8L4 14V11H2V3Z"/>
                 </svg>

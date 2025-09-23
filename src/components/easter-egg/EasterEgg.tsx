@@ -14,11 +14,27 @@ export const EasterEgg: React.FC = () => {
   const handleFoldClick = () => {
     setIsRevealed(true);
     document.body.classList.add('figma-revealed');
+
+    // Track easter egg reveal event
+    if (typeof window !== 'undefined' && window.umami) {
+      window.umami.track('Easter Egg Revealed', {
+        component: 'Figma Easter Egg',
+        action: 'fold_click'
+      });
+    }
   };
 
   const handleClose = () => {
     setIsRevealed(false);
     document.body.classList.remove('figma-revealed');
+
+    // Track easter egg close event
+    if (typeof window !== 'undefined' && window.umami) {
+      window.umami.track('Easter Egg Closed', {
+        component: 'Figma Easter Egg',
+        action: 'close_click'
+      });
+    }
   };
 
   return (
