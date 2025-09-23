@@ -8,7 +8,6 @@ const projectUrls = {
   keystrok: '/projects/keystrok',
   opensource: '/projects/service-radar', // Using service-radar as opensource project
   grafana: '/projects/grafana',
-  jungleai: '/projects/keystrok', // Fallback to keystrok for now
 } as const;
 ---
 
@@ -339,7 +338,6 @@ const projectUrls = {
         <li><a href={projectUrls.keystrok} aria-label="View Keystrok project">Keystrok</a></li>
         <li><a href={projectUrls.opensource} aria-label="View Open Source projects">Open Source</a></li>
         <li><a href={projectUrls.grafana} aria-label="View Grafana Labs projects">Grafana Labs</a></li>
-        <li><a href={projectUrls.jungleai} aria-label="View Jungle AI project">Jungle AI</a></li>
         <li><span class="dimmed" aria-label="More projects coming soon">More</span></li>
       </ul>
     </nav>

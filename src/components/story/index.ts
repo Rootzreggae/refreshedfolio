@@ -1,6 +1,11 @@
-export { default as CompCarousel } from './CompCarousel.astro';
-export { default as CompSideBySide } from './CompSideBySide.astro';
-export { default as CompExpandable } from './CompExpandable.astro';
-export { default as CompBeforeAfter } from './CompBeforeAfter.astro';
-export { default as CompImageGrid } from './CompImageGrid.astro';
-export { default as CompParallax } from './CompParallax.astro';
+// Note: These exports are for reference only.
+// Import Astro components directly in .astro files instead of through this index.
+// TypeScript cannot resolve .astro imports from .ts files, which can cause dev server crashes.
+
+// Use these imports in .astro files:
+// import CompCarousel from './CompCarousel.astro';
+// import CompSideBySide from './CompSideBySide.astro';
+// import CompExpandable from './CompExpandable.astro';
+// import CompBeforeAfter from './CompBeforeAfter.astro';
+// import CompImageGrid from './CompImageGrid.astro';
+// import CompParallax from './CompParallax.astro';
