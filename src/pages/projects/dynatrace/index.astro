@@ -160,12 +160,16 @@ body {
 }
 
 .project-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background: linear-gradient(135deg, #262624 0%, #1a1a1a 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   overflow: hidden;
   transition: transform 0.3s, border-color 0.3s;
   position: relative;
+  cursor: pointer;
 }
 
 .project-card:hover {
@@ -360,7 +364,7 @@ html {
 
     <div class="projects-grid">
       <!-- Spaces -->
-      <article class="project-card">
+      <a href="/projects/dynatrace/spaces" class="project-card">
         <div class="project-image">
           <div class="project-number">01</div>
           <img src="/images/Spaces/cropped/kjat.png" alt="Spaces management dashboard">
@@ -378,12 +382,12 @@ html {
             <span class="project-tag">Information Architecture</span>
             <span class="project-tag">Design Leadership</span>
           </div>
-          <a href="/projects/dynatrace/spaces" class="project-link">View Case Study</a>
+          <span class="project-link">View Case Study</span>
         </div>
-      </article>
+      </a>
 
       <!-- Settings Platform -->
-      <article class="project-card">
+      <a href="/projects/dynatrace/settings-platform" class="project-card">
         <div class="project-image">
           <div class="project-number">02</div>
           <img src="/images/platform settings/SCR-20260406-obmw.png" alt="Settings Platform landing page design">
@@ -401,9 +405,9 @@ html {
             <span class="project-tag">Design Systems</span>
             <span class="project-tag">Competitive Analysis</span>
           </div>
-          <a href="/projects/dynatrace/settings-platform" class="project-link">View Case Study</a>
+          <span class="project-link">View Case Study</span>
         </div>
-      </article>
+      </a>
     </div>
   </section>
 </div>
