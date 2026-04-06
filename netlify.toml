@@ -32,5 +32,9 @@
 #     path = "/projects/another-project/*"
 #     function = "auth"
 [[edge_functions]]
+  path = "/projects/dynatrace"
+  function = "auth"
+
+[[edge_functions]]
   path = "/projects/dynatrace/*"
   function = "auth"
