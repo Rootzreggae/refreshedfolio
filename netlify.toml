@@ -23,3 +23,14 @@
   from = "/netlify.toml"
   to = "/404"
   status = 404
+
+# ── Password-protected routes ──────────────────────────────────
+# The auth edge function intercepts these paths and checks for a
+# valid portfolio_auth cookie. Add more [[edge_functions]] blocks
+# to protect additional routes, e.g.:
+#   [[edge_functions]]
+#     path = "/projects/another-project/*"
+#     function = "auth"
+[[edge_functions]]
+  path = "/projects/dynatrace/*"
+  function = "auth"
