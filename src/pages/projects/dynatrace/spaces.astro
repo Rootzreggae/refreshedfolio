@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary Meta Tags -->
+<title>Dynatrace Spaces: Scaling Enterprise Observability Governance - Nilson Gaspar</title>
+<meta name="title" content="Dynatrace Spaces: Scaling Enterprise Observability Governance - Nilson Gaspar">
+<meta name="description" content="Designing the permission governance layer for Dynatrace's largest customers. Spaces lets central teams delegate administration while teams independently manage monitoring.">
+<meta name="author" content="Nilson Gaspar">
+<meta name="keywords" content="Dynatrace, Spaces, enterprise observability, permission governance, product design, IAM, design leadership">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/projects/dynatrace/">
+<meta property="og:title" content="Dynatrace Spaces: Scaling Enterprise Observability Governance - Nilson Gaspar">
+<meta property="og:description" content="Designing the permission governance layer for Dynatrace's largest customers. Spaces lets central teams delegate administration while teams independently manage monitoring.">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://nilsongaspar.com/projects/dynatrace/">
+<meta property="twitter:title" content="Dynatrace Spaces: Scaling Enterprise Observability Governance - Nilson Gaspar">
+<meta property="twitter:description" content="Designing the permission governance layer for Dynatrace's largest customers. Spaces lets central teams delegate administration while teams independently manage monitoring.">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #30302e;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Navigation */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 48px;
+  background: linear-gradient(to bottom, #30302e 0%, transparent 100%);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 120px 48px 80px;
+}
+
+/* Hero Section — Centered */
+.hero-section {
+  text-align: center;
+  padding: 120px 0 80px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 120px;
+}
+
+.hero-eyebrow {
+  font-size: 14px;
+  color: #1496ff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+  margin-bottom: 32px;
+}
+
+.hero-title {
+  font-size: clamp(48px, 8vw, 100px);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+  color: #fff;
+}
+
+.hero-subtitle {
+  font-size: 22px;
+  font-weight: 300;
+  color: #aaa;
+  max-width: 800px;
+  margin: 0 auto 60px;
+  line-height: 1.6;
+}
+
+.hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-top: 60px;
+}
+
+.meta-item {
+  text-align: center;
+}
+
+.meta-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.meta-value {
+  font-size: 22px;
+  font-weight: 400;
+  color: #1496ff;
+}
+
+/* Section Headers */
+.section {
+  margin: 120px 0;
+}
+
+.section-header {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.section-number {
+  font-size: 14px;
+  color: #1496ff;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 48px;
+  font-weight: 300;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.section-description {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #bbb;
+  max-width: 800px;
+}
+
+/* Consolidation Flow */
+.consolidation-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 48px;
+  background: #262624;
+  border-radius: 8px;
+  margin: 60px 0;
+  flex-wrap: wrap;
+}
+
+.flow-box {
+  padding: 20px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  min-width: 180px;
+}
+
+.flow-box.problem {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.flow-box.neutral {
+  background: rgba(20, 150, 255, 0.1);
+  color: #1496ff;
+  border: 1px solid rgba(20, 150, 255, 0.3);
+}
+
+.flow-box.outcome {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  font-weight: 600;
+}
+
+.flow-arrow {
+  color: #555;
+  font-size: 18px;
+}
+
+/* Problem Grid */
+.problem-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  align-items: start;
+  margin: 80px 0;
+}
+
+.problem-content h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.problem-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.problem-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.problem-content li {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.problem-content li strong {
+  color: #1496ff;
+}
+
+.problem-sidebar {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+}
+
+.sidebar-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+  color: #fff;
+  font-weight: 400;
+}
+
+.sidebar-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #aaa;
+}
+
+.sidebar-text em {
+  color: #fff;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Research Image */
+.research-image-container {
+  margin: 80px 0;
+  background: #1a1a1a;
+  padding: 32px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.research-image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.image-caption {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Pain Points Grid */
+.pain-points-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin: 80px 0;
+}
+
+.pain-point {
+  padding: 40px;
+  background: #262624;
+  border-top: 3px solid #ff6b6b;
+  transition: transform 0.3s;
+}
+
+.pain-point:hover {
+  transform: translateY(-4px);
+}
+
+.pain-point-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+
+.pain-point-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #aaa;
+}
+
+/* Competitor Table */
+.competitor-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 60px 0;
+  font-size: 15px;
+}
+
+.competitor-table th {
+  text-align: left;
+  padding: 16px 24px;
+  background: #262624;
+  color: #fff;
+  font-weight: 500;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.competitor-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #aaa;
+}
+
+.competitor-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.competitor-table .highlight {
+  color: #1496ff;
+  font-weight: 500;
+}
+
+.competitor-table .warning {
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+/* Split Section */
+.split-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin: 120px 0;
+  align-items: center;
+}
+
+.split-content h3 {
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.split-content p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #bbb;
+  margin-bottom: 24px;
+}
+
+.metaphor-card {
+  background: #262624;
+  padding: 48px;
+  border-radius: 8px;
+  border-left: 4px solid #1496ff;
+}
+
+.metaphor-row {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.metaphor-row:last-child {
+  border-bottom: none;
+}
+
+.metaphor-concept {
+  font-size: 28px;
+  font-weight: 300;
+  color: #1496ff;
+  min-width: 200px;
+}
+
+.metaphor-equals {
+  color: #555;
+  font-size: 20px;
+}
+
+.metaphor-analogy {
+  font-size: 18px;
+  color: #aaa;
+}
+
+/* Paradigm Shift */
+.paradigm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 80px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.paradigm-card {
+  background: #30302e;
+  padding: 48px;
+}
+
+.paradigm-card.before {
+  border-left: 4px solid #ff6b6b;
+}
+
+.paradigm-card.after {
+  border-left: 4px solid #1496ff;
+}
+
+.paradigm-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.paradigm-label.before { color: #ff6b6b; }
+.paradigm-label.after { color: #1496ff; }
+
+.paradigm-card h4 {
+  font-size: 24px;
+  color: #fff;
+  margin-bottom: 16px;
+  font-weight: 400;
+}
+
+.paradigm-card p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #aaa;
+}
+
+/* Quote Section */
+.quote-section {
+  padding: 100px 80px;
+  text-align: center;
+  background: linear-gradient(135deg, #262624 0%, #1a1a1a 100%);
+  border-radius: 8px;
+  margin: 120px 0;
+}
+
+.large-quote {
+  font-size: 28px;
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.5;
+  color: #fff;
+  max-width: 900px;
+  margin: 0 auto 24px;
+}
+
+.quote-author {
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Solution Gallery */
+.solution-gallery {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  margin: 80px 0;
+}
+
+.gallery-item {
+  background: #1a1a1a;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.gallery-item:hover {
+  transform: scale(1.01);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.gallery-caption {
+  padding: 32px 48px;
+  background: #262624;
+}
+
+.gallery-caption h4 {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.gallery-caption p {
+  font-size: 15px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+/* Two-Column Gallery */
+.gallery-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin: 48px 0;
+}
+
+/* Process Cards */
+.process-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin: 80px 0;
+}
+
+.process-card {
+  padding: 40px;
+  background: #262624;
+  border-radius: 4px;
+  border-top: 3px solid #1496ff;
+  transition: transform 0.3s;
+}
+
+.process-card:hover {
+  transform: translateY(-4px);
+}
+
+.process-number {
+  font-size: 48px;
+  font-weight: 100;
+  color: #1496ff;
+  margin-bottom: 20px;
+}
+
+.process-title {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 12px;
+  font-weight: 400;
+}
+
+.process-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #aaa;
+}
+
+/* Impact Section */
+.impact-section {
+  background: #262624;
+  padding: 80px;
+  border-radius: 8px;
+  margin: 120px 0;
+}
+
+.impact-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.impact-title {
+  font-size: 48px;
+  font-weight: 300;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.impact-subtitle {
+  font-size: 18px;
+  color: #aaa;
+}
+
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 48px;
+}
+
+.impact-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 24px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.impact-label {
+  font-size: 18px;
+  color: #aaa;
+  max-width: 70%;
+}
+
+.impact-value {
+  font-size: 28px;
+  font-weight: 300;
+  color: #1496ff;
+}
+
+/* Reflection */
+.reflection-spread {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  margin: 80px 0;
+  align-items: start;
+}
+
+.reflection-sidebar {
+  background: #262624;
+  padding: 48px;
+  border-radius: 4px;
+  position: sticky;
+  top: 120px;
+}
+
+.reflection-sidebar h4 {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+
+.reflection-sidebar p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #aaa;
+  margin-bottom: 16px;
+}
+
+.reflection-sidebar p:last-child {
+  margin-bottom: 0;
+}
+
+/* Full Width Image */
+.full-width-image {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 80px 48px;
+  background: #1a1a1a;
+  margin-top: 120px;
+  margin-bottom: 120px;
+  text-align: center;
+}
+
+.full-width-image img {
+  max-width: 1400px;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .hero-meta {
+    gap: 40px;
+  }
+
+  .problem-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .split-section {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .paradigm-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .process-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reflection-spread {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .gallery-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .impact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 80px 24px 48px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+  }
+
+  .hero-subtitle {
+    font-size: 18px;
+  }
+
+  .hero-meta {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .section-title {
+    font-size: 32px;
+  }
+
+  .pain-points-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .process-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .consolidation-flow {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: #1496ff;
+  color: #000;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-link">&larr; Back to Work</a>
+  <div>
+    <span class="nav-link">Dynatrace / 2025&ndash;2026</span>
+  </div>
+</nav>
+
+<div class="container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <p class="hero-eyebrow">Dynatrace &middot; Enterprise Observability</p>
+    <h1 class="hero-title">Spaces</h1>
+    <p class="hero-subtitle">
+      Designing the permission governance layer that lets central monitoring teams delegate administration
+      safely&mdash;so individual teams can manage their own observability inside clear boundaries.
+    </p>
+
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-label">Company</div>
+        <div class="meta-value">Dynatrace</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Role</div>
+        <div class="meta-value">Lead Product Designer</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Duration</div>
+        <div class="meta-value">6 Months</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Scope</div>
+        <div class="meta-value">70+ Apps Audited</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 — THE PROBLEM -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">01 &mdash; THE PROBLEM</span>
+      <h2 class="section-title">Consolidation Creates Permission Chaos</h2>
+    </div>
+
+    <div class="consolidation-flow">
+      <div class="flow-box problem">Many Small Environments</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box neutral">Consolidating</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box neutral">Few Large Environments</div>
+      <span class="flow-arrow">&rarr;</span>
+      <div class="flow-box outcome">Permission Chaos</div>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-content">
+        <h3>The Enterprise Dilemma</h3>
+        <p>
+          Dynatrace&rsquo;s largest customers were consolidating many small environments into fewer, larger ones
+          to maximize end-to-end tracing and root cause analysis. The benefits were clear: broader visibility,
+          faster incident diagnosis, better resource utilization.
+        </p>
+        <p>
+          But this created a governance crisis. When many teams share a single environment, the old model breaks:
+          administrators either get dangerously broad permissions, or they get too few and must file requests
+          with central teams for routine changes.
+        </p>
+        <ul>
+          <li>Segments filter data, but <strong>provide no access control</strong></li>
+          <li>No single, auditable way to <strong>slice access inside a shared environment</strong></li>
+          <li>Many resources lack granularity: <strong>&ldquo;write all SLOs or none&rdquo;</strong></li>
+          <li>Complex IAM policies, manual processes, <strong>external tooling</strong> consuming central team time</li>
+        </ul>
+      </div>
+
+      <div class="problem-sidebar">
+        <h4 class="sidebar-title">The Core Insight</h4>
+        <p class="sidebar-text">
+          Segments organize data. But they were never designed for access control.
+          The platform needed a <em>permission-relevant</em> layer that segments deliberately lacked.
+        </p>
+        <p class="sidebar-text" style="margin-top: 24px;">
+          Spaces provide exactly this: an explicit boundary for access, configuration, routing, storage, and cost.
+          Every signal, entity, and object belongs to <em>exactly one Space</em>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 — RESEARCH & ANALYSIS -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">02 &mdash; DEEP DIVE</span>
+      <h2 class="section-title">Auditing the IAM Experience</h2>
+      <p class="section-description">
+        Before proposing any solution, I mapped the entire existing Identity and Access Management flow
+        end-to-end, documenting every pain point users encountered when trying to accomplish a basic task:
+        &ldquo;Give my team access to the production environment.&rdquo;
+      </p>
+    </div>
+
+    <div class="research-image-container">
+      <img src="/images/Spaces/cropped/kidi.png" alt="IAM audit flow mapping pain points in the current access management experience">
+      <p class="image-caption">Complete IAM flow audit revealing 8 critical pain points across the access management journey</p>
+    </div>
+
+    <div class="pain-points-grid">
+      <div class="pain-point">
+        <h4 class="pain-point-title">Overwhelming Navigation</h4>
+        <p class="pain-point-text">10 items in the IAM dropdown with no clear hierarchy. Users must understand the difference between User, Group, and Policy Management before they can start.</p>
+      </div>
+      <div class="pain-point">
+        <h4 class="pain-point-title">Disconnected Workflows</h4>
+        <p class="pain-point-text">Creating a group &rarr; adding permissions &rarr; assigning users requires jumping between 3 different sections. No guided flow or indication of next steps.</p>
+      </div>
+      <div class="pain-point">
+        <h4 class="pain-point-title">Permission Complexity</h4>
+        <p class="pain-point-text">20+ permissions in a flat dropdown mixing categories (Dynatrace Access, Data Access, Integrations, Custom, Role). No progressive disclosure or recommended defaults.</p>
+      </div>
+      <div class="pain-point">
+        <h4 class="pain-point-title">Empty State Gaps</h4>
+        <p class="pain-point-text">After creating a group, users land on an empty page with no guidance. The &ldquo;+ Permission&rdquo; button is not prominent and easy to miss.</p>
+      </div>
+      <div class="pain-point">
+        <h4 class="pain-point-title">Terminology Overload</h4>
+        <p class="pain-point-text">Groups, Permissions, Policies, Boundaries, Roles, Scope, Access &mdash; 7+ overlapping concepts for what should be a straightforward task.</p>
+      </div>
+      <div class="pain-point">
+        <h4 class="pain-point-title">Modal Overuse</h4>
+        <p class="pain-point-text">Narrow modals with vertical scrolling. Tables have unused horizontal space. Filters stacked vertically instead of utilizing available width.</p>
+      </div>
+    </div>
+
+    <!-- Competitor Analysis -->
+    <h3 style="font-size: 32px; margin: 80px 0 32px; font-weight: 400;">Competitive Landscape</h3>
+    <p class="section-description" style="margin-bottom: 48px;">
+      I analyzed how Elastic Kibana, New Relic, and Splunk approach the same fundamental challenge
+      of team-scoped access within shared environments.
+    </p>
+
+    <div class="research-image-container">
+      <img src="/images/Spaces/cropped/kiuy.png" alt="Competitor analysis matrix with consolidation flow and role definitions">
+      <p class="image-caption">Competitive landscape analysis: consolidation triggers, feature comparison across Elastic/New Relic/Splunk, and the three-tier role model</p>
+    </div>
+
+    <table class="competitor-table">
+      <thead>
+        <tr>
+          <th>Aspect</th>
+          <th>Elastic Kibana</th>
+          <th>New Relic</th>
+          <th>Splunk</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Feature Name</strong></td>
+          <td>Spaces</td>
+          <td>Accounts + Teams (2025)</td>
+          <td>Teams</td>
+        </tr>
+        <tr>
+          <td><strong>Primary Model</strong></td>
+          <td>Isolated workspace containers</td>
+          <td>Heavy accounts + lightweight teams</td>
+          <td>Landing pages with links</td>
+        </tr>
+        <tr>
+          <td><strong>Content Ownership</strong></td>
+          <td>Hard boundaries (import/export)</td>
+          <td>Account-bound + team tags</td>
+          <td>Linked, not owned</td>
+        </tr>
+        <tr>
+          <td><strong>Maturity</strong></td>
+          <td class="highlight">6+ years (since 2018)</td>
+          <td class="warning">Just added Feb 2025</td>
+          <td>Stable but basic</td>
+        </tr>
+        <tr>
+          <td><strong>Assessment</strong></td>
+          <td class="highlight">Gold Standard</td>
+          <td>Retrofitting</td>
+          <td class="warning">Weak</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 03 — THE MENTAL MODEL -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">03 &mdash; THE MENTAL MODEL</span>
+      <h2 class="section-title">Spaces Are Not Workspaces</h2>
+      <p class="section-description">
+        The biggest challenge wasn&rsquo;t technical&mdash;it was conceptual. The team kept defaulting to
+        &ldquo;workspace&rdquo; thinking: Spaces as rooms you enter and exit. I had to reframe the entire
+        mental model to unlock alignment.
+      </p>
+    </div>
+
+    <div class="split-section">
+      <div class="split-content">
+        <h3>The Geography Metaphor</h3>
+        <p>
+          In early workshops, I introduced a geography metaphor that cut through months of misalignment.
+          It made the hierarchy immediately tangible for PMs and engineers alike:
+        </p>
+        <p>
+          This reframing was critical. It separated Spaces (governance boundaries) from Segments (data filters)
+          in everyone&rsquo;s mind. The team stopped trying to use segments as the entry point for Spaces,
+          which would have collapsed two distinct concepts into one confused experience.
+        </p>
+      </div>
+
+      <div class="metaphor-card">
+        <div class="metaphor-row">
+          <span class="metaphor-concept">Environment</span>
+          <span class="metaphor-equals">=</span>
+          <span class="metaphor-analogy">Planet</span>
+        </div>
+        <div class="metaphor-row">
+          <span class="metaphor-concept">Spaces</span>
+          <span class="metaphor-equals">=</span>
+          <span class="metaphor-analogy">Countries</span>
+        </div>
+        <div class="metaphor-row">
+          <span class="metaphor-concept">Segments</span>
+          <span class="metaphor-equals">=</span>
+          <span class="metaphor-analogy">Zip Codes</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Full Width — IA Map -->
+  <div class="full-width-image">
+    <img src="/images/Spaces/cropped/kiph.png" alt="Complete information architecture map for organizations adopting Spaces">
+    <p class="image-caption">Complete information architecture mapping the journey from account management through Space creation to practitioner experience</p>
+  </div>
+
+  <!-- 04 — PARADIGM SHIFT -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">04 &mdash; THE PARADIGM SHIFT</span>
+      <h2 class="section-title">Invisible by Default, Filterable When Needed</h2>
+      <p class="section-description">
+        After months of design work on a selector-based model, executive feedback fundamentally shifted
+        the paradigm. Spaces should be invisible permission infrastructure&mdash;not workspaces you enter
+        and exit. I reconciled both positions into a merged design direction.
+      </p>
+    </div>
+
+    <div class="paradigm-grid">
+      <div class="paradigm-card before">
+        <p class="paradigm-label before">Previous Design (v1&ndash;v3)</p>
+        <h4>&ldquo;I select a Space, work within it&rdquo;</h4>
+        <p>Prominent sidebar selector, green dot indicator, Space-branded launchpad with
+          &ldquo;Welcome to Payments&rdquo; tooltips, invitation emails, &ldquo;Exit Space&rdquo; button.</p>
+      </div>
+      <div class="paradigm-card after">
+        <p class="paradigm-label after">Merged Direction (v4)</p>
+        <h4>&ldquo;I see the environment through my Space lens&rdquo;</h4>
+        <p>Space as a filterable dimension in the unified filter bar&mdash;not a dedicated selector.
+          Single-Space users may never know Spaces exist. Space badges on objects reveal provenance for multi-Space users.</p>
+      </div>
+    </div>
+
+    <div class="research-image-container">
+      <img src="/images/Spaces/cropped/kiyv.png" alt="Analysis of the global picker paradox and design options">
+      <p class="image-caption">Decomposing the global picker&rsquo;s dual responsibilities: the label answers &ldquo;Where am I?&rdquo; while the dropdown answers &ldquo;Where can I go?&rdquo; &mdash; fundamentally different jobs</p>
+    </div>
+  </section>
+
+  <!-- Cross-Space Problems & Invitation Flow -->
+  <div class="gallery-two-col" style="margin-top: 80px;">
+    <div class="gallery-item">
+      <img src="/images/Spaces/cropped/kjat.png" alt="Cross-space problems research and practitioner questions">
+      <div class="gallery-caption">
+        <h4>Cross-Space Problem Mapping</h4>
+        <p>Mapping every question that arises when practitioners work across multiple Spaces: onboarding, content visibility, navigation, and object ownership.</p>
+      </div>
+    </div>
+    <div class="gallery-item">
+      <img src="/images/Spaces/cropped/kjcx.png" alt="Invitation flow sequence diagram and first login experience">
+      <div class="gallery-caption">
+        <h4>Invitation &amp; First Login Flows</h4>
+        <p>Sequence diagrams for two paths: Central Team adds practitioner vs. Space Admin adds user — with email content specs, first login experience, and platform home in Space context.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote Section -->
+  <div class="quote-section">
+    <blockquote class="large-quote">
+      &ldquo;If I&rsquo;m only part of one Space and I never share anything with a Space,
+      I maybe never know that I only have access to one Space&mdash;because I just see the
+      environment in a way that I&rsquo;m supposed to see it.&rdquo;
+    </blockquote>
+    <cite class="quote-author">&mdash; Executive Stakeholder, Dynatrace</cite>
+  </div>
+
+  <!-- 05 — THE SOLUTION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">05 &mdash; DESIGN SOLUTION</span>
+      <h2 class="section-title">From Concept to Interface</h2>
+      <p class="section-description">
+        I designed the complete Space creation and management experience&mdash;a guided wizard that transforms
+        a complex governance task into four clear steps, with intelligent defaults and conflict detection
+        built into the flow.
+      </p>
+    </div>
+
+    <div class="process-cards">
+      <div class="process-card">
+        <div class="process-number">1</div>
+        <h4 class="process-title">Welcome</h4>
+        <p class="process-text">Value proposition, environment selection with member and entity counts for context.</p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">2</div>
+        <h4 class="process-title">Create Space</h4>
+        <p class="process-text">Name, description, and data scope definition using existing tags. Smart recommendations based on current Spaces.</p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">3</div>
+        <h4 class="process-title">Assign Groups</h4>
+        <p class="process-text">Suggested groups based on naming patterns, with member counts and creation dates for confidence.</p>
+      </div>
+      <div class="process-card">
+        <div class="process-number">4</div>
+        <h4 class="process-title">Review</h4>
+        <p class="process-text">Complete summary with conflict detection before committing changes to the environment.</p>
+      </div>
+    </div>
+
+    <!-- Solution Screenshots -->
+    <div class="solution-gallery">
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kkct.png" alt="Account Management home with Spaces introduction">
+        <div class="gallery-caption">
+          <h4>Spaces Discovery</h4>
+          <p>The entry point surfaces on the Account Management home page, introducing Spaces with clear value messaging and a direct &ldquo;Start adoption&rdquo; call to action.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kkes.png" alt="Welcome to Spaces — Step 1 of the creation wizard">
+        <div class="gallery-caption">
+          <h4>Step 1: Welcome</h4>
+          <p>Value proposition with three key benefits, followed by environment selection showing member counts and entity volumes to help central teams choose where to start.</p>
+        </div>
+      </div>
+
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kkhh.png" alt="Define Data Scope step in Space creation wizard">
+        <div class="gallery-caption">
+          <h4>Step 2: Intelligent Data Scoping</h4>
+          <p>Instead of requiring DQL knowledge, the interface surfaces existing tags (k8s.namespace, AWS account ID) with value counts and cross-field overlap warnings. Existing Spaces using the same tag dimension are flagged to maintain consistency.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="gallery-two-col">
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kkkb.png" alt="Step 3 — Assign groups to the Space">
+        <div class="gallery-caption">
+          <h4>Step 3: Assign Groups</h4>
+          <p>Smart group suggestions based on naming patterns, with member counts and creation dates for confidence. Tabs for Suggested, All, and Selected groups.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kkmx.png" alt="Environments and Spaces management dashboard">
+        <div class="gallery-caption">
+          <h4>Environments &amp; Spaces Dashboard</h4>
+          <p>At-a-glance stats across all environments with expandable Space lists. Central teams see Spaces, members, and entities per environment.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conflict Resolution Process -->
+    <div class="gallery-item" style="margin-top: 48px;">
+      <img src="/images/Spaces/cropped/kjho.png" alt="Signal ranking decision trees and conflict detection flow">
+      <div class="gallery-caption">
+        <h4>Signal Assignment &amp; Conflict Detection</h4>
+        <p>The decision tree I designed for how signals get assigned to Spaces: 0 matches go to default, 1 match assigns directly, 2+ matches trigger the conflict resolution flow. The right side maps the Space creation/edit conflict detection path.</p>
+      </div>
+    </div>
+
+    <!-- Before State — Current Dynatrace UI -->
+    <h3 style="font-size: 32px; margin: 80px 0 32px; font-weight: 400;">Spaces in the Practitioner Experience</h3>
+    <p class="section-description" style="margin-bottom: 48px;">
+      For practitioners, Spaces manifest through the existing segment filter — no new UI paradigm to learn.
+      The current app picker and filter infrastructure adapts to show Space-scoped segments.
+    </p>
+
+    <div class="gallery-two-col">
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kjrg.png" alt="Current Dynatrace Infrastructure Explorer UI">
+        <div class="gallery-caption">
+          <h4>Before: Environment-wide View</h4>
+          <p>The current Infrastructure Explorer showing all hosts across the environment — no scoping applied.</p>
+        </div>
+      </div>
+      <div class="gallery-item">
+        <img src="/images/Spaces/cropped/kjvs.png" alt="Spaces filtering via segments dropdown">
+        <div class="gallery-caption">
+          <h4>After: Space-Scoped via Segments</h4>
+          <p>Spaces surface as a filter dimension within the existing segments panel, showing segments from the user&rsquo;s Space alongside environment-wide segments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 — IMPACT -->
+  <div class="impact-section">
+    <div class="impact-header">
+      <h2 class="impact-title">Design Impact</h2>
+      <p class="impact-subtitle">Reshaping a platform-wide initiative through design leadership</p>
+    </div>
+
+    <div class="impact-grid">
+      <div class="impact-item">
+        <span class="impact-label">Apps inventoried and analyzed</span>
+        <span class="impact-value">70+</span>
+      </div>
+      <div class="impact-item">
+        <span class="impact-label">IAM pain points identified and addressed</span>
+        <span class="impact-value">8</span>
+      </div>
+      <div class="impact-item">
+        <span class="impact-label">Edge cases documented and resolved</span>
+        <span class="impact-value">38</span>
+      </div>
+      <div class="impact-item">
+        <span class="impact-label">Design iterations from v1 to merged v4</span>
+        <span class="impact-value">4</span>
+      </div>
+      <div class="impact-item">
+        <span class="impact-label">Shifted team from MVP-only to 2-year vision</span>
+        <span class="impact-value">Strategic</span>
+      </div>
+      <div class="impact-item">
+        <span class="impact-label">Reframed Spaces vs. Segments mental model</span>
+        <span class="impact-value">Adopted</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 — REFLECTION -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-number">07 &mdash; REFLECTION</span>
+      <h2 class="section-title">Building Trust Through Depth</h2>
+    </div>
+
+    <div class="reflection-spread">
+      <div>
+        <p class="section-description">
+          When I joined the Spaces initiative, PMs and designers were misaligned. PMs saw designers
+          as people who make things pretty. Designers were hesitant to deep-dive into Grail documentation
+          and technical architecture, reinforcing that perception.
+        </p>
+        <p class="section-description" style="margin-top: 32px;">
+          I put in the work to read every document, understand what a Grail tag is, learn how OpenPipeline
+          routes signals, and translate that knowledge into design decisions that PMs and engineers respected.
+          I ran workshops, but more importantly, I built personal connections: &ldquo;I&rsquo;m here to win
+          with you, not work against you.&rdquo;
+        </p>
+        <p class="section-description" style="margin-top: 32px;">
+          The team went from stressful, misaligned meetings to genuine collaboration. We conceded things
+          to each other, challenged each other productively, and became friends working on a shared problem.
+          The Spaces initiative continues toward its Summer 2026 MVP and December 2026 general availability.
+        </p>
+      </div>
+
+      <div class="reflection-sidebar">
+        <h4>What I Learned</h4>
+        <p>
+          <strong>Depth earns trust.</strong> Reading documentation and understanding technical constraints
+          changed how the entire team saw design&rsquo;s role.
+        </p>
+        <p>
+          <strong>Metaphors unlock alignment.</strong> The Planet/Country/Zip code framing resolved months
+          of conceptual confusion in one workshop.
+        </p>
+        <p>
+          <strong>Kill your darlings.</strong> When exec feedback invalidated the selector paradigm, I
+          preserved months of depth work by clearly separating what was killed (surface UX) from what
+          survived (mechanics, edge cases, architecture).
+        </p>
+        <p>
+          <strong>Vision protects the MVP.</strong> Without a 2-year roadmap, short-term delivery
+          decisions were constantly colliding. The long view resolved them.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+
+</body>
+</html>
