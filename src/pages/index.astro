@@ -8,6 +8,7 @@ const projectUrls = {
   keystrok: '/projects/keystrok',
   opensource: '/projects/service-radar', // Using service-radar as opensource project
   grafana: '/projects/grafana',
+  dynatrace: '/projects/dynatrace',
 } as const;
 ---
 
@@ -90,9 +91,18 @@ const projectUrls = {
     .nav-links a:hover {
       color: #ffffff;
     }
-    
+
     .nav-links a.dimmed {
       color: #555555;
+    }
+
+    .lock-badge {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin-left: 6px;
+      vertical-align: middle;
+      opacity: 0.5;
     }
     
     .nav-links li {
@@ -338,6 +348,15 @@ const projectUrls = {
         <li><a href={projectUrls.keystrok} aria-label="View Keystrok project">Keystrok</a></li>
         <li><a href={projectUrls.opensource} aria-label="View Open Source projects">Open Source</a></li>
         <li><a href={projectUrls.grafana} aria-label="View Grafana Labs projects">Grafana Labs</a></li>
+        <li>
+          <a href={projectUrls.dynatrace} aria-label="View Dynatrace project (password protected)">
+            Dynatrace
+            <svg class="lock-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Password protected">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </a>
+        </li>
         <li><span class="dimmed" aria-label="More projects coming soon">More</span></li>
       </ul>
     </nav>
