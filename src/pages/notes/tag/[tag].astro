@@ -1,0 +1,242 @@
+---
+import {
+  getPublishedNotes,
+  groupByYear,
+  getAllTags,
+  getNoteStats,
+  formatDate,
+  tagSlug,
+  type Note,
+} from '../../../lib/notes';
+
+export async function getStaticPaths() {
+  const notes = await getPublishedNotes();
+  const tags = getAllTags(notes);
+  return tags.map((tag) => {
+    const slug = tagSlug(tag);
+    const filtered = notes.filter((n) => n.data.tags.includes(tag));
+    return {
+      params: { tag: slug },
+      props: { tag, notes: filtered },
+    };
+  });
+}
+
+interface Props {
+  tag: string;
+  notes: Note[];
+}
+
+const { tag, notes } = Astro.props;
+const grouped = groupByYear(notes);
+const noteStats = new Map(
+  notes.map((n) => [n.slug, getNoteStats(n.body)]),
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>{`#${tag}`} — Notes — Nilson Gaspar</title>
+<meta name="description" content={`Notes tagged ${tag}.`}>
+
+<link rel="alternate" type="application/rss+xml" title="Nilson Gaspar — Notes" href="/rss.xml">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #1a1a1a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --dim: #555;
+    --rule: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .nav {
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .nav a:hover { color: var(--text); }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 48px 120px;
+  }
+
+  .page-header {
+    margin-bottom: 64px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-eyebrow {
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  .page-count {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .year-group { margin-bottom: 72px; }
+
+  .year-label {
+    font-size: 12px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .year-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .note-list { display: flex; flex-direction: column; }
+
+  .note-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    align-items: baseline;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+
+  .note-item:hover { background: rgba(255, 255, 255, 0.02); }
+  .note-item:hover .note-title { color: #fff; }
+
+  .note-date {
+    color: var(--dim);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .note-title {
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.5;
+    transition: color 0.15s;
+  }
+
+  .note-meta {
+    color: var(--dim);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  .footer {
+    margin-top: 96px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .footer a { color: var(--muted); text-decoration: none; }
+  .footer a:hover { color: var(--text); }
+
+  ::selection { background: #444; color: #fff; }
+
+  @media (max-width: 640px) {
+    .container { padding: 48px 24px 80px; }
+    .note-item { grid-template-columns: 1fr; gap: 4px; }
+    .note-date { font-size: 12px; }
+    .note-meta { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/notes">&larr; All notes</a>
+  <a href="/rss.xml">RSS</a>
+</nav>
+
+<div class="container">
+  <header class="page-header">
+    <div class="page-eyebrow">Tag</div>
+    <h1 class="page-title">#{tag}</h1>
+    <div class="page-count">{notes.length} {notes.length === 1 ? 'note' : 'notes'}</div>
+  </header>
+
+  {grouped.map(([year, yearNotes]) => (
+    <section class="year-group">
+      <div class="year-label">{year}</div>
+      <div class="note-list">
+        {yearNotes.map((note) => {
+          const stats = noteStats.get(note.slug)!;
+          return (
+            <a href={`/notes/${note.slug}`} class="note-item">
+              <span class="note-date">{formatDate(note.data.publishDate)}</span>
+              <span class="note-title">{note.data.title}</span>
+              <span class="note-meta">{stats.minutes} min</span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+
+  <footer class="footer">
+    <a href="/notes">&larr; All notes</a>
+    <a href="/">Home</a>
+  </footer>
+</div>
+
+</body>
+</html>
