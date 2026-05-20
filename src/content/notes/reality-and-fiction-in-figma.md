@@ -1,6 +1,6 @@
 ---
 title: 'Reality and Fiction in Figma'
-description: 'The gap between using a tool and understanding what is underneath it — and why that matters more in the age of AI agents.'
+description: 'The gap between using a tool and understanding what is underneath it, and why that matters more in the age of AI agents.'
 publishDate: 2026-05-20
 tags: ['design', 'ai', 'code']
 featured: true

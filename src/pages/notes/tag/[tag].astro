@@ -40,10 +40,10 @@ const noteStats = new Map(
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>{`#${tag}`} — Notes — Nilson Gaspar</title>
+<title>{`#${tag}`} | Notes | Nilson Gaspar</title>
 <meta name="description" content={`Notes tagged ${tag}.`}>
 
-<link rel="alternate" type="application/rss+xml" title="Nilson Gaspar — Notes" href="/rss.xml">
+<link rel="alternate" type="application/rss+xml" title="Nilson Gaspar Notes" href="/rss.xml">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="icon" type="image/png" href="/favicon.png">
 
@@ -51,10 +51,11 @@ const noteStats = new Map(
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #1a1a1a;
-    --text: #e8e8e8;
-    --muted: #888;
-    --dim: #555;
+    --bg: #30302e;
+    --text: #ffffff;
+    --muted: #aaa;
+    --dim: #888;
+    --faint: #666;
     --rule: rgba(255, 255, 255, 0.08);
   }
 
@@ -69,133 +70,175 @@ const noteStats = new Map(
   }
 
   .nav {
-    padding: 32px 48px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 48px;
+    background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+    z-index: 100;
+    backdrop-filter: blur(10px);
     display: flex;
     justify-content: space-between;
     align-items: baseline;
   }
 
   .nav a {
-    color: var(--muted);
+    color: var(--dim);
     text-decoration: none;
-    font-size: 12px;
-    letter-spacing: 0.05em;
+    font-size: 13px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    transition: color 0.2s;
   }
 
   .nav a:hover { color: var(--text); }
 
-  .container {
-    max-width: 720px;
+  .wrap {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 80px 48px 120px;
+    padding: 140px 48px 120px;
   }
 
   .page-header {
-    margin-bottom: 64px;
-    padding-bottom: 32px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 80px;
+    margin-bottom: 96px;
+    padding-bottom: 48px;
     border-bottom: 1px solid var(--rule);
   }
 
-  .page-eyebrow {
+  .page-label {
     font-size: 12px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
+    color: var(--faint);
     text-transform: uppercase;
-    margin-bottom: 16px;
+    letter-spacing: 0.15em;
+    padding-top: 16px;
   }
 
   .page-title {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
-    font-size: 28px;
+    font-size: clamp(36px, 5vw, 56px);
     font-weight: 600;
     color: #fff;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
   }
 
   .page-count {
-    color: var(--muted);
+    color: var(--dim);
     font-size: 14px;
-    margin-top: 8px;
+    margin-top: 16px;
   }
 
-  .year-group { margin-bottom: 72px; }
+  .year-group {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+  }
 
   .year-label {
-    font-size: 12px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
-    margin-bottom: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    font-size: 56px;
+    font-weight: 300;
+    color: var(--faint);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+
+  .note-list {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column;
+    max-width: 880px;
   }
-
-  .year-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--rule);
-  }
-
-  .note-list { display: flex; flex-direction: column; }
 
   .note-item {
     display: grid;
-    grid-template-columns: 64px 1fr auto;
+    grid-template-columns: 80px 1fr auto;
     align-items: baseline;
-    gap: 24px;
-    padding: 16px 0;
+    gap: 32px;
+    padding: 20px 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
     color: var(--text);
-    transition: background 0.15s;
+    transition: padding 0.2s, color 0.2s;
   }
 
-  .note-item:hover { background: rgba(255, 255, 255, 0.02); }
+  .note-item:hover { padding-left: 8px; }
   .note-item:hover .note-title { color: #fff; }
+  .note-item:hover .note-date { color: var(--muted); }
 
   .note-date {
-    color: var(--dim);
+    color: var(--faint);
     font-size: 13px;
     font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
   }
 
   .note-title {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
     color: var(--text);
-    font-size: 15px;
-    line-height: 1.5;
-    transition: color 0.15s;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.35;
+    transition: color 0.2s;
   }
 
   .note-meta {
-    color: var(--dim);
+    color: var(--faint);
     font-size: 12px;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
 
   .footer {
-    margin-top: 96px;
+    max-width: 1200px;
+    margin: 80px auto 0;
     padding-top: 32px;
     border-top: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
-    color: var(--muted);
+    color: var(--dim);
     font-size: 12px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .footer a { color: var(--muted); text-decoration: none; }
+  .footer a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
   .footer a:hover { color: var(--text); }
 
-  ::selection { background: #444; color: #fff; }
+  ::selection { background: #555; color: #fff; }
 
-  @media (max-width: 640px) {
-    .container { padding: 48px 24px 80px; }
-    .note-item { grid-template-columns: 1fr; gap: 4px; }
-    .note-date { font-size: 12px; }
+  @media (max-width: 900px) {
+    .wrap { padding: 120px 32px 80px; }
+    .page-header, .year-group {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .year-label { position: static; font-size: 36px; }
+    .note-item { grid-template-columns: 64px 1fr auto; gap: 16px; }
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 100px 24px 64px; }
+    .note-item {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      padding: 16px 0;
+    }
+    .note-item:hover { padding-left: 0; }
+    .note-title { font-size: 17px; }
     .note-meta { font-size: 11px; }
   }
 </style>
@@ -207,11 +250,13 @@ const noteStats = new Map(
   <a href="/rss.xml">RSS</a>
 </nav>
 
-<div class="container">
+<div class="wrap">
   <header class="page-header">
-    <div class="page-eyebrow">Tag</div>
-    <h1 class="page-title">#{tag}</h1>
-    <div class="page-count">{notes.length} {notes.length === 1 ? 'note' : 'notes'}</div>
+    <div class="page-label">Tag</div>
+    <div>
+      <h1 class="page-title">#{tag}</h1>
+      <div class="page-count">{notes.length} {notes.length === 1 ? 'note' : 'notes'}</div>
+    </div>
   </header>
 
   {grouped.map(([year, yearNotes]) => (
