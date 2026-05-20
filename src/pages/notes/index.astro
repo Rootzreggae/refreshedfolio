@@ -1,0 +1,315 @@
+---
+import {
+  getPublishedNotes,
+  groupByYear,
+  getAllTags,
+  getNoteStats,
+  formatDate,
+  tagSlug,
+} from '../../lib/notes';
+
+const notes = await getPublishedNotes();
+const grouped = groupByYear(notes);
+const allTags = getAllTags(notes);
+
+const noteStats = new Map(
+  notes.map((n) => [n.slug, getNoteStats(n.body)]),
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Notes | Nilson Gaspar</title>
+<meta name="title" content="Notes | Nilson Gaspar">
+<meta name="description" content="Design essays and thinking by Nilson Gaspar.">
+<meta name="author" content="Nilson Gaspar">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nilsongaspar.com/notes/">
+<meta property="og:title" content="Notes | Nilson Gaspar">
+<meta property="og:description" content="Design essays and thinking by Nilson Gaspar.">
+
+<link rel="alternate" type="application/rss+xml" title="Nilson Gaspar Notes" href="/rss.xml">
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #30302e;
+    --text: #ffffff;
+    --muted: #aaa;
+    --dim: #888;
+    --faint: #666;
+    --rule: rgba(255, 255, 255, 0.08);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 48px;
+    background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .nav a {
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav a:hover { color: var(--text); }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 140px 48px 120px;
+  }
+
+  /* Header */
+  .page-header {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 80px;
+    margin-bottom: 96px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .page-label {
+    font-size: 12px;
+    color: var(--faint);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding-top: 8px;
+  }
+
+  .page-description {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1.45;
+    color: var(--text);
+    max-width: 700px;
+  }
+
+  .tag-bar {
+    grid-column: 2;
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+
+  .tag-bar a {
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.2s;
+  }
+
+  .tag-bar a:hover { color: var(--text); }
+
+  /* Year groups */
+  .year-group {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 80px;
+    margin-bottom: 80px;
+  }
+
+  .year-label {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    font-size: 56px;
+    font-weight: 300;
+    color: var(--faint);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+
+  .note-list {
+    display: flex;
+    flex-direction: column;
+    max-width: 880px;
+  }
+
+  .note-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: baseline;
+    gap: 32px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--text);
+    transition: padding 0.2s, color 0.2s;
+  }
+
+  .note-item:hover {
+    padding-left: 8px;
+  }
+
+  .note-item:hover .note-title { color: #fff; }
+  .note-item:hover .note-date { color: var(--muted); }
+
+  .note-date {
+    color: var(--faint);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+
+  .note-title {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.35;
+    transition: color 0.2s;
+  }
+
+  .note-meta {
+    color: var(--faint);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .empty {
+    color: var(--muted);
+    font-style: italic;
+    padding: 48px 0;
+  }
+
+  /* Footer */
+  .footer {
+    max-width: 1200px;
+    margin: 80px auto 0;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    color: var(--dim);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .footer a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer a:hover { color: var(--text); }
+
+  ::selection { background: #555; color: #fff; }
+
+  @media (max-width: 900px) {
+    .wrap { padding: 120px 32px 80px; }
+    .page-header, .year-group {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .page-description { font-size: 20px; }
+    .tag-bar { grid-column: 1; margin-top: 16px; }
+    .year-label { position: static; font-size: 36px; }
+    .note-item { grid-template-columns: 64px 1fr auto; gap: 16px; }
+  }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 100px 24px 64px; }
+    .note-item {
+      grid-template-columns: 1fr;
+      gap: 4px;
+      padding: 16px 0;
+    }
+    .note-item:hover { padding-left: 0; }
+    .note-title { font-size: 17px; }
+    .note-meta { font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/">&larr; Back</a>
+  <a href="/rss.xml">RSS</a>
+</nav>
+
+<div class="wrap">
+  <header class="page-header">
+    <div class="page-label">Notes</div>
+    <div>
+      <p class="page-description">
+        Design essays and thinking. Written from practice. What I notice while shipping, mentoring, and working with tools.
+      </p>
+      {allTags.length > 0 && (
+        <div class="tag-bar">
+          {allTags.map((tag) => (
+            <a href={`/notes/tag/${tagSlug(tag)}`}>#{tag}</a>
+          ))}
+        </div>
+      )}
+    </div>
+  </header>
+
+  {notes.length === 0 ? (
+    <p class="empty">No notes published yet.</p>
+  ) : (
+    grouped.map(([year, yearNotes]) => (
+      <section class="year-group">
+        <div class="year-label">{year}</div>
+        <div class="note-list">
+          {yearNotes.map((note) => {
+            const stats = noteStats.get(note.slug)!;
+            return (
+              <a href={`/notes/${note.slug}`} class="note-item">
+                <span class="note-date">{formatDate(note.data.publishDate)}</span>
+                <span class="note-title">{note.data.title}</span>
+                <span class="note-meta">{stats.minutes} min</span>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))
+  )}
+
+  <footer class="footer">
+    <a href="/">Home</a>
+    <a href="/rss.xml">Subscribe via RSS</a>
+  </footer>
+</div>
+
+</body>
+</html>
