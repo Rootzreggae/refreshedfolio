@@ -210,6 +210,18 @@ const formattedUpdated = updatedDate?.toLocaleDateString('en-US', {
     margin-bottom: 1.5em;
   }
 
+  /* Editorial: oversized serif drop cap on the opening paragraph */
+  .prose :global(> p:first-of-type::first-letter) {
+    font-family: "Times New Roman", "Iowan Old Style", "Georgia", "Charter", serif;
+    float: left;
+    font-size: 7.4em;
+    line-height: 0.82;
+    font-weight: 500;
+    color: #fff;
+    padding: 0.06em 0.12em 0 0;
+    letter-spacing: -0.02em;
+  }
+
   .prose h2 {
     font-size: 26px;
     font-weight: 600;
@@ -338,6 +350,10 @@ const formattedUpdated = updatedDate?.toLocaleDateString('en-US', {
     .article-header { margin-bottom: 56px; }
     .article-description { font-size: 17px; }
     .prose { font-size: 16px; }
+    .prose :global(> p:first-of-type::first-letter) {
+      font-size: 4.4em;
+      padding-top: 0.05em;
+    }
   }
 </style>
 </head>
