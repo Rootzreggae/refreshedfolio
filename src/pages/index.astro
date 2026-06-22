@@ -5,6 +5,7 @@ import { selectedWork, contact } from '../lib/work';
 // Notes seam — live from the notes content collection.
 const notes = await getPublishedNotes();
 const recentNotes = notes.slice(0, 5);
+const latestNote = notes[0];
 
 // ⌘K command items. The "Work" group derives from the same selectedWork source
 // as the hero column, so the palette and the visible list never drift.
@@ -157,7 +158,8 @@ const commandItems: CmdItem[] = [
 
     .work-nav { display: flex; flex-direction: column; align-items: flex-end; gap: clamp(14px, 2.2vh, 24px); flex: none; max-width: 340px; }
     .work-nav__kicker { font-family: var(--mono); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
-    .work-link { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; color: var(--primary); transition: color .2s ease; }
+    .work-nav__sep { align-self: stretch; height: 1px; background: var(--rule-drop); margin: clamp(4px, 1vh, 10px) 0; }
+    .work-link { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-align: right; color: var(--primary); transition: color .2s ease; background: none; border: none; padding: 0; cursor: pointer; font: inherit; }
     .work-link:hover { color: #fff; }
     .work-link__name { font-size: clamp(1.3rem, 2.5vw, 2rem); font-weight: 400; letter-spacing: -.018em; display: inline-flex; align-items: center; gap: 7px; }
     .work-link__name svg { flex: none; opacity: .8; }
@@ -321,7 +323,15 @@ const commandItems: CmdItem[] = [
         </div>
       </div>
 
-      <nav class="work-nav" aria-label="Selected work">
+      <nav class="work-nav" aria-label="Writing and selected work">
+        <span class="work-nav__kicker">Writing</span>
+        <button class="work-link" type="button" data-go="notes" aria-label="Open notes">
+          <span class="work-link__name">Notes</span>
+          {latestNote && <span class="work-link__cap">latest — {latestNote.data.title}</span>}
+        </button>
+
+        <div class="work-nav__sep" role="presentation"></div>
+
         <span class="work-nav__kicker">Selected work</span>
         {selectedWork.map((w) => (
           <a class="work-link" href={w.url} aria-label={w.locked ? `${w.name} (password protected)` : w.name}>
