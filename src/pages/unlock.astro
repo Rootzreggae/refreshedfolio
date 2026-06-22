@@ -16,11 +16,13 @@ const hasError = Astro.url.searchParams.has('error');
     }
 
     body {
-      background: #1a1a1a;
+      /* !important to override global.css's desktop body bg lock */
+      background: #161513 !important;
       color: #ffffff;
       font-family: 'NB International', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
       min-height: 100vh;
-      display: flex;
+      /* !important to override global.css's body display:block lock */
+      display: flex !important;
       align-items: center;
       justify-content: center;
     }
@@ -62,8 +64,8 @@ const hasError = Astro.url.searchParams.has('error');
     .password-input {
       width: 100%;
       padding: 14px 16px;
-      background: #2a2a2a;
-      border: 1px solid #3a3a3a;
+      background: #211f19;
+      border: 1px solid #34312a;
       border-radius: 8px;
       color: #ffffff;
       font-family: inherit;
@@ -88,7 +90,7 @@ const hasError = Astro.url.searchParams.has('error');
       width: 100%;
       padding: 14px 16px;
       background: #ffffff;
-      color: #1a1a1a;
+      color: #161513;
       border: none;
       border-radius: 8px;
       font-family: inherit;
