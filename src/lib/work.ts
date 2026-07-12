@@ -59,7 +59,10 @@ export const selectedWork: WorkItem[] = [
 /** Real contact / social values used across the home page. */
 export const contact = {
   email: 'hello@nilsongaspar.com',
-  bluesky: { handle: '@nilsongaspar', url: 'https://bsky.app/profile/nilsongaspar.bsky.social' },
+  bluesky: {
+    handle: '@nilsongaspar',
+    url: 'https://bsky.app/profile/nilsongaspar.bsky.social',
+  },
   github: { handle: '/nilsongaspar', url: 'https://github.com/nilsongaspar' },
   based: 'Lisbon, Portugal',
 };

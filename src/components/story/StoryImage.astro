@@ -9,27 +9,36 @@ export interface Props {
   placeholder?: string;
 }
 
-const { 
-  src, 
-  alt = '', 
-  caption, 
-  size = 'default', 
-  container = 'default', 
+const {
+  src,
+  alt = '',
+  caption,
+  size = 'default',
+  container = 'default',
   margin = 'default',
-  placeholder = 'Image placeholder'
+  placeholder = 'Image placeholder',
 } = Astro.props;
 
-const heightClass = size === 'medium' ? 'medium' : size === 'small' ? 'small' : '';
+const heightClass =
+  size === 'medium' ? 'medium' : size === 'small' ? 'small' : '';
 ---
 
-<div class={`story-container ${container === 'narrow' ? 'narrow' : container === 'wide' ? 'wide' : ''}`}>
+<div
+  class={`story-container ${container === 'narrow' ? 'narrow' : container === 'wide' ? 'wide' : ''}`}
+>
   <div class={`comp-image-single ${margin === 'large' ? 'large-margin' : ''}`}>
     <div class={`image-frame ${heightClass}`}>
-      {src ? (
-        <img src={src} alt={alt} class="w-full h-full object-cover rounded-lg" />
-      ) : (
-        <span class="placeholder-text">{placeholder}</span>
-      )}
+      {
+        src ? (
+          <img
+            src={src}
+            alt={alt}
+            class="h-full w-full rounded-lg object-cover"
+          />
+        ) : (
+          <span class="placeholder-text">{placeholder}</span>
+        )
+      }
     </div>
     {caption && <p class="image-caption">{caption}</p>}
   </div>

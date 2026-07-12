@@ -12,13 +12,8 @@ export default defineConfig({
   site: 'https://nilsongaspar.com',
   integrations: [
     mdx({
-      remarkPlugins: [
-        remarkDirective,
-        storyDirectives,
-      ],
-      rehypePlugins: [
-        rehypeRaw,
-      ],
+      remarkPlugins: [remarkDirective, storyDirectives],
+      rehypePlugins: [rehypeRaw],
     }),
   ],
   vite: {

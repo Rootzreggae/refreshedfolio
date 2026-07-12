@@ -1,612 +1,971 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Primary Meta Tags -->
-<title>Dynatrace Settings Platform: Redesigning Enterprise Configuration - Nilson Gaspar</title>
-<meta name="title" content="Dynatrace Settings Platform: Redesigning Enterprise Configuration - Nilson Gaspar">
-<meta name="description" content="Redesigning the configuration experience for Dynatrace's enterprise observability platform. From identity crisis to control tower — a 2-year vision for settings.">
-<meta name="author" content="Nilson Gaspar">
-
-<!-- Open Graph -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nilsongaspar.com/projects/dynatrace/settings-platform">
-<meta property="og:title" content="Dynatrace Settings Platform: Redesigning Enterprise Configuration - Nilson Gaspar">
-<meta property="og:description" content="Redesigning the configuration experience for Dynatrace's enterprise observability platform.">
-
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" href="/favicon.png">
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: #16304C;
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-.nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  padding: 24px 48px;
-  background: linear-gradient(to bottom, #16304C 0%, transparent 100%);
-  z-index: 100; backdrop-filter: blur(10px);
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-.nav-link {
-  color: #888; text-decoration: none; font-size: 13px;
-  letter-spacing: 1px; text-transform: uppercase; transition: color 0.3s;
-}
-
-.nav-link:hover { color: #fff; }
-
-.container { max-width: 1600px; margin: 0 auto; padding: 120px 48px 80px; }
-
-/* Hero — Centered */
-.hero-section {
-  text-align: center; padding: 120px 0 80px;
-  border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 120px;
-}
-
-.hero-eyebrow {
-  font-size: 14px; color: #6c5ce7; text-transform: uppercase;
-  letter-spacing: 2px; font-weight: 500; margin-bottom: 32px;
-}
-
-.hero-title {
-  font-size: clamp(48px, 8vw, 90px); font-weight: 700;
-  line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 40px; color: #fff;
-}
-
-.hero-subtitle {
-  font-size: 22px; font-weight: 300; color: #aaa;
-  max-width: 750px; margin: 0 auto 60px; line-height: 1.6;
-}
-
-.hero-meta {
-  display: flex; justify-content: center; gap: 80px; margin-top: 60px;
-}
-
-.meta-item { text-align: center; }
-
-.meta-label {
-  font-size: 12px; text-transform: uppercase; letter-spacing: 1px;
-  color: #666; margin-bottom: 8px;
-}
-
-.meta-value { font-size: 22px; font-weight: 400; color: #6c5ce7; }
-
-/* Section Headers */
-.section { margin: 120px 0; }
-
-.section-header { margin-bottom: 48px; }
-
-.section-number {
-  font-size: 14px; color: #6c5ce7; font-weight: 500;
-  letter-spacing: 1px; margin-bottom: 24px;
-}
-
-.section-title {
-  font-size: 48px; font-weight: 300; line-height: 1.2; margin-bottom: 24px;
-}
-
-.section-description {
-  font-size: 20px; line-height: 1.8; color: #bbb; max-width: 800px;
-}
-
-/* Pain Points Grid */
-.pain-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 32px; margin: 80px 0;
-}
-
-.pain-card {
-  padding: 40px; background: #182E49;
-  border-top: 3px solid #ff6b6b; transition: transform 0.3s;
-}
-
-.pain-card:hover { transform: translateY(-4px); }
-
-.pain-card h4 { font-size: 20px; color: #fff; margin-bottom: 12px; font-weight: 400; }
-.pain-card p { font-size: 15px; line-height: 1.7; color: #aaa; }
-
-/* Research Image */
-.research-image {
-  margin: 80px 0; background: #102237; padding: 32px;
-  border-radius: 8px;
-}
-
-.research-image img { width: 100%; height: auto; border-radius: 4px; }
-
-.image-caption {
-  margin-top: 16px; font-size: 14px; color: #888;
-  text-align: center; font-style: italic;
-}
-
-/* Split Section */
-.split-section {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; margin: 120px 0; align-items: center;
-}
-
-.split-content h3 { font-size: 32px; font-weight: 400; margin-bottom: 24px; color: #fff; }
-.split-content p { font-size: 18px; line-height: 1.8; color: #bbb; margin-bottom: 24px; }
-
-/* Insight Card */
-.insight-card {
-  background: #182E49; padding: 48px;
-  border-left: 4px solid #6c5ce7; border-radius: 4px;
-}
-
-.insight-card h4 { font-size: 24px; color: #fff; margin-bottom: 16px; font-weight: 400; }
-.insight-card p { font-size: 16px; line-height: 1.7; color: #aaa; }
-
-/* Solution Gallery */
-.solution-gallery {
-  display: grid; grid-template-columns: 1fr; gap: 48px; margin: 80px 0;
-}
-
-.gallery-item {
-  background: #102237; border-radius: 8px; overflow: hidden;
-  transition: transform 0.3s;
-}
-
-.gallery-item:hover { transform: scale(1.01); }
-.gallery-item img { width: 100%; height: auto; display: block; }
-
-.gallery-caption {
-  padding: 32px 48px; background: #182E49;
-}
-
-.gallery-caption h4 { font-size: 20px; color: #fff; margin-bottom: 8px; font-weight: 400; }
-.gallery-caption p { font-size: 15px; color: #aaa; line-height: 1.6; }
-
-/* Two Col Gallery */
-.gallery-two-col {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin: 48px 0;
-}
-
-/* Quote */
-.quote-section {
-  padding: 100px 80px; text-align: center;
-  background: linear-gradient(135deg, #182E49 0%, #102237 100%);
-  border-radius: 8px; margin: 120px 0;
-}
-
-.large-quote {
-  font-size: 28px; font-weight: 300; font-style: italic;
-  line-height: 1.5; color: #fff; max-width: 900px; margin: 0 auto 24px;
-}
-
-.quote-author {
-  font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px;
-}
-
-/* Comparison Table */
-.comparison-table {
-  width: 100%; border-collapse: collapse; margin: 60px 0; font-size: 15px;
-}
-
-.comparison-table th {
-  text-align: left; padding: 16px 24px; background: #182E49;
-  color: #fff; font-weight: 500; border-bottom: 2px solid rgba(255,255,255,0.1);
-}
-
-.comparison-table td {
-  padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #aaa;
-}
-
-.comparison-table tr:hover td { background: rgba(255,255,255,0.02); }
-.comparison-table .highlight { color: #6c5ce7; font-weight: 500; }
-.comparison-table .warning { color: #ff6b6b; font-weight: 500; }
-
-/* Impact Section */
-.impact-section {
-  background: #182E49; padding: 80px; border-radius: 8px; margin: 120px 0;
-}
-
-.impact-header { text-align: center; margin-bottom: 60px; }
-.impact-title { font-size: 48px; font-weight: 300; color: #fff; margin-bottom: 16px; }
-.impact-subtitle { font-size: 18px; color: #aaa; }
-
-.impact-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px;
-}
-
-.impact-item {
-  display: flex; align-items: baseline; justify-content: space-between;
-  padding: 24px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.impact-label { font-size: 18px; color: #aaa; max-width: 70%; }
-.impact-value { font-size: 28px; font-weight: 300; color: #6c5ce7; }
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .hero-meta { gap: 40px; }
-  .split-section { grid-template-columns: 1fr; gap: 48px; }
-  .pain-grid { grid-template-columns: 1fr; }
-  .gallery-two-col { grid-template-columns: 1fr; }
-  .impact-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 768px) {
-  .container { padding: 80px 24px 48px; }
-  .hero-title { font-size: 48px; }
-  .hero-meta { flex-direction: column; gap: 24px; }
-  .section-title { font-size: 32px; }
-}
-
-html { scroll-behavior: smooth; }
-::selection { background: #6c5ce7; color: #000; }
-</style>
-</head>
-<body>
-
-<nav class="nav">
-  <a href="/projects/dynatrace" class="nav-link">&larr; Back to Dynatrace</a>
-  <div><span class="nav-link">Settings Platform / 2025&ndash;2026</span></div>
-</nav>
-
-<div class="container">
-  <!-- Hero -->
-  <section class="hero-section">
-    <p class="hero-eyebrow">Dynatrace &middot; Platform Configuration</p>
-    <h1 class="hero-title">Settings Platform</h1>
-    <p class="hero-subtitle">
-      Redesigning the configuration experience for enterprise observability.
-      From identity crisis to control tower&mdash;a 2-year vision for how teams
-      configure, override, and govern platform settings at scale.
-    </p>
-    <div class="hero-meta">
-      <div class="meta-item">
-        <div class="meta-label">Company</div>
-        <div class="meta-value">Dynatrace</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Role</div>
-        <div class="meta-value">Lead Product Designer</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Duration</div>
-        <div class="meta-value">6 Months</div>
-      </div>
-      <div class="meta-item">
-        <div class="meta-label">Parallel With</div>
-        <div class="meta-value">Spaces Initiative</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 01 — THE PROBLEM -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">01 &mdash; THE PROBLEM</span>
-      <h2 class="section-title">An Identity Crisis at Scale</h2>
-      <p class="section-description">
-        The Settings Platform is the app that provides the configurable widget and canvas
-        for every app inside Dynatrace. It&rsquo;s the tone setter for settings structure&mdash;a
-        place where all apps render their respective settings. When I joined, the team was
-        migrating from Gen 2 to Gen 3, but they weren&rsquo;t just carrying over usability
-        problems&mdash;they were creating new ones.
-      </p>
-    </div>
-
-    <!-- Identity Crisis diagram -->
-    <div class="research-image">
-      <img src="/images/platform settings/SCR-20260406-oarw.png" alt="Identity Crisis Component analysis — the scope selector trying to serve multiple purposes">
-      <p class="image-caption">The scope selector component&rsquo;s identity crisis: trying to serve navigation, scoping, and entity search simultaneously</p>
-    </div>
-
-    <div class="pain-grid">
-      <div class="pain-card">
-        <h4>No Landing Page</h4>
-        <p>Users dropped into settings with no orientation. No search hero, no recent activity, no way to understand what needed attention.</p>
-      </div>
-      <div class="pain-card">
-        <h4>Identity Crisis Selector</h4>
-        <p>One component tried to handle environment scoping, entity search, and navigation. Users couldn&rsquo;t tell what it was for.</p>
-      </div>
-      <div class="pain-card">
-        <h4>Wasted Visual Estate</h4>
-        <p>A second sidebar consumed precious screen width. Most users were in India on small screens&mdash;nobody was tackling this.</p>
-      </div>
-      <div class="pain-card">
-        <h4>3 Competing Search Systems</h4>
-        <p>Global search, settings search, and entity search all coexisted. Users defaulted to entity search because that was their actual job to be done.</p>
-      </div>
-      <div class="pain-card">
-        <h4>Broken Breadcrumbs</h4>
-        <p>Breadcrumbs would disappear mid-journey because rendered canvas content from other teams didn&rsquo;t implement them.</p>
-      </div>
-      <div class="pain-card">
-        <h4>No Override Visibility</h4>
-        <p>Users couldn&rsquo;t see what was customized where. Entity-level overrides were buried behind &ldquo;...&rdquo; menus in individual schemas.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 02 — RESEARCH -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">02 &mdash; RESEARCH &amp; ANALYSIS</span>
-      <h2 class="section-title">Understanding the Landscape</h2>
-      <p class="section-description">
-        I studied 15+ platforms to understand how the best products handle settings,
-        inheritance, and configuration at scale. The insight that changed everything
-        wasn&rsquo;t about UI patterns&mdash;it was about culture.
-      </p>
-    </div>
-
-    <!-- Cross-platform comparison -->
-    <div class="research-image">
-      <img src="/images/platform settings/SCR-20260406-ocar.png" alt="Cross-platform comparison of 15+ settings experiences">
-      <p class="image-caption">Competitive analysis across GitHub, Grafana, Salesforce, Terraform, AWS, Azure, Stripe, Datadog, and more</p>
-    </div>
-
-    <div class="quote-section">
-      <blockquote class="large-quote">
-        &ldquo;The word &lsquo;consistency&rsquo; was harming the experience. Designers focused
-        only on visual consistency, generating patterns unique to Dynatrace that confused
-        everyone. Consistency is multi-dimensional: internal, external, functional, and visual.
-        Three of them need to be at play at all times.&rdquo;
-      </blockquote>
-      <cite class="quote-author">&mdash; Nilson Gaspar</cite>
-    </div>
-
-    <!-- Key problems observed -->
-    <div class="research-image">
-      <img src="/images/platform settings/SCR-20260406-obkg.png" alt="Key problems observed in Platform Settings — problem mapping">
-      <p class="image-caption">Systematic mapping of every problem in the existing Settings experience: no hub, identity crisis, duplication, mixed paradigms</p>
-    </div>
-  </section>
-
-  <!-- 03 — THE INSIGHT -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">03 &mdash; THE INSIGHT</span>
-      <h2 class="section-title">Settings is a Launchpad, Not a Dashboard</h2>
-    </div>
-
-    <div class="split-section">
-      <div class="split-content">
-        <h3>Search-First Philosophy</h3>
-        <p>
-          Users come to Settings to configure something specific. They don&rsquo;t come to monitor
-          or browse. The primary navigation method should be search&mdash;prominent, center-placed,
-          impossible to miss.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title
+      >Dynatrace Settings Platform: Redesigning Enterprise Configuration -
+      Nilson Gaspar</title
+    >
+    <meta
+      name="title"
+      content="Dynatrace Settings Platform: Redesigning Enterprise Configuration - Nilson Gaspar"
+    />
+    <meta
+      name="description"
+      content="Redesigning the configuration experience for Dynatrace's enterprise observability platform. From identity crisis to control tower — a 2-year vision for settings."
+    />
+    <meta name="author" content="Nilson Gaspar" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://nilsongaspar.com/projects/dynatrace/settings-platform"
+    />
+    <meta
+      property="og:title"
+      content="Dynatrace Settings Platform: Redesigning Enterprise Configuration - Nilson Gaspar"
+    />
+    <meta
+      property="og:description"
+      content="Redesigning the configuration experience for Dynatrace's enterprise observability platform."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #16304c;
+        color: #ffffff;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 24px 48px;
+        background: linear-gradient(to bottom, #16304c 0%, transparent 100%);
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: #888;
+        text-decoration: none;
+        font-size: 13px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #fff;
+      }
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 120px 48px 80px;
+      }
+
+      /* Hero — Centered */
+      .hero-section {
+        text-align: center;
+        padding: 120px 0 80px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 120px;
+      }
+
+      .hero-eyebrow {
+        font-size: 14px;
+        color: #6c5ce7;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 500;
+        margin-bottom: 32px;
+      }
+
+      .hero-title {
+        font-size: clamp(48px, 8vw, 90px);
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        margin-bottom: 40px;
+        color: #fff;
+      }
+
+      .hero-subtitle {
+        font-size: 22px;
+        font-weight: 300;
+        color: #aaa;
+        max-width: 750px;
+        margin: 0 auto 60px;
+        line-height: 1.6;
+      }
+
+      .hero-meta {
+        display: flex;
+        justify-content: center;
+        gap: 80px;
+        margin-top: 60px;
+      }
+
+      .meta-item {
+        text-align: center;
+      }
+
+      .meta-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #666;
+        margin-bottom: 8px;
+      }
+
+      .meta-value {
+        font-size: 22px;
+        font-weight: 400;
+        color: #6c5ce7;
+      }
+
+      /* Section Headers */
+      .section {
+        margin: 120px 0;
+      }
+
+      .section-header {
+        margin-bottom: 48px;
+      }
+
+      .section-number {
+        font-size: 14px;
+        color: #6c5ce7;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+      }
+
+      .section-title {
+        font-size: 48px;
+        font-weight: 300;
+        line-height: 1.2;
+        margin-bottom: 24px;
+      }
+
+      .section-description {
+        font-size: 20px;
+        line-height: 1.8;
+        color: #bbb;
+        max-width: 800px;
+      }
+
+      /* Pain Points Grid */
+      .pain-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        margin: 80px 0;
+      }
+
+      .pain-card {
+        padding: 40px;
+        background: #182e49;
+        border-top: 3px solid #ff6b6b;
+        transition: transform 0.3s;
+      }
+
+      .pain-card:hover {
+        transform: translateY(-4px);
+      }
+
+      .pain-card h4 {
+        font-size: 20px;
+        color: #fff;
+        margin-bottom: 12px;
+        font-weight: 400;
+      }
+      .pain-card p {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #aaa;
+      }
+
+      /* Research Image */
+      .research-image {
+        margin: 80px 0;
+        background: #102237;
+        padding: 32px;
+        border-radius: 8px;
+      }
+
+      .research-image img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+      }
+
+      .image-caption {
+        margin-top: 16px;
+        font-size: 14px;
+        color: #888;
+        text-align: center;
+        font-style: italic;
+      }
+
+      /* Split Section */
+      .split-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        margin: 120px 0;
+        align-items: center;
+      }
+
+      .split-content h3 {
+        font-size: 32px;
+        font-weight: 400;
+        margin-bottom: 24px;
+        color: #fff;
+      }
+      .split-content p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #bbb;
+        margin-bottom: 24px;
+      }
+
+      /* Insight Card */
+      .insight-card {
+        background: #182e49;
+        padding: 48px;
+        border-left: 4px solid #6c5ce7;
+        border-radius: 4px;
+      }
+
+      .insight-card h4 {
+        font-size: 24px;
+        color: #fff;
+        margin-bottom: 16px;
+        font-weight: 400;
+      }
+      .insight-card p {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #aaa;
+      }
+
+      /* Solution Gallery */
+      .solution-gallery {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 48px;
+        margin: 80px 0;
+      }
+
+      .gallery-item {
+        background: #102237;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .gallery-item:hover {
+        transform: scale(1.01);
+      }
+      .gallery-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .gallery-caption {
+        padding: 32px 48px;
+        background: #182e49;
+      }
+
+      .gallery-caption h4 {
+        font-size: 20px;
+        color: #fff;
+        margin-bottom: 8px;
+        font-weight: 400;
+      }
+      .gallery-caption p {
+        font-size: 15px;
+        color: #aaa;
+        line-height: 1.6;
+      }
+
+      /* Two Col Gallery */
+      .gallery-two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin: 48px 0;
+      }
+
+      /* Quote */
+      .quote-section {
+        padding: 100px 80px;
+        text-align: center;
+        background: linear-gradient(135deg, #182e49 0%, #102237 100%);
+        border-radius: 8px;
+        margin: 120px 0;
+      }
+
+      .large-quote {
+        font-size: 28px;
+        font-weight: 300;
+        font-style: italic;
+        line-height: 1.5;
+        color: #fff;
+        max-width: 900px;
+        margin: 0 auto 24px;
+      }
+
+      .quote-author {
+        font-size: 14px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Comparison Table */
+      .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 60px 0;
+        font-size: 15px;
+      }
+
+      .comparison-table th {
+        text-align: left;
+        padding: 16px 24px;
+        background: #182e49;
+        color: #fff;
+        font-weight: 500;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .comparison-table td {
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #aaa;
+      }
+
+      .comparison-table tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .comparison-table .highlight {
+        color: #6c5ce7;
+        font-weight: 500;
+      }
+      .comparison-table .warning {
+        color: #ff6b6b;
+        font-weight: 500;
+      }
+
+      /* Impact Section */
+      .impact-section {
+        background: #182e49;
+        padding: 80px;
+        border-radius: 8px;
+        margin: 120px 0;
+      }
+
+      .impact-header {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+      .impact-title {
+        font-size: 48px;
+        font-weight: 300;
+        color: #fff;
+        margin-bottom: 16px;
+      }
+      .impact-subtitle {
+        font-size: 18px;
+        color: #aaa;
+      }
+
+      .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 48px;
+      }
+
+      .impact-item {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .impact-label {
+        font-size: 18px;
+        color: #aaa;
+        max-width: 70%;
+      }
+      .impact-value {
+        font-size: 28px;
+        font-weight: 300;
+        color: #6c5ce7;
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .hero-meta {
+          gap: 40px;
+        }
+        .split-section {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+        .pain-grid {
+          grid-template-columns: 1fr;
+        }
+        .gallery-two-col {
+          grid-template-columns: 1fr;
+        }
+        .impact-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 80px 24px 48px;
+        }
+        .hero-title {
+          font-size: 48px;
+        }
+        .hero-meta {
+          flex-direction: column;
+          gap: 24px;
+        }
+        .section-title {
+          font-size: 32px;
+        }
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+      ::selection {
+        background: #6c5ce7;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="/projects/dynatrace" class="nav-link">&larr; Back to Dynatrace</a
+      >
+      <div
+        ><span class="nav-link">Settings Platform / 2025&ndash;2026</span></div
+      >
+    </nav>
+
+    <div class="container">
+      <!-- Hero -->
+      <section class="hero-section">
+        <p class="hero-eyebrow">Dynatrace &middot; Platform Configuration</p>
+        <h1 class="hero-title">Settings Platform</h1>
+        <p class="hero-subtitle">
+          Redesigning the configuration experience for enterprise observability.
+          From identity crisis to control tower&mdash;a 2-year vision for how
+          teams configure, override, and govern platform settings at scale.
         </p>
-        <p>
-          I mapped four user intents to four UI elements: &ldquo;I know what I need&rdquo; &rarr; Search bar.
-          &ldquo;I was just working on...&rdquo; &rarr; Recent Activity. &ldquo;What&rsquo;s new?&rdquo; &rarr;
-          What&rsquo;s New section. &ldquo;I want to browse&rdquo; &rarr; Horizontal navigation.
-        </p>
-      </div>
-      <div class="research-image" style="margin: 0;">
-        <img src="/images/platform settings/SCR-20260406-obmw.png" alt="Search-first landing page — user intent mapping">
-      </div>
-    </div>
-  </section>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <div class="meta-label">Company</div>
+            <div class="meta-value">Dynatrace</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Role</div>
+            <div class="meta-value">Lead Product Designer</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Duration</div>
+            <div class="meta-value">6 Months</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Parallel With</div>
+            <div class="meta-value">Spaces Initiative</div>
+          </div>
+        </div>
+      </section>
 
-  <!-- 04 — DESIGN SOLUTION -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">04 &mdash; DESIGN SOLUTION</span>
-      <h2 class="section-title">The Control Tower</h2>
-      <p class="section-description">
-        I designed a complete 2-year vision: a landing page that acts as a control tower,
-        a mega menu that replaces the second sidebar, a hierarchy &amp; overrides hub,
-        and consistent navigation that works across every app in the platform.
-      </p>
-    </div>
+      <!-- 01 — THE PROBLEM -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">01 &mdash; THE PROBLEM</span>
+          <h2 class="section-title">An Identity Crisis at Scale</h2>
+          <p class="section-description">
+            The Settings Platform is the app that provides the configurable
+            widget and canvas for every app inside Dynatrace. It&rsquo;s the
+            tone setter for settings structure&mdash;a place where all apps
+            render their respective settings. When I joined, the team was
+            migrating from Gen 2 to Gen 3, but they weren&rsquo;t just carrying
+            over usability problems&mdash;they were creating new ones.
+          </p>
+        </div>
 
-    <!-- Layout structure -->
-    <div class="gallery-two-col">
-      <div class="gallery-item">
-        <img src="/images/platform settings/SCR-20260406-obqy.png" alt="Complete layout structure — App Shell architecture">
-        <div class="gallery-caption">
-          <h4>Layout Architecture</h4>
-          <p>App Shell &rarr; Global Header (Spaces) &rarr; Main Layout with full-width sheet component. The mega menu trigger replaces the second sidebar entirely.</p>
+        <!-- Identity Crisis diagram -->
+        <div class="research-image">
+          <img
+            src="/images/platform settings/SCR-20260406-oarw.png"
+            alt="Identity Crisis Component analysis — the scope selector trying to serve multiple purposes"
+          />
+          <p class="image-caption"
+            >The scope selector component&rsquo;s identity crisis: trying to
+            serve navigation, scoping, and entity search simultaneously</p
+          >
+        </div>
+
+        <div class="pain-grid">
+          <div class="pain-card">
+            <h4>No Landing Page</h4>
+            <p
+              >Users dropped into settings with no orientation. No search hero,
+              no recent activity, no way to understand what needed attention.</p
+            >
+          </div>
+          <div class="pain-card">
+            <h4>Identity Crisis Selector</h4>
+            <p
+              >One component tried to handle environment scoping, entity search,
+              and navigation. Users couldn&rsquo;t tell what it was for.</p
+            >
+          </div>
+          <div class="pain-card">
+            <h4>Wasted Visual Estate</h4>
+            <p
+              >A second sidebar consumed precious screen width. Most users were
+              in India on small screens&mdash;nobody was tackling this.</p
+            >
+          </div>
+          <div class="pain-card">
+            <h4>3 Competing Search Systems</h4>
+            <p
+              >Global search, settings search, and entity search all coexisted.
+              Users defaulted to entity search because that was their actual job
+              to be done.</p
+            >
+          </div>
+          <div class="pain-card">
+            <h4>Broken Breadcrumbs</h4>
+            <p
+              >Breadcrumbs would disappear mid-journey because rendered canvas
+              content from other teams didn&rsquo;t implement them.</p
+            >
+          </div>
+          <div class="pain-card">
+            <h4>No Override Visibility</h4>
+            <p
+              >Users couldn&rsquo;t see what was customized where. Entity-level
+              overrides were buried behind &ldquo;...&rdquo; menus in individual
+              schemas.</p
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 — RESEARCH -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">02 &mdash; RESEARCH &amp; ANALYSIS</span>
+          <h2 class="section-title">Understanding the Landscape</h2>
+          <p class="section-description">
+            I studied 15+ platforms to understand how the best products handle
+            settings, inheritance, and configuration at scale. The insight that
+            changed everything wasn&rsquo;t about UI patterns&mdash;it was about
+            culture.
+          </p>
+        </div>
+
+        <!-- Cross-platform comparison -->
+        <div class="research-image">
+          <img
+            src="/images/platform settings/SCR-20260406-ocar.png"
+            alt="Cross-platform comparison of 15+ settings experiences"
+          />
+          <p class="image-caption"
+            >Competitive analysis across GitHub, Grafana, Salesforce, Terraform,
+            AWS, Azure, Stripe, Datadog, and more</p
+          >
+        </div>
+
+        <div class="quote-section">
+          <blockquote class="large-quote">
+            &ldquo;The word &lsquo;consistency&rsquo; was harming the
+            experience. Designers focused only on visual consistency, generating
+            patterns unique to Dynatrace that confused everyone. Consistency is
+            multi-dimensional: internal, external, functional, and visual. Three
+            of them need to be at play at all times.&rdquo;
+          </blockquote>
+          <cite class="quote-author">&mdash; Nilson Gaspar</cite>
+        </div>
+
+        <!-- Key problems observed -->
+        <div class="research-image">
+          <img
+            src="/images/platform settings/SCR-20260406-obkg.png"
+            alt="Key problems observed in Platform Settings — problem mapping"
+          />
+          <p class="image-caption"
+            >Systematic mapping of every problem in the existing Settings
+            experience: no hub, identity crisis, duplication, mixed paradigms</p
+          >
+        </div>
+      </section>
+
+      <!-- 03 — THE INSIGHT -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">03 &mdash; THE INSIGHT</span>
+          <h2 class="section-title">Settings is a Launchpad, Not a Dashboard</h2
+          >
+        </div>
+
+        <div class="split-section">
+          <div class="split-content">
+            <h3>Search-First Philosophy</h3>
+            <p>
+              Users come to Settings to configure something specific. They
+              don&rsquo;t come to monitor or browse. The primary navigation
+              method should be search&mdash;prominent, center-placed, impossible
+              to miss.
+            </p>
+            <p>
+              I mapped four user intents to four UI elements: &ldquo;I know what
+              I need&rdquo; &rarr; Search bar. &ldquo;I was just working
+              on...&rdquo; &rarr; Recent Activity. &ldquo;What&rsquo;s
+              new?&rdquo; &rarr; What&rsquo;s New section. &ldquo;I want to
+              browse&rdquo; &rarr; Horizontal navigation.
+            </p>
+          </div>
+          <div class="research-image" style="margin: 0;">
+            <img
+              src="/images/platform settings/SCR-20260406-obmw.png"
+              alt="Search-first landing page — user intent mapping"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 — DESIGN SOLUTION -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">04 &mdash; DESIGN SOLUTION</span>
+          <h2 class="section-title">The Control Tower</h2>
+          <p class="section-description">
+            I designed a complete 2-year vision: a landing page that acts as a
+            control tower, a mega menu that replaces the second sidebar, a
+            hierarchy &amp; overrides hub, and consistent navigation that works
+            across every app in the platform.
+          </p>
+        </div>
+
+        <!-- Layout structure -->
+        <div class="gallery-two-col">
+          <div class="gallery-item">
+            <img
+              src="/images/platform settings/SCR-20260406-obqy.png"
+              alt="Complete layout structure — App Shell architecture"
+            />
+            <div class="gallery-caption">
+              <h4>Layout Architecture</h4>
+              <p
+                >App Shell &rarr; Global Header (Spaces) &rarr; Main Layout with
+                full-width sheet component. The mega menu trigger replaces the
+                second sidebar entirely.</p
+              >
+            </div>
+          </div>
+          <div class="gallery-item">
+            <img
+              src="/images/platform settings/SCR-20260406-obou.png"
+              alt="Mega menu design decisions and rejected patterns"
+            />
+            <div class="gallery-caption">
+              <h4>Mega Menu Decisions</h4>
+              <p
+                >Single &ldquo;Settings&rdquo; trigger, click-only behavior (no
+                hover), configurable per app. Rejected: 2-row tabs, simple
+                dropdown, hover-to-open.</p
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Inheritance model -->
+        <div class="solution-gallery">
+          <div class="gallery-item">
+            <img
+              src="/images/platform settings/SCR-20260406-obcw.png"
+              alt="Settings inheritance model — Environment to Entity"
+            />
+            <div class="gallery-caption">
+              <h4>Inheritance Model</h4>
+              <p
+                >Environment-level defaults flow down to entities. The missing
+                piece: users needed a mental model for how inheritance works AND
+                a domain model for how schemas, objects, and entities relate.</p
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Edge cases -->
+        <div class="solution-gallery">
+          <div class="gallery-item">
+            <img
+              src="/images/platform settings/SCR-20260406-obgc.png"
+              alt="Inheritance edge cases — 7 scenarios with decision trees"
+            />
+            <div class="gallery-caption">
+              <h4>7 Inheritance Scenarios</h4>
+              <p
+                >I documented every edge case: ancestor resets, field changes,
+                multi-entity impact, chain insertions, conflict resolution,
+                scale operations, and batch resets. All designed from
+                scratch&mdash;no prior documentation existed.</p
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 — THE MEGA MENU -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">05 &mdash; RECLAIMING SPACE</span>
+          <h2 class="section-title">Killing the Second Sidebar</h2>
+          <p class="section-description">
+            Every app in Dynatrace used a second sidebar for navigation. It
+            consumed ~250px of screen width. Data showed most users were in
+            India on small screens. Nobody was tackling this&mdash;until I
+            started iterating.
+          </p>
+        </div>
+
+        <div class="split-section">
+          <div class="split-content">
+            <h3>8 Iterations</h3>
+            <p>
+              It wasn&rsquo;t &ldquo;my task&rdquo;&mdash;or so my colleagues
+              thought. But fixing the product experience IS the designer&rsquo;s
+              task. I shared progress weekly, got feedback, iterated.
+            </p>
+            <p>
+              By week three, the mood shifted from confusion to excitement. A
+              principal designer from another focus area started meeting with me
+              regularly&mdash;my mega menu would solve a complaint her users had
+              been voicing for years.
+            </p>
+            <p>
+              The mega menu is configurable per app. Settings gets categories
+              (Data + Platform). The Spaces app gets &ldquo;Pick up where you
+              left off&rdquo; + app grid. Each app defines what goes in the
+              menu. The second sidebar dies.
+            </p>
+          </div>
+          <div class="insight-card">
+            <h4>The Consistency Trap</h4>
+            <p>
+              The design team of 70 designers was stuck in a common practice:
+              not creating new components because a small design system team
+              should handle &ldquo;consistency.&rdquo; But that team
+              wasn&rsquo;t aware of every initiative and user need. What they
+              released was bare minimum. The overall team simply reused these
+              bare minimums, creating patterns that were strange for everyone
+              outside Dynatrace.
+            </p>
+            <p style="margin-top: 16px; color: #6c5ce7;">
+              I started tutoring 4 designers in my focus area and one principal
+              designer in another. The goal: understand that consistency is
+              multi-dimensional, and that creating new patterns IS contributing
+              to the design system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 — IMPACT -->
+      <div class="impact-section">
+        <div class="impact-header">
+          <h2 class="impact-title">Design Impact</h2>
+          <p class="impact-subtitle"
+            >Reshaping platform configuration through design leadership</p
+          >
+        </div>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="impact-label"
+              >Platforms analyzed in competitive research</span
+            >
+            <span class="impact-value">15+</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-label"
+              >Mega menu iterations before team alignment</span
+            >
+            <span class="impact-value">8</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-label">Inheritance edge cases documented</span>
+            <span class="impact-value">7</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-label"
+              >Filtering systems unified into one proposal</span
+            >
+            <span class="impact-value">3 &rarr; 1</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-label"
+              >Designers mentored on design principles</span
+            >
+            <span class="impact-value">5</span>
+          </div>
+          <div class="impact-item">
+            <span class="impact-label"
+              >Shipped: breadcrumbs, entity search, IA refactoring</span
+            >
+            <span class="impact-value">Shipped</span>
+          </div>
         </div>
       </div>
-      <div class="gallery-item">
-        <img src="/images/platform settings/SCR-20260406-obou.png" alt="Mega menu design decisions and rejected patterns">
-        <div class="gallery-caption">
-          <h4>Mega Menu Decisions</h4>
-          <p>Single &ldquo;Settings&rdquo; trigger, click-only behavior (no hover), configurable per app. Rejected: 2-row tabs, simple dropdown, hover-to-open.</p>
+
+      <!-- 07 — COMPLETE IA -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">07 &mdash; THE VISION</span>
+          <h2 class="section-title">Complete Information Architecture</h2>
+          <p class="section-description">
+            The full 2-year vision documented across multiple
+            iterations&mdash;from landing page to category navigation, schema
+            detail, overrides hub, and entity-level inheritance chains.
+          </p>
         </div>
-      </div>
-    </div>
 
-    <!-- Inheritance model -->
-    <div class="solution-gallery">
-      <div class="gallery-item">
-        <img src="/images/platform settings/SCR-20260406-obcw.png" alt="Settings inheritance model — Environment to Entity">
-        <div class="gallery-caption">
-          <h4>Inheritance Model</h4>
-          <p>Environment-level defaults flow down to entities. The missing piece: users needed a mental model for how inheritance works AND a domain model for how schemas, objects, and entities relate.</p>
+        <div class="research-image">
+          <img
+            src="/images/platform settings/SCR-20260406-obxw.png"
+            alt="Complete information architecture documentation"
+          />
+          <p class="image-caption"
+            >The complete IA: multiple iterations of category structures, view
+            hierarchies, overrides hub design, and navigation patterns</p
+          >
         </div>
-      </div>
-    </div>
+      </section>
 
-    <!-- Edge cases -->
-    <div class="solution-gallery">
-      <div class="gallery-item">
-        <img src="/images/platform settings/SCR-20260406-obgc.png" alt="Inheritance edge cases — 7 scenarios with decision trees">
-        <div class="gallery-caption">
-          <h4>7 Inheritance Scenarios</h4>
-          <p>I documented every edge case: ancestor resets, field changes, multi-entity impact, chain insertions, conflict resolution, scale operations, and batch resets. All designed from scratch&mdash;no prior documentation existed.</p>
+      <!-- PROTOTYPE CTA -->
+      <section class="section" style="padding-bottom: 0;">
+        <div
+          style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(20,150,255,0.08)); border: 1px solid rgba(99,102,241,0.2); border-radius: 16px; padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;"
+        >
+          <div style="flex: 1; min-width: 280px;">
+            <span class="section-label" style="margin-bottom: 8px;"
+              >Interactive Prototype</span
+            >
+            <h3
+              style="font-size: 22px; font-weight: 600; color: #ffffff; margin-top: 8px; margin-bottom: 8px;"
+              >Explore the Settings Prototype</h3
+            >
+            <p
+              style="font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 520px;"
+              >Navigate the control tower landing page, category views, schema
+              details, and overrides hub I designed and coded as a React
+              prototype.</p
+            >
+          </div>
+          <a
+            href="https://spaces-prototype.netlify.app/settings"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: rgba(99,102,241,0.9); color: #ffffff; font-size: 15px; font-weight: 600; border-radius: 10px; text-decoration: none; white-space: nowrap; transition: background 0.2s ease;"
+          >
+            View Prototype &rarr;
+          </a>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- 05 — THE MEGA MENU -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">05 &mdash; RECLAIMING SPACE</span>
-      <h2 class="section-title">Killing the Second Sidebar</h2>
-      <p class="section-description">
-        Every app in Dynatrace used a second sidebar for navigation. It consumed ~250px
-        of screen width. Data showed most users were in India on small screens. Nobody was
-        tackling this&mdash;until I started iterating.
-      </p>
-    </div>
+      <!-- 08 — REFLECTION -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">08 &mdash; REFLECTION</span>
+          <h2 class="section-title">Fixing What Nobody Would Touch</h2>
+        </div>
 
-    <div class="split-section">
-      <div class="split-content">
-        <h3>8 Iterations</h3>
-        <p>
-          It wasn&rsquo;t &ldquo;my task&rdquo;&mdash;or so my colleagues thought. But fixing the product
-          experience IS the designer&rsquo;s task. I shared progress weekly, got feedback, iterated.
-        </p>
-        <p>
-          By week three, the mood shifted from confusion to excitement. A principal designer
-          from another focus area started meeting with me regularly&mdash;my mega menu would solve
-          a complaint her users had been voicing for years.
-        </p>
-        <p>
-          The mega menu is configurable per app. Settings gets categories (Data + Platform).
-          The Spaces app gets &ldquo;Pick up where you left off&rdquo; + app grid. Each app defines
-          what goes in the menu. The second sidebar dies.
-        </p>
-      </div>
-      <div class="insight-card">
-        <h4>The Consistency Trap</h4>
-        <p>
-          The design team of 70 designers was stuck in a common practice: not creating new
-          components because a small design system team should handle &ldquo;consistency.&rdquo;
-          But that team wasn&rsquo;t aware of every initiative and user need. What they released
-          was bare minimum. The overall team simply reused these bare minimums, creating
-          patterns that were strange for everyone outside Dynatrace.
-        </p>
-        <p style="margin-top: 16px; color: #6c5ce7;">
-          I started tutoring 4 designers in my focus area and one principal designer in another.
-          The goal: understand that consistency is multi-dimensional, and that creating new
-          patterns IS contributing to the design system.
-        </p>
-      </div>
-    </div>
-  </section>
+        <div class="split-section">
+          <div>
+            <p class="section-description">
+              This project taught me that the biggest design problems
+              aren&rsquo;t in the interface&mdash;they&rsquo;re in how teams
+              think about design. The word &ldquo;consistency&rdquo; had become
+              a cage. Designers weren&rsquo;t exploring because exploring felt
+              inconsistent. The design system team couldn&rsquo;t keep up
+              because they didn&rsquo;t know what every initiative needed.
+            </p>
+            <p class="section-description" style="margin-top: 32px;">
+              I worked on Spaces and Settings simultaneously for 6 months. The
+              two initiatives are deeply connected&mdash;Spaces defines who can
+              access what, Settings defines what they can configure. Designing
+              both gave me a unique perspective: the governance layer and the
+              configuration surface need to speak the same language.
+            </p>
+            <p class="section-description" style="margin-top: 32px;">
+              Several features shipped before my departure: breadcrumbs that
+              persist across app boundaries, the entity search pattern, and the
+              IA refactoring was mid-implementation. The 2-year vision&mdash;the
+              control tower landing page, the overrides hub, the mega
+              menu&mdash;lives on in prototypes and documentation the team
+              continues to reference.
+            </p>
+          </div>
 
-  <!-- 06 — IMPACT -->
-  <div class="impact-section">
-    <div class="impact-header">
-      <h2 class="impact-title">Design Impact</h2>
-      <p class="impact-subtitle">Reshaping platform configuration through design leadership</p>
+          <div class="insight-card">
+            <h4>What I Learned</h4>
+            <p>
+              <strong>Culture shapes products.</strong> The &ldquo;consistency trap&rdquo;
+              wasn&rsquo;t a tooling problem&mdash;it was a mindset problem. Fixing
+              it required mentoring, not Figma.
+            </p>
+            <p style="margin-top: 16px;">
+              <strong>Fix the product, not your task list.</strong> The mega menu
+              wasn&rsquo;t in my brief. The filter unification wasn&rsquo;t in my
+              brief. But they were the right things to do.
+            </p>
+            <p style="margin-top: 16px;">
+              <strong>Document everything.</strong> When I joined, there was no documentation
+              from previous designers. I left behind edge case matrices, IA documents,
+              competitive analysis, and interactive prototypes. The next designer
+              won&rsquo;t start from zero.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
-    <div class="impact-grid">
-      <div class="impact-item">
-        <span class="impact-label">Platforms analyzed in competitive research</span>
-        <span class="impact-value">15+</span>
-      </div>
-      <div class="impact-item">
-        <span class="impact-label">Mega menu iterations before team alignment</span>
-        <span class="impact-value">8</span>
-      </div>
-      <div class="impact-item">
-        <span class="impact-label">Inheritance edge cases documented</span>
-        <span class="impact-value">7</span>
-      </div>
-      <div class="impact-item">
-        <span class="impact-label">Filtering systems unified into one proposal</span>
-        <span class="impact-value">3 &rarr; 1</span>
-      </div>
-      <div class="impact-item">
-        <span class="impact-label">Designers mentored on design principles</span>
-        <span class="impact-value">5</span>
-      </div>
-      <div class="impact-item">
-        <span class="impact-label">Shipped: breadcrumbs, entity search, IA refactoring</span>
-        <span class="impact-value">Shipped</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 07 — COMPLETE IA -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">07 &mdash; THE VISION</span>
-      <h2 class="section-title">Complete Information Architecture</h2>
-      <p class="section-description">
-        The full 2-year vision documented across multiple iterations&mdash;from landing page
-        to category navigation, schema detail, overrides hub, and entity-level inheritance chains.
-      </p>
-    </div>
-
-    <div class="research-image">
-      <img src="/images/platform settings/SCR-20260406-obxw.png" alt="Complete information architecture documentation">
-      <p class="image-caption">The complete IA: multiple iterations of category structures, view hierarchies, overrides hub design, and navigation patterns</p>
-    </div>
-  </section>
-
-  <!-- PROTOTYPE CTA -->
-  <section class="section" style="padding-bottom: 0;">
-    <div style="background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(20,150,255,0.08)); border: 1px solid rgba(99,102,241,0.2); border-radius: 16px; padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 280px;">
-        <span class="section-label" style="margin-bottom: 8px;">Interactive Prototype</span>
-        <h3 style="font-size: 22px; font-weight: 600; color: #ffffff; margin-top: 8px; margin-bottom: 8px;">Explore the Settings Prototype</h3>
-        <p style="font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 520px;">Navigate the control tower landing page, category views, schema details, and overrides hub I designed and coded as a React prototype.</p>
-      </div>
-      <a href="https://spaces-prototype.netlify.app/settings" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: rgba(99,102,241,0.9); color: #ffffff; font-size: 15px; font-weight: 600; border-radius: 10px; text-decoration: none; white-space: nowrap; transition: background 0.2s ease;">
-        View Prototype &rarr;
-      </a>
-    </div>
-  </section>
-
-  <!-- 08 — REFLECTION -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">08 &mdash; REFLECTION</span>
-      <h2 class="section-title">Fixing What Nobody Would Touch</h2>
-    </div>
-
-    <div class="split-section">
-      <div>
-        <p class="section-description">
-          This project taught me that the biggest design problems aren&rsquo;t in the interface&mdash;they&rsquo;re
-          in how teams think about design. The word &ldquo;consistency&rdquo; had become a cage. Designers
-          weren&rsquo;t exploring because exploring felt inconsistent. The design system team couldn&rsquo;t
-          keep up because they didn&rsquo;t know what every initiative needed.
-        </p>
-        <p class="section-description" style="margin-top: 32px;">
-          I worked on Spaces and Settings simultaneously for 6 months. The two initiatives are
-          deeply connected&mdash;Spaces defines who can access what, Settings defines what they
-          can configure. Designing both gave me a unique perspective: the governance layer and
-          the configuration surface need to speak the same language.
-        </p>
-        <p class="section-description" style="margin-top: 32px;">
-          Several features shipped before my departure: breadcrumbs that persist across app
-          boundaries, the entity search pattern, and the IA refactoring was mid-implementation.
-          The 2-year vision&mdash;the control tower landing page, the overrides hub, the mega
-          menu&mdash;lives on in prototypes and documentation the team continues to reference.
-        </p>
-      </div>
-
-      <div class="insight-card">
-        <h4>What I Learned</h4>
-        <p>
-          <strong>Culture shapes products.</strong> The &ldquo;consistency trap&rdquo; wasn&rsquo;t a
-          tooling problem&mdash;it was a mindset problem. Fixing it required mentoring, not Figma.
-        </p>
-        <p style="margin-top: 16px;">
-          <strong>Fix the product, not your task list.</strong> The mega menu wasn&rsquo;t in my brief.
-          The filter unification wasn&rsquo;t in my brief. But they were the right things to do.
-        </p>
-        <p style="margin-top: 16px;">
-          <strong>Document everything.</strong> When I joined, there was no documentation from previous
-          designers. I left behind edge case matrices, IA documents, competitive analysis, and
-          interactive prototypes. The next designer won&rsquo;t start from zero.
-        </p>
-      </div>
-    </div>
-  </section>
-</div>
-
-</body>
+  </body>
 </html>

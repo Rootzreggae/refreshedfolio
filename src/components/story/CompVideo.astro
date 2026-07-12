@@ -5,11 +5,13 @@ export interface Props {
   caption?: string;
 }
 
-const { src, title = "Video", caption } = Astro.props;
+const { src, title = 'Video', caption } = Astro.props;
 
 // Extract video ID from YouTube URL
 const getYouTubeVideoId = (url: string) => {
-  const match = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
+  );
   return match ? match[1] : null;
 };
 
@@ -23,7 +25,8 @@ const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : src;
     title={title}
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
     referrerpolicy="strict-origin-when-cross-origin"
-    allowfullscreen>
+    allowfullscreen
+  >
   </iframe>
   {caption && <p class="video-caption">{caption}</p>}
 </div>

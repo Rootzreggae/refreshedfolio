@@ -128,7 +128,14 @@ export interface ProjectMetadata {
 
   // === CONTENT ORGANIZATION ===
   /** Story sections to include in the narrative */
-  sections: ('problem' | 'research' | 'design' | 'development' | 'results' | 'learnings')[];
+  sections: (
+    | 'problem'
+    | 'research'
+    | 'design'
+    | 'development'
+    | 'results'
+    | 'learnings'
+  )[];
 
   // === SEO AND DISCOVERY ===
   /** Keywords for search optimization */
@@ -159,7 +166,13 @@ export interface ProjectMetadata {
 
   // === CONTENT STRATEGY ===
   /** Target audience for this case study */
-  audience?: ('developers' | 'designers' | 'product-managers' | 'executives' | 'general')[];
+  audience?: (
+    | 'developers'
+    | 'designers'
+    | 'product-managers'
+    | 'executives'
+    | 'general'
+  )[];
 
   /** Primary narrative focus */
   narrativeFocus?: 'process' | 'results' | 'technical' | 'collaboration';

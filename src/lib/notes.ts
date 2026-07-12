@@ -8,7 +8,7 @@ export async function getPublishedNotes(): Promise<Note[]> {
     return import.meta.env.PROD ? data.draft !== true : true;
   });
   return notes.sort(
-    (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf(),
+    (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
   );
 }
 

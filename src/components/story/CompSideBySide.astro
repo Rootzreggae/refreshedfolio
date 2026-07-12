@@ -29,33 +29,46 @@ const { leftContent, rightContent } = Astro.props;
   <div class="side-content">
     {leftContent.title && <h3>{leftContent.title}</h3>}
     {leftContent.text && <p>{leftContent.text}</p>}
-    {leftContent.items && leftContent.items.length > 0 && (
-      <ul>
-        {leftContent.items.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-    )}
+    {
+      leftContent.items && leftContent.items.length > 0 && (
+        <ul>
+          {leftContent.items.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      )
+    }
 
     {leftContent.secondTitle && <h3>{leftContent.secondTitle}</h3>}
-    {leftContent.secondItems && leftContent.secondItems.length > 0 && (
-      <ul>
-        {leftContent.secondItems.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
-    )}
+    {
+      leftContent.secondItems && leftContent.secondItems.length > 0 && (
+        <ul>
+          {leftContent.secondItems.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      )
+    }
   </div>
 
   <div class="side-visual">
-    {rightContent.type === 'carousel' && rightContent.carouselId && rightContent.images ? (
-      <CompCarousel id={rightContent.carouselId} images={rightContent.images} />
-    ) : rightContent.type === 'image' && rightContent.src ? (
-      <div>
-        <img src={rightContent.src} alt={rightContent.alt || ''} />
-        {rightContent.caption && <p class="image-caption">{rightContent.caption}</p>}
-      </div>
-    ) : null}
+    {
+      rightContent.type === 'carousel' &&
+      rightContent.carouselId &&
+      rightContent.images ? (
+        <CompCarousel
+          id={rightContent.carouselId}
+          images={rightContent.images}
+        />
+      ) : rightContent.type === 'image' && rightContent.src ? (
+        <div>
+          <img src={rightContent.src} alt={rightContent.alt || ''} />
+          {rightContent.caption && (
+            <p class="image-caption">{rightContent.caption}</p>
+          )}
+        </div>
+      ) : null
+    }
   </div>
 </div>
 

@@ -11,54 +11,44 @@ The design system is built on CSS custom properties (design tokens) that provide
 ### Token Categories
 
 #### Colors
+
 ```css
 /* Background Colors */
---color-bg-primary: #1a1a1a     /* Main background */
---color-bg-secondary: #0a0a0a   /* Darker areas */
---color-bg-elevated: #2a2a2a    /* Cards, elevated surfaces */
-
-/* Text Colors */
---color-text-primary: #ffffff    /* Headlines, primary content */
---color-text-secondary: #cccccc  /* Body text */
---color-text-tertiary: #888888   /* Supporting text */
---color-text-quaternary: #666666 /* Muted text, labels */
---color-text-muted: #555555      /* Disabled, very low contrast */
-
-/* Border Colors */
---color-border-primary: #333333   /* Standard dividers */
---color-border-secondary: #1a1a1a /* Subtle dividers */
-
-/* Accent Colors */
---color-accent-primary: #4a9eff   /* Links, CTAs, highlights */
---color-accent-hover: #3d8ae6     /* Hover states */
+--color-bg-primary: #1a1a1a /* Main background */ --color-bg-secondary: #0a0a0a
+  /* Darker areas */ --color-bg-elevated: #2a2a2a /* Cards, elevated surfaces */
+  /* Text Colors */ --color-text-primary: #ffffff
+  /* Headlines, primary content */ --color-text-secondary: #cccccc
+  /* Body text */ --color-text-tertiary: #888888 /* Supporting text */
+  --color-text-quaternary: #666666 /* Muted text, labels */
+  --color-text-muted: #555555 /* Disabled, very low contrast */
+  /* Border Colors */ --color-border-primary: #333333 /* Standard dividers */
+  --color-border-secondary: #1a1a1a /* Subtle dividers */ /* Accent Colors */
+  --color-accent-primary: #4a9eff /* Links, CTAs, highlights */
+  --color-accent-hover: #3d8ae6 /* Hover states */;
 ```
 
 #### Typography Scale
+
 ```css
---font-size-xs: 0.75rem     /* 12px - Captions, metadata */
---font-size-sm: 0.875rem    /* 14px - Small text */
---font-size-base: 1rem      /* 16px - Body text */
---font-size-lg: 1.125rem    /* 18px - Large body text */
---font-size-xl: 1.25rem     /* 20px - Subheadings */
---font-size-2xl: 1.5rem     /* 24px - Section headings */
---font-size-4xl: 2rem       /* 32px - Page headings */
---font-size-5xl: 3rem       /* 48px - Hero text */
---font-size-6xl: 4rem       /* 64px - Large hero */
---font-size-7xl: 4.5rem     /* 72px - Extra large hero */
+--font-size-xs: 0.75rem /* 12px - Captions, metadata */ --font-size-sm: 0.875rem
+  /* 14px - Small text */ --font-size-base: 1rem /* 16px - Body text */
+  --font-size-lg: 1.125rem /* 18px - Large body text */ --font-size-xl: 1.25rem
+  /* 20px - Subheadings */ --font-size-2xl: 1.5rem /* 24px - Section headings */
+  --font-size-4xl: 2rem /* 32px - Page headings */ --font-size-5xl: 3rem
+  /* 48px - Hero text */ --font-size-6xl: 4rem /* 64px - Large hero */
+  --font-size-7xl: 4.5rem /* 72px - Extra large hero */;
 ```
 
 #### Spacing Scale
+
 ```css
---space-1: 0.25rem   /* 4px - Tight spacing */
---space-2: 0.5rem    /* 8px - Small gaps */
---space-3: 0.75rem   /* 12px - List items */
---space-4: 1rem      /* 16px - Standard spacing */
---space-5: 1.25rem   /* 20px - Paragraph margins */
---space-6: 1.5rem    /* 24px - Section spacing */
---space-8: 2rem      /* 32px - Component spacing */
---space-16: 4rem     /* 64px - Layout spacing */
---space-20: 5rem     /* 80px - Section padding */
---space-32: 8rem     /* 128px - Large section gaps */
+--space-1: 0.25rem /* 4px - Tight spacing */ --space-2: 0.5rem
+  /* 8px - Small gaps */ --space-3: 0.75rem /* 12px - List items */
+  --space-4: 1rem /* 16px - Standard spacing */ --space-5: 1.25rem
+  /* 20px - Paragraph margins */ --space-6: 1.5rem /* 24px - Section spacing */
+  --space-8: 2rem /* 32px - Component spacing */ --space-16: 4rem
+  /* 64px - Layout spacing */ --space-20: 5rem /* 80px - Section padding */
+  --space-32: 8rem /* 128px - Large section gaps */;
 ```
 
 ## Layout System
@@ -79,10 +69,10 @@ import UnifiedLayout from '../layouts/UnifiedLayout.astro';
   showHeader={true}
   headerLayout="hero"
   navigation={{
-    backLink: "/work",
-    backText: "Back to Work",
-    nextLink: "/work/next-project",
-    nextText: "Next Project"
+    backLink: '/work',
+    backText: 'Back to Work',
+    nextLink: '/work/next-project',
+    nextText: 'Next Project',
   }}
 >
   <!-- Your content here -->
@@ -92,21 +82,25 @@ import UnifiedLayout from '../layouts/UnifiedLayout.astro';
 ### Layout Types
 
 #### 1. Project Layout (`layout="project"`)
+
 - **Use for**: Traditional project pages with markdown content
 - **Container**: Standard (1200px max-width)
 - **Features**: Navigation, header, prose styling
 
 #### 2. Story Layout (`layout="story"`)
+
 - **Use for**: Component-rich storytelling pages
 - **Container**: Wide (1400px max-width)
 - **Features**: Navigation, hero header, story components
 
 #### 3. Category Layout (`layout="category"`)
+
 - **Use for**: Project listing and overview pages
 - **Container**: Standard
 - **Features**: Navigation, grid layouts
 
 #### 4. Prose Layout (`layout="prose"`)
+
 - **Use for**: Markdown-heavy content (notes, articles)
 - **Container**: Narrow for readability
 - **Features**: Typography-focused styling
@@ -116,12 +110,12 @@ import UnifiedLayout from '../layouts/UnifiedLayout.astro';
 ```astro
 <!-- Narrow: 640px - For reading content -->
 <UnifiedLayout containerSize="narrow">
-
-<!-- Standard: 1200px - Default for most content -->
-<UnifiedLayout containerSize="standard">
-
-<!-- Wide: 1400px - For story components, media-rich content -->
-<UnifiedLayout containerSize="wide">
+  <!-- Standard: 1200px - Default for most content -->
+  <UnifiedLayout containerSize="standard">
+    <!-- Wide: 1400px - For story components, media-rich content -->
+    <UnifiedLayout containerSize="wide" /></UnifiedLayout
+  ></UnifiedLayout
+>
 ```
 
 ## Component Library
@@ -194,10 +188,10 @@ import ProjectHeader from '../components/ui/ProjectHeader.astro';
   subtitle="Brief project description"
   description="Longer project description explaining the context and goals."
   metadata={{
-    "Project": "Keystrok",
-    "Role": "Product Designer",
-    "Timeline": "2023-2024",
-    "Technologies": ["React", "TypeScript", "Figma"]
+    Project: 'Keystrok',
+    Role: 'Product Designer',
+    Timeline: '2023-2024',
+    Technologies: ['React', 'TypeScript', 'Figma'],
   }}
   layout="hero"
   showDivider={true}
@@ -270,10 +264,18 @@ import CompImageSingle from '../components/story/CompImageSingle.astro';
 
 ```css
 /* Mobile-first approach */
-@media (min-width: 640px)  { /* sm: Tablet portrait */ }
-@media (min-width: 768px)  { /* md: Tablet landscape */ }
-@media (min-width: 1024px) { /* lg: Desktop */ }
-@media (min-width: 1280px) { /* xl: Large desktop */ }
+@media (min-width: 640px) {
+  /* sm: Tablet portrait */
+}
+@media (min-width: 768px) {
+  /* md: Tablet landscape */
+}
+@media (min-width: 1024px) {
+  /* lg: Desktop */
+}
+@media (min-width: 1280px) {
+  /* xl: Large desktop */
+}
 ```
 
 ### Container Behavior
@@ -295,39 +297,48 @@ font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
 ## When to Use Each Layout
 
 ### UnifiedLayout with layout="story"
+
 **Use for:**
+
 - Component-rich case studies
 - Visual storytelling projects
 - Interactive content
 - Projects with custom components
 
 **Features:**
+
 - Wide container (1400px)
 - Story component support
 - Hero header with metadata
 - Flexible navigation
 
 ### UnifiedLayout with layout="project"
+
 **Use for:**
+
 - Traditional markdown projects
 - Documentation-style content
 - Simple project pages
 - Blog-style articles
 
 **Features:**
+
 - Standard container (1200px)
 - Prose typography
 - Standard header
 - Clean reading experience
 
 ### UnifiedLayout with layout="category"
+
 **Use for:**
+
 - Project listing pages
 - Category overviews
 - Portfolio grids
 - Navigation pages
 
 **Features:**
+
 - Grid layouts
 - Card components
 - Consistent spacing
@@ -336,23 +347,27 @@ font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
 ## Accessibility Requirements
 
 ### Color Contrast
+
 - Text on background: 4.5:1 minimum ratio
 - Interactive elements: Clear focus states
 - Accent colors: Sufficient contrast for links
 
 ### Typography
+
 - Minimum 16px body text
 - Clear heading hierarchy
 - Adequate line spacing (1.5-1.7)
 - Readable font weights
 
 ### Navigation
+
 - Keyboard accessible
 - Screen reader friendly
 - Clear focus indicators
 - Semantic HTML structure
 
 ### Images
+
 - Alt text for all images
 - Figcaptions for context
 - Lazy loading for performance
@@ -412,16 +427,19 @@ font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
 ## Performance Considerations
 
 ### CSS Custom Properties
+
 - Single source of truth reduces bundle size
 - Runtime theming capabilities
 - Efficient cascade inheritance
 
 ### Component Architecture
+
 - Shared base components reduce duplication
 - Semantic HTML for better performance
 - Optimized image loading
 
 ### Responsive Images
+
 - Use `loading="lazy"` for images below fold
 - Provide appropriate alt text
 - Consider WebP format for better compression
@@ -429,6 +447,7 @@ font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
 ## Maintenance Guidelines
 
 ### Adding New Components
+
 1. Use existing design tokens
 2. Follow naming conventions (`comp-*`, `component__element`, `component--modifier`)
 3. Include responsive design
@@ -436,12 +455,14 @@ font-size: clamp(var(--font-size-5xl), 6vw, var(--font-size-7xl));
 5. Document component API
 
 ### Updating Design Tokens
+
 1. Modify tokens in `src/styles/global.css`
 2. Test across all components
 3. Update Tailwind config if needed
 4. Document breaking changes
 
 ### Version Control
+
 - Document component changes
 - Maintain backward compatibility when possible
 - Use semantic versioning for major updates

@@ -14,28 +14,33 @@ const {
   nextLink,
   nextText,
   variant = 'header',
-  showDivider = true
+  showDivider = true,
 } = Astro.props;
 ---
 
-<nav class={`navigation navigation--${variant}`} class:list={{ 'navigation--divider': showDivider }}>
+<nav
+  class={`navigation navigation--${variant}`}
+  class:list={{ 'navigation--divider': showDivider }}
+>
   <div class="navigation__container">
-    {variant === 'header' ? (
-      <a href={backLink} class="navigation__link navigation__link--back">
-        ← {backText}
-      </a>
-    ) : (
-      <div class="navigation__footer">
-        <a href={backLink} class="navigation__link">
+    {
+      variant === 'header' ? (
+        <a href={backLink} class="navigation__link navigation__link--back">
           ← {backText}
         </a>
-        {nextLink && nextText && (
-          <a href={nextLink} class="navigation__link">
-            {nextText} →
+      ) : (
+        <div class="navigation__footer">
+          <a href={backLink} class="navigation__link">
+            ← {backText}
           </a>
-        )}
-      </div>
-    )}
+          {nextLink && nextText && (
+            <a href={nextLink} class="navigation__link">
+              {nextText} →
+            </a>
+          )}
+        </div>
+      )
+    }
   </div>
 </nav>
 

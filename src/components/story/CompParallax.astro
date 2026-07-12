@@ -7,18 +7,21 @@ export interface Props {
   className?: string;
 }
 
-const { title, subtitle, backgroundImage, height = "400px", className = "" } = Astro.props;
+const {
+  title,
+  subtitle,
+  backgroundImage,
+  height = '400px',
+  className = '',
+} = Astro.props;
 ---
 
-<div 
-  class={`parallax-section ${className}`} 
-  style={`height: ${height}`}
->
-  <div 
+<div class={`parallax-section ${className}`} style={`height: ${height}`}>
+  <div
     class="parallax-bg"
     style={backgroundImage ? `background-image: url(${backgroundImage})` : ''}
   ></div>
-  
+
   <div class="parallax-content">
     <h2>{title}</h2>
     {subtitle && <p>{subtitle}</p>}
@@ -36,7 +39,7 @@ const { title, subtitle, backgroundImage, height = "400px", className = "" } = A
     align-items: center;
     justify-content: center;
   }
-  
+
   .parallax-bg {
     position: absolute;
     top: -20%;
@@ -49,7 +52,7 @@ const { title, subtitle, backgroundImage, height = "400px", className = "" } = A
     background-position: center;
     background-attachment: fixed;
   }
-  
+
   .parallax-content {
     position: relative;
     z-index: 2;
@@ -59,26 +62,26 @@ const { title, subtitle, backgroundImage, height = "400px", className = "" } = A
     border-radius: 8px;
     backdrop-filter: blur(10px);
   }
-  
+
   .parallax-content h2 {
     font-size: 48px;
     font-weight: 300;
     margin-bottom: 20px;
     color: #3390ff;
   }
-  
+
   .parallax-content p {
     font-size: 18px;
     color: #cccccc;
     max-width: 600px;
     margin: 0 auto;
   }
-  
+
   @media (max-width: 768px) {
     .parallax-content h2 {
       font-size: 32px;
     }
-    
+
     .parallax-content {
       padding: 40px 20px;
     }
