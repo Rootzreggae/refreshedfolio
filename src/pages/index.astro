@@ -16,13 +16,13 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nilson Gaspar — Product Designer</title>
-  <meta name="description" content="Nilson Gaspar — product designer working in developer tools and observability. Currently at Dynatrace, previously Grafana Labs. Based in Lisbon." />
+  <meta name="description" content="Nilson Gaspar — product designer working in developer tools and observability. Most recently at Dynatrace, previously Grafana Labs. Based in Lisbon." />
   <meta name="author" content="Nilson Gaspar" />
 
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nilsongaspar.com/" />
   <meta property="og:title" content="Nilson Gaspar — Product Designer" />
-  <meta property="og:description" content="Product designer working in developer tools and observability. Currently at Dynatrace." />
+  <meta property="og:description" content="Product designer working in developer tools and observability. Most recently at Dynatrace." />
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
@@ -63,10 +63,15 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
     @media (max-width: 760px) {
       [data-panel="left"] { display: none !important; }
       [data-panel="toolbar"] { display: none !important; }
-      [data-topbar] { padding-left: 14px !important; }
+      /* the "↖ Cover" button owns the left edge — drop the brand breadcrumb,
+         there is no room for both plus the right-hand controls */
+      [data-topbar] { padding-left: 14px !important; justify-content: flex-end !important; }
+      [data-topbar] > div:first-child { display: none !important; }
     }
     /* cover: stack the right nav under the headline on narrow screens */
     @media (max-width: 720px) {
+      /* leave room for the corner hint above the headline */
+      [data-cover-scroll] { padding-top: 84px !important; padding-bottom: 32px !important; }
       [data-cover-row] { flex-direction: column !important; align-items: flex-start !important; gap: 40px !important; }
       [data-cover-nav] { align-items: flex-start !important; text-align: left !important; margin-left: 0 !important; max-width: 100% !important; width: 100%; }
       [data-cover-nav] a { align-items: flex-start !important; }
@@ -351,9 +356,9 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
   <!-- ===== Cover: the composed homepage (on top) ========= -->
   <!-- ===================================================== -->
   <div data-sheet style="position:absolute; inset:0; z-index:3; background:#102237; color:#E7EAF0; will-change:clip-path;">
-    <div style="position:absolute; inset:0; display:flex; flex-direction:column; padding:clamp(40px,5vw,64px);">
+    <div data-cover-scroll style="position:absolute; inset:0; display:flex; flex-direction:column; padding:clamp(40px,5vw,64px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;">
 
-      <div style="flex:1; display:flex; align-items:center;">
+      <div style="flex:1 0 auto; display:flex; align-items:center;">
        <div data-cover-row style="width:100%; display:flex; align-items:flex-start; justify-content:space-between; gap:clamp(36px,5vw,72px); flex-wrap:wrap;">
         <div style="flex:1 1 360px; max-width:660px;">
           <h1 style="margin:0; font-weight:500; font-size:clamp(2.3rem,5vw,4.8rem); line-height:1.0; letter-spacing:-.028em;">I make complex developer tools feel a little more <span style="text-decoration:underline; text-decoration-color:#54E0A6; text-underline-offset:.1em; text-decoration-thickness:.05em;">human</span>.</h1>
@@ -403,6 +408,9 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
       </div>
 
     </div>
+
+    <!-- peel grab zone: exists only so touch drags here don't also scroll the cover -->
+    <div data-corner style="position:absolute; top:0; right:0; touch-action:none;"></div>
   </div>
 
   <!-- curl / flap -->
@@ -432,6 +440,7 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
   const stage = $('[data-stage]');
   const sheet = $('[data-sheet]');
   const flap = $('[data-flap]');
+  const corner = $('[data-corner]');
   const about = $('[data-about]');
   const back = $('[data-back]');
   const hint = $('[data-hint]');
@@ -460,6 +469,8 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
   const measure = () => {
     const r = stage.getBoundingClientRect();
     W = r.width; H = r.height; rectLeft = r.left; rectTop = r.top;
+    const c = cornerSize();
+    corner.style.width = c + 'px'; corner.style.height = c + 'px';
   };
   const rect4 = (): Pt[] => [[0, 0], [W, 0], [W, H], [0, H]];
 
@@ -494,7 +505,10 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
     band = clipHalf(band, val - CURL_D, true);
     flap.style.clipPath = toClip(band.map((p) => reflectPt(p, val)));
   }
-  const inCorner = (x: number, y: number) => x > W - 210 && y < 210;
+  // ponytail: clamp the grab zone on phones so it can't eat a scroll gesture
+  // that starts in the top-right of the cover.
+  const cornerSize = () => Math.min(210, W * 0.34, H * 0.2);
+  const inCorner = (x: number, y: number) => { const c = cornerSize(); return x > W - c && y < c; };
 
   // ---------- workspace ----------
   const applyPan = () => { group.style.transform = `translate(${panX}px,${panY}px)`; };

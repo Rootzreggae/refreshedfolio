@@ -16,7 +16,7 @@ export interface WorkItem {
   url: string;
   /** Two-line caption shown under the name in the hero column. */
   caption: string;
-  /** Short tenure tag shown in the Work slide-over (now / prev / side / ∞). */
+  /** Short tenure tag shown in the Work slide-over (recent / prev / side / ∞). */
   tenure: string;
   /** One-line description shown in the Work slide-over. */
   blurb: string;
@@ -28,9 +28,9 @@ export const selectedWork: WorkItem[] = [
   {
     name: 'Dynatrace',
     url: '/projects/dynatrace',
-    caption: 'developer tooling · now',
-    tenure: 'now',
-    blurb: 'Building developer tooling for observability at scale.',
+    caption: 'developer tooling · most recent',
+    tenure: 'recent',
+    blurb: 'Developer tooling for observability at scale.',
     locked: true,
   },
   {
