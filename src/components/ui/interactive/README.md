@@ -37,7 +37,7 @@ export default defineConfig({
 import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ---
 
-<div class="relative bg-bg-elevated p-6 rounded-lg">
+<div class="bg-bg-elevated relative rounded-lg p-6">
   <h2>Your Content</h2>
   <p>This card has an interactive folded corner.</p>
 
@@ -59,22 +59,22 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 
 ### Required Props
 
-| Prop | Type | Description |
-|------|------|-------------|
+| Prop       | Type              | Description                      |
+| ---------- | ----------------- | -------------------------------- |
 | `children` | `React.ReactNode` | Content to display when unfolded |
 
 ### Optional Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `cornerSize` | `number` | `32` | Corner size in pixels |
-| `maxUnfold` | `number` | `200` | Maximum unfold distance |
-| `position` | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'` | `'top-right'` | Corner position |
-| `onUnfold` | `() => void` | `undefined` | Callback when fully unfolded |
-| `onFold` | `() => void` | `undefined` | Callback when returning to folded state |
-| `reduceMotion` | `boolean` | `false` | Disable animations |
-| `className` | `string` | `''` | Additional CSS classes |
-| `ariaLabel` | `string` | `'Interactive folded corner element'` | Accessibility label |
+| Prop           | Type                                                           | Default                               | Description                             |
+| -------------- | -------------------------------------------------------------- | ------------------------------------- | --------------------------------------- |
+| `cornerSize`   | `number`                                                       | `32`                                  | Corner size in pixels                   |
+| `maxUnfold`    | `number`                                                       | `200`                                 | Maximum unfold distance                 |
+| `position`     | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'` | `'top-right'`                         | Corner position                         |
+| `onUnfold`     | `() => void`                                                   | `undefined`                           | Callback when fully unfolded            |
+| `onFold`       | `() => void`                                                   | `undefined`                           | Callback when returning to folded state |
+| `reduceMotion` | `boolean`                                                      | `false`                               | Disable animations                      |
+| `className`    | `string`                                                       | `''`                                  | Additional CSS classes                  |
+| `ariaLabel`    | `string`                                                       | `'Interactive folded corner element'` | Accessibility label                     |
 
 ## Positioning
 
@@ -88,11 +88,13 @@ The component supports four corner positions:
 ## Interaction Methods
 
 ### Mouse/Touch
+
 - **Hover**: Subtle scale and glow effect
 - **Drag**: Smooth physics-based dragging
 - **Release**: Snaps to fully unfolded if dragged >60% of maxUnfold distance
 
 ### Keyboard
+
 - **Tab**: Focus the corner element
 - **Enter/Space**: Toggle between folded and unfolded states
 - **Escape**: Return to folded state (when unfolded)
@@ -133,8 +135,9 @@ Custom styling can be applied via the `className` prop or by targeting the compo
 ## Integration Examples
 
 ### Portfolio Card
+
 ```astro
-<div class="relative bg-bg-elevated rounded-lg p-6">
+<div class="bg-bg-elevated relative rounded-lg p-6">
   <h3>Project Title</h3>
   <p>Brief description...</p>
 
@@ -156,8 +159,9 @@ Custom styling can be applied via the `className` prop or by targeting the compo
 ```
 
 ### Contact Card
+
 ```astro
-<div class="relative bg-bg-elevated rounded-lg p-6">
+<div class="bg-bg-elevated relative rounded-lg p-6">
   <h3>Get in Touch</h3>
   <p>Let's discuss your project...</p>
 
@@ -168,10 +172,10 @@ Custom styling can be applied via the `className` prop or by targeting the compo
     ariaLabel="View contact options"
   >
     <div class="space-y-3">
-      <a href="mailto:hello@example.com" class="block text-accent-primary">
+      <a href="mailto:hello@example.com" class="text-accent-primary block">
         Email: hello@example.com
       </a>
-      <a href="tel:+1234567890" class="block text-accent-primary">
+      <a href="tel:+1234567890" class="text-accent-primary block">
         Phone: +1 (234) 567-890
       </a>
     </div>
@@ -180,8 +184,9 @@ Custom styling can be applied via the `className` prop or by targeting the compo
 ```
 
 ### Multiple Corners
+
 ```astro
-<div class="relative bg-bg-elevated rounded-lg p-8">
+<div class="bg-bg-elevated relative rounded-lg p-8">
   <h3>Multi-Corner Demo</h3>
 
   <!-- Top-left: Navigation -->
@@ -192,9 +197,9 @@ Custom styling can be applied via the `className` prop or by targeting the compo
     ariaLabel="Quick navigation"
   >
     <nav class="space-y-1">
-      <a href="/" class="block text-accent-primary">Home</a>
-      <a href="/projects" class="block text-accent-primary">Projects</a>
-      <a href="/about" class="block text-accent-primary">About</a>
+      <a href="/" class="text-accent-primary block">Home</a>
+      <a href="/projects" class="text-accent-primary block">Projects</a>
+      <a href="/about" class="text-accent-primary block">About</a>
     </nav>
   </FoldedCorner>
 
@@ -205,7 +210,7 @@ Custom styling can be applied via the `className` prop or by targeting the compo
     cornerSize={32}
     ariaLabel="View metadata"
   >
-    <div class="text-sm space-y-1">
+    <div class="space-y-1 text-sm">
       <p>Created: 2024</p>
       <p>Updated: Today</p>
       <p>Version: 1.0</p>

@@ -4,10 +4,7 @@ export interface Props {
   spacing?: 'tight' | 'normal' | 'loose';
 }
 
-const {
-  size = 'standard',
-  spacing = 'normal'
-} = Astro.props;
+const { size = 'standard', spacing = 'normal' } = Astro.props;
 ---
 
 <div class={`comp-text comp-text--${size} comp-text--${spacing}`}>

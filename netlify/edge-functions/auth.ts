@@ -1,13 +1,13 @@
-import type { Context } from "https://edge.netlify.com";
+import type { Context } from 'https://edge.netlify.com';
 
 export default async function auth(request: Request, context: Context) {
   const url = new URL(request.url);
-  const cookie = request.headers.get("cookie") || "";
+  const cookie = request.headers.get('cookie') || '';
 
   // Check for valid auth cookie
-  const hasAuth = cookie.split(";").some((c) => {
-    const [name, value] = c.trim().split("=");
-    return name === "portfolio_auth" && value === "authenticated";
+  const hasAuth = cookie.split(';').some((c) => {
+    const [name, value] = c.trim().split('=');
+    return name === 'portfolio_auth' && value === 'authenticated';
   });
 
   if (hasAuth) {
@@ -15,7 +15,7 @@ export default async function auth(request: Request, context: Context) {
   }
 
   // Redirect to unlock page with the original URL as redirect param
-  const unlockUrl = new URL("/unlock", request.url);
-  unlockUrl.searchParams.set("redirect", url.pathname);
+  const unlockUrl = new URL('/unlock', request.url);
+  unlockUrl.searchParams.set('redirect', url.pathname);
   return Response.redirect(unlockUrl.toString(), 302);
 }

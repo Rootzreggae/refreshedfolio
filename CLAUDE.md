@@ -1,10 +1,13 @@
 # CLAUDE.md
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
+
 This is **Refreshedfolio**, a personal portfolio website for Nilson Gaspar built with Astro 5 and Tailwind CSS v4. It showcases design work and technical projects with a focus on clean, minimal design and performance.
 
 ## Key Technologies & Architecture
+
 - **Framework**: Astro 5 with TypeScript (strict mode)
 - **Styling**: Tailwind CSS v4 with Vite plugin integration
 - **Content Management**: Astro Content Collections with Zod schemas
@@ -12,13 +15,16 @@ This is **Refreshedfolio**, a personal portfolio website for Nilson Gaspar built
 - **Package Manager**: npm
 
 ### Content Architecture
+
 The project uses Astro's content collections for structured content management:
+
 - **Projects Collection**: Comprehensive schema supporting portfolio projects with metadata like role, technologies, metrics, methodologies, etc.
 - **Notes Collection**: Simpler schema for blog-like content
 - **Categories**: Projects are organized by category (keystrok, grafana, opensource, jungleai, notes)
 - **Project Types**: Supports both 'single' projects and 'category' overview pages
 
 ### Layout System
+
 - `BaseLayout.astro`: Main layout with dark mode, view transitions, and SEO meta tags
 - `ProjectLayout.astro`: Specialized layout for project content pages
 - Global styles in `src/styles/global.css`
@@ -26,12 +32,14 @@ The project uses Astro's content collections for structured content management:
 ## Available Resources & Decision Framework
 
 ### MCP Servers (Use for Real-time Information)
+
 - **figma-dev-mode-mcp-server**: Design handoff, token extraction
 - **puppeteer**: Testing, screenshots, performance audits
 - **gemini-cli**: AI-assisted development and optimization
 - **context7**: Project context and codebase analysis
 
 ### Specialized Agents (Consult for Domain Expertise)
+
 - **Frontend Expert**: Astro/React optimization, performance, accessibility
 - **UX Expert**: Portfolio UX patterns, case study presentation
 - **Content Strategist**: Technical writing, storytelling for developers
@@ -40,6 +48,7 @@ The project uses Astro's content collections for structured content management:
 - **SEO/Analytics Specialist**: Technical SEO, discoverability
 
 ### When to Use Resources
+
 - **Technical implementation** → Frontend Expert + MCP tools
 - **User experience decisions** → UX Expert + puppeteer testing
 - **Content and storytelling** → Content Strategist + gemini-cli
@@ -48,6 +57,7 @@ The project uses Astro's content collections for structured content management:
 - **SEO improvements** → SEO Specialist + current best practices
 
 ## Development Commands
+
 ```bash
 # Development
 npm run dev              # Start dev server at localhost:4321
@@ -140,3 +150,4 @@ Performance: All Core Web Vitals in green
 Accessibility: 100% automated test pass rate
 Design: Consistent component usage across pages
 Content: Engaging case studies demonstrating design expertise
+```

@@ -7,12 +7,12 @@ export interface Props {
   height?: string;
 }
 
-const { 
-  beforeLabel = "Before", 
-  afterLabel = "After", 
+const {
+  beforeLabel = 'Before',
+  afterLabel = 'After',
   beforeImage,
   afterImage,
-  height = "500px" 
+  height = '500px',
 } = Astro.props;
 
 const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
@@ -20,33 +20,37 @@ const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
 
 <div class="before-after" id={id} style={`height: ${height}`}>
   <div class="before">
-    {beforeImage ? (
-      <img src={beforeImage} alt={beforeLabel} loading="lazy" />
-    ) : (
-      <div class="placeholder-content">
-        <slot name="before">
-          <div style="text-align: center;">
-            <h3 style="margin-bottom: 20px;">{beforeLabel}</h3>
-          </div>
-        </slot>
-      </div>
-    )}
+    {
+      beforeImage ? (
+        <img src={beforeImage} alt={beforeLabel} loading="lazy" />
+      ) : (
+        <div class="placeholder-content">
+          <slot name="before">
+            <div style="text-align: center;">
+              <h3 style="margin-bottom: 20px;">{beforeLabel}</h3>
+            </div>
+          </slot>
+        </div>
+      )
+    }
   </div>
-  
+
   <div class="after">
-    {afterImage ? (
-      <img src={afterImage} alt={afterLabel} loading="lazy" />
-    ) : (
-      <div class="placeholder-content">
-        <slot name="after">
-          <div style="text-align: center;">
-            <h3 style="margin-bottom: 20px;">{afterLabel}</h3>
-          </div>
-        </slot>
-      </div>
-    )}
+    {
+      afterImage ? (
+        <img src={afterImage} alt={afterLabel} loading="lazy" />
+      ) : (
+        <div class="placeholder-content">
+          <slot name="after">
+            <div style="text-align: center;">
+              <h3 style="margin-bottom: 20px;">{afterLabel}</h3>
+            </div>
+          </slot>
+        </div>
+      )
+    }
   </div>
-  
+
   <div class="slider-handle">⟷</div>
 </div>
 
@@ -59,8 +63,9 @@ const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
     border: 1px solid #333333;
     cursor: ew-resize;
   }
-  
-  .before, .after {
+
+  .before,
+  .after {
     position: absolute;
     top: 0;
     left: 0;
@@ -72,25 +77,26 @@ const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
     font-size: 18px;
     font-weight: 500;
   }
-  
+
   .before {
     background: #1a1a1a;
     color: #888888;
   }
-  
+
   .after {
     background: #0f0f0f;
     color: #3390ff;
     clip-path: polygon(50% 0%, 100% 0%, 100% 100%, 50% 100%);
     transition: clip-path 0.1s ease;
   }
-  
-  .before img, .after img {
+
+  .before img,
+  .after img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .placeholder-content {
     width: 100%;
     height: 100%;
@@ -98,7 +104,7 @@ const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
     align-items: center;
     justify-content: center;
   }
-  
+
   .slider-handle {
     position: absolute;
     top: 50%;
@@ -123,28 +129,28 @@ const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
   const after = container.querySelector('.after');
   const handle = container.querySelector('.slider-handle');
   let isMouseDown = false;
-  
+
   function updateSlider(event) {
     if (!isMouseDown) return;
-    
+
     const rect = container.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    
+
     after.style.clipPath = `polygon(${percentage}% 0%, 100% 0%, 100% 100%, ${percentage}% 100%)`;
     handle.style.left = `${percentage}%`;
   }
-  
+
   container.addEventListener('mousedown', (event) => {
     isMouseDown = true;
     updateSlider(event);
   });
-  
+
   document.addEventListener('mousemove', updateSlider);
-  
+
   document.addEventListener('mouseup', () => {
     isMouseDown = false;
   });
-  
+
   container.addEventListener('mousemove', updateSlider);
 </script>

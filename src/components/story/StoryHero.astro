@@ -18,20 +18,48 @@ const { title, description, project, role, timeline, status } = Astro.props;
         <h1 class="hero-title">{title}</h1>
         <p class="hero-description">{description}</p>
       </div>
-      
+
       <div class="hero-meta">
-        {project && (
-          <>PROJECT: <span class="meta-highlight">{project.toUpperCase()}</span><br></>
-        )}
-        {role && (
-          <>ROLE: <span class="meta-highlight">{role.toUpperCase()}</span><br></>
-        )}
-        {timeline && (
-          <>TIMELINE: <span class="meta-highlight">{timeline.toUpperCase()}</span><br></>
-        )}
-        {status && (
-          <>STATUS: <span class="meta-highlight">{status.toUpperCase()}</span></>
-        )}
+        {
+          project && (
+            <>
+              PROJECT:{' '}
+              <>
+                <span class="meta-highlight">{project.toUpperCase()}</span>
+                <br />
+              </>
+            </>
+          )
+        }
+        {
+          role && (
+            <>
+              ROLE:{' '}
+              <>
+                <span class="meta-highlight">{role.toUpperCase()}</span>
+                <br />
+              </>
+            </>
+          )
+        }
+        {
+          timeline && (
+            <>
+              TIMELINE:{' '}
+              <>
+                <span class="meta-highlight">{timeline.toUpperCase()}</span>
+                <br />
+              </>
+            </>
+          )
+        }
+        {
+          status && (
+            <>
+              STATUS: <span class="meta-highlight">{status.toUpperCase()}</span>
+            </>
+          )
+        }
       </div>
     </div>
   </div>
@@ -84,7 +112,7 @@ const { title, description, project, role, timeline, status } = Astro.props;
     .story-container {
       padding: 0 30px;
     }
-    
+
     .hero-grid {
       grid-template-columns: 1fr;
       gap: 30px;

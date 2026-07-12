@@ -11,6 +11,7 @@ This specification defines standardized components for displaying project inform
 **Purpose**: Main component for displaying project previews in grids, lists, and featured sections.
 
 #### Props Interface
+
 ```typescript
 interface ProjectCardProps {
   project: ProjectPreview;
@@ -26,6 +27,7 @@ interface ProjectCardProps {
 #### Variants
 
 **Default Variant**
+
 - Full project information display
 - Medium-sized thumbnail (16:9 aspect ratio)
 - Title, description, role, timeline
@@ -33,6 +35,7 @@ interface ProjectCardProps {
 - Hover animations and transitions
 
 **Featured Variant**
+
 - Large hero treatment for homepage
 - Prominent thumbnail or hero image
 - Enhanced typography hierarchy
@@ -40,18 +43,21 @@ interface ProjectCardProps {
 - Call-to-action button
 
 **Compact Variant**
+
 - Minimal information for sidebars
 - Small thumbnail (square aspect ratio)
 - Title and role only
 - Reduced spacing
 
 **Minimal Variant**
+
 - Text-only display for lists
 - No thumbnail
 - Title, role, timeline
 - Clean typography focus
 
 #### Responsive Behavior
+
 - **Desktop**: Full information display
 - **Tablet**: Optimized spacing, maintained functionality
 - **Mobile**: Stacked layout, essential information only
@@ -61,6 +67,7 @@ interface ProjectCardProps {
 **Purpose**: Consistent display of project metadata across detail pages and previews.
 
 #### Props Interface
+
 ```typescript
 interface ProjectMetadataProps {
   project: ProjectEntry | ProjectPreview;
@@ -73,6 +80,7 @@ interface ProjectMetadataProps {
 ```
 
 #### Display Patterns
+
 - **Role**: Displayed with subtle styling
 - **Timeline**: Formatted consistently (e.g., "2023 (6 months)")
 - **Client**: Company/organization name
@@ -84,6 +92,7 @@ interface ProjectMetadataProps {
 **Purpose**: Handles project-to-project navigation and breadcrumbs.
 
 #### Props Interface
+
 ```typescript
 interface ProjectNavigationProps {
   navigation: ProjectNavigation;
@@ -94,6 +103,7 @@ interface ProjectNavigationProps {
 ```
 
 #### Navigation Types
+
 - **Breadcrumbs**: Home > Category > Project hierarchy
 - **Sibling Navigation**: Previous/Next within category
 - **Parent-Child**: Category to subprojects
@@ -104,6 +114,7 @@ interface ProjectNavigationProps {
 **Purpose**: Standardized display of project success metrics.
 
 #### Props Interface
+
 ```typescript
 interface ProjectMetricsProps {
   metrics: MetricsDisplay;
@@ -115,6 +126,7 @@ interface ProjectMetricsProps {
 ```
 
 #### Metric Types
+
 - **Performance**: Speed improvements, load times
 - **User Satisfaction**: Ratings, NPS scores
 - **Business Impact**: Conversion rates, adoption
@@ -125,6 +137,7 @@ interface ProjectMetricsProps {
 ### 1. Accessibility Standards
 
 #### Required Features
+
 - **Semantic HTML**: Proper heading hierarchy, nav elements
 - **ARIA Labels**: Screen reader optimization
 - **Keyboard Navigation**: Full tab navigation support
@@ -132,6 +145,7 @@ interface ProjectMetricsProps {
 - **Alt Text**: All images have descriptive alt attributes
 
 #### Focus Management
+
 - Visible focus indicators
 - Logical tab order
 - Skip links for navigation
@@ -139,12 +153,14 @@ interface ProjectMetricsProps {
 ### 2. Performance Optimization
 
 #### Image Handling
+
 - **Lazy Loading**: For thumbnails and hero images
 - **Responsive Images**: Multiple sizes for different viewports
 - **WebP Support**: Modern format with fallbacks
 - **Aspect Ratio**: Consistent ratios to prevent layout shift
 
 #### Component Optimization
+
 - **Code Splitting**: Load components as needed
 - **Memoization**: Prevent unnecessary re-renders
 - **Bundle Size**: Keep components lightweight
@@ -152,16 +168,19 @@ interface ProjectMetricsProps {
 ### 3. Design System Integration
 
 #### Typography
+
 - Consistent heading hierarchy (h1-h6)
 - Body text sizing and line height
 - Link styling and hover states
 
 #### Spacing
+
 - Standardized margin and padding scale
 - Consistent component spacing
 - Responsive spacing adjustments
 
 #### Color System
+
 - Project accent colors for branding
 - Consistent hover and active states
 - Dark mode support
@@ -182,6 +201,7 @@ src/components/project/
 ## Usage Examples
 
 ### Homepage Featured Projects
+
 ```astro
 ---
 import { ProjectCard } from '../components/project';
@@ -191,18 +211,21 @@ const featured = await getFeaturedProjects();
 ---
 
 <section class="featured-projects">
-  {featured.map(project => (
-    <ProjectCard
-      project={project}
-      variant="featured"
-      showCategory={true}
-      showMetrics={true}
-    />
-  ))}
+  {
+    featured.map((project) => (
+      <ProjectCard
+        project={project}
+        variant="featured"
+        showCategory={true}
+        showMetrics={true}
+      />
+    ))
+  }
 </section>
 ```
 
 ### Project Detail Navigation
+
 ```astro
 ---
 import { ProjectNavigation } from '../components/project';
@@ -219,6 +242,7 @@ const navigation = await getProjectNavigation(Astro.params.slug);
 ```
 
 ### Category Project Grid
+
 ```astro
 ---
 import { ProjectCard } from '../components/project';
@@ -228,20 +252,23 @@ const projects = await getProjectsByCategory('grafana');
 ---
 
 <div class="project-grid">
-  {projects.map(project => (
-    <ProjectCard
-      project={project}
-      variant="default"
-      showTags={true}
-      orientation="vertical"
-    />
-  ))}
+  {
+    projects.map((project) => (
+      <ProjectCard
+        project={project}
+        variant="default"
+        showTags={true}
+        orientation="vertical"
+      />
+    ))
+  }
 </div>
 ```
 
 ## Styling Architecture
 
 ### CSS Custom Properties
+
 ```css
 /* Project component theming */
 :root {
@@ -254,6 +281,7 @@ const projects = await getProjectsByCategory('grafana');
 ```
 
 ### Component-Specific Styles
+
 - Scoped styling with Astro's CSS scoping
 - Utility classes for spacing and layout
 - Component variants using CSS custom properties
@@ -262,12 +290,14 @@ const projects = await getProjectsByCategory('grafana');
 ## Quality Assurance
 
 ### Testing Requirements
+
 - [ ] **Visual Regression**: Screenshots across viewports
 - [ ] **Accessibility**: Screen reader and keyboard testing
 - [ ] **Performance**: Lighthouse scores >90
 - [ ] **Cross-Browser**: Chrome, Firefox, Safari, Edge
 
 ### Content Validation
+
 - [ ] **Required Fields**: All props properly typed
 - [ ] **Image Handling**: Proper fallbacks and loading
 - [ ] **Navigation**: All links functional
@@ -276,12 +306,14 @@ const projects = await getProjectsByCategory('grafana');
 ## Future Enhancements
 
 ### Phase 2 Features
+
 - **Search Integration**: Filter and search within components
 - **Animation Library**: Consistent micro-interactions
 - **Analytics Integration**: Track component interactions
 - **A/B Testing**: Component variant testing
 
 ### Advanced Features
+
 - **Dynamic Content**: Real-time project updates
 - **Personalization**: User preference-based display
 - **Social Sharing**: Integrated sharing buttons
@@ -290,12 +322,15 @@ const projects = await getProjectsByCategory('grafana');
 ## Migration from Existing Components
 
 ### Current Story Components
+
 Replace existing story components with standardized versions:
+
 - `CompProjectHeader` → `ProjectCard` (featured variant)
 - `CompMetrics` → `ProjectMetrics`
 - Custom metadata displays → `ProjectMetadata`
 
 ### Backwards Compatibility
+
 - Support existing component props during transition
 - Gradual migration path for content
 - Fallback styling for legacy components
@@ -303,12 +338,14 @@ Replace existing story components with standardized versions:
 ## Success Metrics
 
 ### Technical Metrics
+
 - **Performance**: <100ms component render time
 - **Accessibility**: 100% automated test pass rate
 - **Bundle Size**: <50kb total component library
 - **Browser Support**: 98%+ compatibility
 
 ### User Experience Metrics
+
 - **Navigation Success**: >95% task completion
 - **Content Discovery**: Improved time-to-relevant-project
 - **Mobile Usability**: >90% mobile user satisfaction

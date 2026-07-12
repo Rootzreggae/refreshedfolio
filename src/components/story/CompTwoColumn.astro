@@ -27,29 +27,33 @@ const { leftImages, rightImages } = Astro.props;
 
 <div class="comp-two-column">
   <div class="column-left">
-    {leftImages.map((image) => (
-      <div class="column-image">
-        <img src={image.src} alt={image.alt} />
-        {image.caption && <p class="image-caption">{image.caption}</p>}
-      </div>
-    ))}
+    {
+      leftImages.map((image) => (
+        <div class="column-image">
+          <img src={image.src} alt={image.alt} />
+          {image.caption && <p class="image-caption">{image.caption}</p>}
+        </div>
+      ))
+    }
   </div>
 
   <div class="column-right">
-    {rightImages.map((image) => (
-      <div class="column-image">
-        <img src={image.src} alt={image.alt} />
-        {image.caption && <p class="image-caption">{image.caption}</p>}
-        {image.embedded && image.embedded.type === 'carousel' && (
-          <div class="embedded-carousel">
-            <CompCarousel
-              id={image.embedded.carouselId}
-              images={image.embedded.images}
-            />
-          </div>
-        )}
-      </div>
-    ))}
+    {
+      rightImages.map((image) => (
+        <div class="column-image">
+          <img src={image.src} alt={image.alt} />
+          {image.caption && <p class="image-caption">{image.caption}</p>}
+          {image.embedded && image.embedded.type === 'carousel' && (
+            <div class="embedded-carousel">
+              <CompCarousel
+                id={image.embedded.carouselId}
+                images={image.embedded.images}
+              />
+            </div>
+          )}
+        </div>
+      ))
+    }
   </div>
 </div>
 

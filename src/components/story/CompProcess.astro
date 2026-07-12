@@ -14,12 +14,14 @@ const { title, steps } = Astro.props;
 
 <div class="comp-process">
   {title && <h2 class="process-title">{title}</h2>}
-  {steps.map((step) => (
-    <div class="process-phase">
-      <div class="phase-title">{step.title}</div>
-      <div class="phase-description">{step.description}</div>
-    </div>
-  ))}
+  {
+    steps.map((step) => (
+      <div class="process-phase">
+        <div class="phase-title">{step.title}</div>
+        <div class="phase-description">{step.description}</div>
+      </div>
+    ))
+  }
 </div>
 
 <style>

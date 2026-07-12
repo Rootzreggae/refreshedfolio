@@ -18,11 +18,13 @@ const {
   alignment = 'center',
   spacing = 'normal',
   borderRadius = 'medium',
-  showBorder = true
+  showBorder = true,
 } = Astro.props;
 ---
 
-<figure class={`comp-image-single comp-image-single--${size} comp-image-single--${alignment} comp-image-single--${spacing}`}>
+<figure
+  class={`comp-image-single comp-image-single--${size} comp-image-single--${alignment} comp-image-single--${spacing}`}
+>
   <img
     src={src}
     alt={alt}
@@ -30,11 +32,13 @@ const {
     class={`comp-image-single__image comp-image-single__image--${borderRadius}`}
     class:list={{ 'comp-image-single__image--border': showBorder }}
   />
-  {caption && (
-    <figcaption class="comp-image-single__caption body-sm">
-      {caption}
-    </figcaption>
-  )}
+  {
+    caption && (
+      <figcaption class="comp-image-single__caption body-sm">
+        {caption}
+      </figcaption>
+    )
+  }
 </figure>
 
 <style>

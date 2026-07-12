@@ -1,1110 +1,1323 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Primary Meta Tags -->
-<title>Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar</title>
-<meta name="title" content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar">
-<meta name="description" content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end.">
-<meta name="author" content="Nilson Gaspar">
-<meta name="keywords" content="API key management, security, open source, self-hosted, developer tools, secret rotation, product design, UX design">
-
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nilsongaspar.com/projects/keystrok">
-<meta property="og:title" content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar">
-<meta property="og:description" content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end.">
-<meta property="og:image" content="https://nilsongaspar.com/images/keystrok/home.png">
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://nilsongaspar.com/projects/keystrok">
-<meta property="twitter:title" content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar">
-<meta property="twitter:description" content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end.">
-<meta property="twitter:image" content="https://nilsongaspar.com/images/keystrok/home.png">
-
-
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" href="/favicon.png">
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: #16304C;
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* Navigation */
-.nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  padding: 24px 48px;
-  background: linear-gradient(to bottom, #16304C 0%, transparent 100%);
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-link {
-  color: #888;
-  text-decoration: none;
-  font-size: 13px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  transition: color 0.3s;
-}
-
-.nav-link:hover {
-  color: #fff;
-}
-
-/* Container */
-.container {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 120px 48px 80px;
-}
-
-/* Hero Spread */
-.hero-spread {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 0;
-  margin-bottom: 120px;
-  position: relative;
-}
-
-.hero-left {
-  padding: 80px 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: #16304C;
-  position: relative;
-}
-
-.hero-number {
-  position: absolute;
-  top: 40px;
-  left: 60px;
-  font-size: 180px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.03);
-  line-height: 1;
-}
-
-.hero-title {
-  font-size: clamp(36px, 5vw, 72px);
-  font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  margin-bottom: 40px;
-  position: relative;
-  z-index: 2;
-}
-
-.hero-subtitle {
-  font-size: 20px;
-  font-weight: 300;
-  color: #aaa;
-  line-height: 1.5;
-  margin-bottom: 40px;
-  max-width: 500px;
-}
-
-.hero-links {
-  display: flex;
-  gap: 24px;
-  margin-bottom: 60px;
-}
-
-.hero-links a {
-  color: #18a0fb;
-  text-decoration: none;
-  font-size: 16px;
-  transition: opacity 0.3s;
-}
-
-.hero-links a:hover {
-  opacity: 0.7;
-}
-
-.hero-meta-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  padding-top: 32px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.meta-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.meta-number {
-  font-size: 48px;
-  font-weight: 200;
-  color: #fff;
-  line-height: 1;
-}
-
-.meta-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #666;
-}
-
-.hero-right {
-  position: relative;
-  overflow: hidden;
-  background: #102237;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-image {
-  width: 90%;
-  height: auto;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* Section Headers */
-.section {
-  margin: 120px 0;
-}
-
-.section-header {
-  margin-bottom: 48px;
-  position: relative;
-}
-
-.section-number {
-  font-size: 14px;
-  color: #18a0fb;
-  font-weight: 500;
-  letter-spacing: 1px;
-  margin-bottom: 24px;
-}
-
-.section-title {
-  font-size: 48px;
-  font-weight: 300;
-  line-height: 1.2;
-  margin-bottom: 24px;
-}
-
-.section-description {
-  font-size: 20px;
-  line-height: 1.8;
-  color: #bbb;
-  max-width: 800px;
-}
-
-/* Problem Section */
-.problem-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 80px;
-  align-items: start;
-  margin: 80px 0;
-}
-
-.problem-content h3 {
-  font-size: 32px;
-  font-weight: 400;
-  margin-bottom: 24px;
-  color: #fff;
-}
-
-.problem-content p {
-  font-size: 18px;
-  line-height: 1.8;
-  color: #bbb;
-  margin-bottom: 24px;
-}
-
-.problem-content ul {
-  list-style: none;
-  padding: 0;
-}
-
-.problem-content li {
-  font-size: 18px;
-  line-height: 1.8;
-  color: #bbb;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-}
-
-.problem-content li strong {
-  color: #18a0fb;
-}
-
-.problem-sidebar {
-  background: #182E49;
-  padding: 48px;
-  border-radius: 4px;
-}
-
-.sidebar-title {
-  font-size: 24px;
-  margin-bottom: 32px;
-  color: #fff;
-  font-weight: 400;
-}
-
-.sidebar-story {
-  font-size: 16px;
-  line-height: 1.8;
-  color: #aaa;
-  font-style: italic;
-}
-
-/* Research Section */
-.research-visual {
-  margin: 80px 0;
-  position: relative;
-}
-
-.survey-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.image-caption {
-  font-size: 14px;
-  color: #888;
-  text-align: center;
-  font-style: italic;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px;
-  margin: 80px 0;
-}
-
-.stat-card {
-  background: #16304C;
-  padding: 48px 32px;
-  text-align: center;
-  transition: background 0.3s;
-}
-
-.stat-card:hover {
-  background: #182E49;
-}
-
-.stat-value {
-  font-size: 64px;
-  font-weight: 200;
-  color: #18a0fb;
-  margin-bottom: 16px;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #888;
-  line-height: 1.4;
-}
-
-/* User Segments */
-.segments-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 48px;
-  margin: 80px 0;
-}
-
-.segment-card {
-  padding: 48px;
-  background: #182E49;
-  border-left: 3px solid #18a0fb;
-  transition: transform 0.3s;
-}
-
-.segment-card:hover {
-  transform: translateX(8px);
-}
-
-.segment-title {
-  font-size: 24px;
-  color: #fff;
-  margin-bottom: 16px;
-  font-weight: 400;
-}
-
-.segment-text {
-  font-size: 16px;
-  line-height: 1.8;
-  color: #aaa;
-}
-
-/* Design Principles */
-.principles-spread {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 120px;
-  margin: 120px 0;
-  align-items: start;
-}
-
-.principles-list {
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-}
-
-.principle {
-  display: flex;
-  gap: 32px;
-  align-items: start;
-}
-
-.principle-number {
-  font-size: 48px;
-  font-weight: 200;
-  color: #18a0fb;
-  line-height: 1;
-  min-width: 60px;
-}
-
-.principle-content h4 {
-  font-size: 24px;
-  margin-bottom: 12px;
-  font-weight: 400;
-  color: #fff;
-}
-
-.principle-content p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #aaa;
-}
-
-.design-decisions {
-  background: #182E49;
-  padding: 48px;
-  border-radius: 4px;
-}
-
-.design-decisions h3 {
-  font-size: 28px;
-  margin-bottom: 32px;
-  color: #fff;
-  font-weight: 400;
-}
-
-.decision-item {
-  margin-bottom: 32px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.decision-item:last-child {
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
-}
-
-.decision-item h4 {
-  font-size: 20px;
-  color: #18a0fb;
-  margin-bottom: 12px;
-  font-weight: 400;
-}
-
-.decision-item p {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #aaa;
-}
-
-.color-indicators {
-  display: flex;
-  gap: 24px;
-  margin-top: 16px;
-}
-
-.color-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.color-dot.red { background: #ff4444; }
-.color-dot.yellow { background: #ffaa00; }
-.color-dot.green { background: #44ff44; }
-
-/* Solution Gallery */
-.solution-gallery {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
-  margin: 80px 0;
-}
-
-.gallery-item {
-  background: #102237;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.3s;
-}
-
-.gallery-item:hover {
-  transform: scale(1.02);
-}
-
-.gallery-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.gallery-caption {
-  padding: 24px;
-  background: #102237;
-  font-size: 14px;
-  color: #888;
-}
-
-/* Quote Section */
-.quote-section {
-  padding: 120px 80px;
-  text-align: center;
-  background: #182E49;
-  border-radius: 8px;
-  margin: 120px 0;
-  position: relative;
-}
-
-.large-quote {
-  font-size: 36px;
-  font-weight: 300;
-  font-style: italic;
-  line-height: 1.4;
-  color: #fff;
-  max-width: 900px;
-  margin: 0 auto 32px;
-}
-
-.quote-author {
-  font-size: 16px;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Validation Results */
-.results-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 80px;
-  margin: 80px 0;
-}
-
-.results-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.metric-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  padding: 24px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.metric-label {
-  font-size: 18px;
-  color: #aaa;
-}
-
-.metric-value {
-  font-size: 32px;
-  font-weight: 300;
-  color: #18a0fb;
-}
-
-.results-impact {
-  background: #182E49;
-  padding: 48px;
-  border-radius: 4px;
-}
-
-.impact-list {
-  list-style: none;
-  padding: 0;
-}
-
-.impact-list li {
-  padding: 16px 0;
-  font-size: 18px;
-  line-height: 1.6;
-  color: #aaa;
-}
-
-.impact-list strong {
-  color: #fff;
-  font-weight: 500;
-}
-
-/* Roadmap Timeline */
-.roadmap {
-  margin: 120px 0;
-}
-
-.timeline {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  padding: 60px 0;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.timeline-item {
-  flex: 1;
-  text-align: center;
-  position: relative;
-}
-
-.timeline-dot {
-  width: 16px;
-  height: 16px;
-  background: #18a0fb;
-  border-radius: 50%;
-  margin: 0 auto 24px;
-  position: relative;
-  z-index: 2;
-}
-
-.timeline-date {
-  font-size: 14px;
-  color: #18a0fb;
-  margin-bottom: 12px;
-  font-weight: 500;
-}
-
-.timeline-title {
-  font-size: 20px;
-  color: #fff;
-  margin-bottom: 12px;
-}
-
-.timeline-desc {
-  font-size: 14px;
-  color: #888;
-  line-height: 1.4;
-  max-width: 200px;
-  margin: 0 auto;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .hero-spread {
-    grid-template-columns: 1fr;
-  }
-
-  .problem-grid {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-
-  .principles-spread {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .segments-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 80px 24px 48px;
-  }
-
-  .hero-title {
-    font-size: 36px;
-  }
-
-  .section-title {
-    font-size: 32px;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .solution-gallery {
-    grid-template-columns: 1fr;
-  }
-
-  .timeline {
-    flex-direction: column;
-    gap: 48px;
-  }
-}
-
-/* Smooth scroll */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Selection */
-::selection {
-  background: #18a0fb;
-  color: #000;
-}
-</style>
-</head>
-<body>
-
-<nav class="nav">
-  <a href="/" class="nav-link">← Back to Work</a>
-  <div>
-    <span class="nav-link">Keystrok / 2025</span>
-  </div>
-</nav>
-
-<div class="container">
-  <!-- Hero Spread -->
-  <section class="hero-spread">
-    <div class="hero-left">
-      <div class="hero-number">01</div>
-      <h1 class="hero-title">
-        Keystrok: I designed the API-key security tool I couldn't find, then built and shipped it
-      </h1>
-      <p class="hero-subtitle">
-        Self-hosted, open-source API key management that developers actually want to use
-      </p>
-
-      <div class="hero-links">
-        <a href="https://github.com/Rootzreggae/keystrok">GitHub →</a>
-        <a href="https://codeberg.org/windgodfist/keystrok">Codeberg →</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Primary Meta Tags -->
+    <title
+      >Keystrok: an open-source API-key security tool, designed and shipped -
+      Nilson Gaspar</title
+    >
+    <meta
+      name="title"
+      content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar"
+    />
+    <meta
+      name="description"
+      content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end."
+    />
+    <meta name="author" content="Nilson Gaspar" />
+    <meta
+      name="keywords"
+      content="API key management, security, open source, self-hosted, developer tools, secret rotation, product design, UX design"
+    />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://nilsongaspar.com/projects/keystrok"
+    />
+    <meta
+      property="og:title"
+      content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar"
+    />
+    <meta
+      property="og:description"
+      content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end."
+    />
+    <meta
+      property="og:image"
+      content="https://nilsongaspar.com/images/keystrok/home.png"
+    />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https://nilsongaspar.com/projects/keystrok"
+    />
+    <meta
+      property="twitter:title"
+      content="Keystrok: an open-source API-key security tool, designed and shipped - Nilson Gaspar"
+    />
+    <meta
+      property="twitter:description"
+      content="Self-hosted, open-source API key management that developers actually want to use. A designer-built tool to find, track, and safely rotate exposed API keys, researched, designed, and shipped end to end."
+    />
+    <meta
+      property="twitter:image"
+      content="https://nilsongaspar.com/images/keystrok/home.png"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #16304c;
+        color: #ffffff;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+
+      /* Navigation */
+      .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 24px 48px;
+        background: linear-gradient(to bottom, #16304c 0%, transparent 100%);
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .nav-link {
+        color: #888;
+        text-decoration: none;
+        font-size: 13px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #fff;
+      }
+
+      /* Container */
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 120px 48px 80px;
+      }
+
+      /* Hero Spread */
+      .hero-spread {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 0;
+        margin-bottom: 120px;
+        position: relative;
+      }
+
+      .hero-left {
+        padding: 80px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #16304c;
+        position: relative;
+      }
+
+      .hero-number {
+        position: absolute;
+        top: 40px;
+        left: 60px;
+        font-size: 180px;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.03);
+        line-height: 1;
+      }
+
+      .hero-title {
+        font-size: clamp(36px, 5vw, 72px);
+        font-weight: 700;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-subtitle {
+        font-size: 20px;
+        font-weight: 300;
+        color: #aaa;
+        line-height: 1.5;
+        margin-bottom: 40px;
+        max-width: 500px;
+      }
+
+      .hero-links {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 60px;
+      }
+
+      .hero-links a {
+        color: #18a0fb;
+        text-decoration: none;
+        font-size: 16px;
+        transition: opacity 0.3s;
+      }
+
+      .hero-links a:hover {
+        opacity: 0.7;
+      }
+
+      .hero-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .meta-stat {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .meta-number {
+        font-size: 48px;
+        font-weight: 200;
+        color: #fff;
+        line-height: 1;
+      }
+
+      .meta-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #666;
+      }
+
+      .hero-right {
+        position: relative;
+        overflow: hidden;
+        background: #102237;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-image {
+        width: 90%;
+        height: auto;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      /* Section Headers */
+      .section {
+        margin: 120px 0;
+      }
+
+      .section-header {
+        margin-bottom: 48px;
+        position: relative;
+      }
+
+      .section-number {
+        font-size: 14px;
+        color: #18a0fb;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+      }
+
+      .section-title {
+        font-size: 48px;
+        font-weight: 300;
+        line-height: 1.2;
+        margin-bottom: 24px;
+      }
+
+      .section-description {
+        font-size: 20px;
+        line-height: 1.8;
+        color: #bbb;
+        max-width: 800px;
+      }
+
+      /* Problem Section */
+      .problem-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 80px;
+        align-items: start;
+        margin: 80px 0;
+      }
+
+      .problem-content h3 {
+        font-size: 32px;
+        font-weight: 400;
+        margin-bottom: 24px;
+        color: #fff;
+      }
+
+      .problem-content p {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #bbb;
+        margin-bottom: 24px;
+      }
+
+      .problem-content ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .problem-content li {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #bbb;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .problem-content li strong {
+        color: #18a0fb;
+      }
+
+      .problem-sidebar {
+        background: #182e49;
+        padding: 48px;
+        border-radius: 4px;
+      }
+
+      .sidebar-title {
+        font-size: 24px;
+        margin-bottom: 32px;
+        color: #fff;
+        font-weight: 400;
+      }
+
+      .sidebar-story {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #aaa;
+        font-style: italic;
+      }
+
+      /* Research Section */
+      .research-visual {
+        margin: 80px 0;
+        position: relative;
+      }
+
+      .survey-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .image-caption {
+        font-size: 14px;
+        color: #888;
+        text-align: center;
+        font-style: italic;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 2px;
+        margin: 80px 0;
+      }
+
+      .stat-card {
+        background: #16304c;
+        padding: 48px 32px;
+        text-align: center;
+        transition: background 0.3s;
+      }
+
+      .stat-card:hover {
+        background: #182e49;
+      }
+
+      .stat-value {
+        font-size: 64px;
+        font-weight: 200;
+        color: #18a0fb;
+        margin-bottom: 16px;
+      }
+
+      .stat-label {
+        font-size: 14px;
+        color: #888;
+        line-height: 1.4;
+      }
+
+      /* User Segments */
+      .segments-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 48px;
+        margin: 80px 0;
+      }
+
+      .segment-card {
+        padding: 48px;
+        background: #182e49;
+        border-left: 3px solid #18a0fb;
+        transition: transform 0.3s;
+      }
+
+      .segment-card:hover {
+        transform: translateX(8px);
+      }
+
+      .segment-title {
+        font-size: 24px;
+        color: #fff;
+        margin-bottom: 16px;
+        font-weight: 400;
+      }
+
+      .segment-text {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #aaa;
+      }
+
+      /* Design Principles */
+      .principles-spread {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 120px;
+        margin: 120px 0;
+        align-items: start;
+      }
+
+      .principles-list {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+      }
+
+      .principle {
+        display: flex;
+        gap: 32px;
+        align-items: start;
+      }
+
+      .principle-number {
+        font-size: 48px;
+        font-weight: 200;
+        color: #18a0fb;
+        line-height: 1;
+        min-width: 60px;
+      }
+
+      .principle-content h4 {
+        font-size: 24px;
+        margin-bottom: 12px;
+        font-weight: 400;
+        color: #fff;
+      }
+
+      .principle-content p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #aaa;
+      }
+
+      .design-decisions {
+        background: #182e49;
+        padding: 48px;
+        border-radius: 4px;
+      }
+
+      .design-decisions h3 {
+        font-size: 28px;
+        margin-bottom: 32px;
+        color: #fff;
+        font-weight: 400;
+      }
+
+      .decision-item {
+        margin-bottom: 32px;
+        padding-bottom: 32px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .decision-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+
+      .decision-item h4 {
+        font-size: 20px;
+        color: #18a0fb;
+        margin-bottom: 12px;
+        font-weight: 400;
+      }
+
+      .decision-item p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #aaa;
+      }
+
+      .color-indicators {
+        display: flex;
+        gap: 24px;
+        margin-top: 16px;
+      }
+
+      .color-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #aaa;
+      }
+
+      .color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .color-dot.red {
+        background: #ff4444;
+      }
+      .color-dot.yellow {
+        background: #ffaa00;
+      }
+      .color-dot.green {
+        background: #44ff44;
+      }
+
+      /* Solution Gallery */
+      .solution-gallery {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+        margin: 80px 0;
+      }
+
+      .gallery-item {
+        background: #102237;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: transform 0.3s;
+      }
+
+      .gallery-item:hover {
+        transform: scale(1.02);
+      }
+
+      .gallery-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .gallery-caption {
+        padding: 24px;
+        background: #102237;
+        font-size: 14px;
+        color: #888;
+      }
+
+      /* Quote Section */
+      .quote-section {
+        padding: 120px 80px;
+        text-align: center;
+        background: #182e49;
+        border-radius: 8px;
+        margin: 120px 0;
+        position: relative;
+      }
+
+      .large-quote {
+        font-size: 36px;
+        font-weight: 300;
+        font-style: italic;
+        line-height: 1.4;
+        color: #fff;
+        max-width: 900px;
+        margin: 0 auto 32px;
+      }
+
+      .quote-author {
+        font-size: 16px;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      /* Validation Results */
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 80px;
+        margin: 80px 0;
+      }
+
+      .results-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      .metric-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 24px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .metric-label {
+        font-size: 18px;
+        color: #aaa;
+      }
+
+      .metric-value {
+        font-size: 32px;
+        font-weight: 300;
+        color: #18a0fb;
+      }
+
+      .results-impact {
+        background: #182e49;
+        padding: 48px;
+        border-radius: 4px;
+      }
+
+      .impact-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .impact-list li {
+        padding: 16px 0;
+        font-size: 18px;
+        line-height: 1.6;
+        color: #aaa;
+      }
+
+      .impact-list strong {
+        color: #fff;
+        font-weight: 500;
+      }
+
+      /* Roadmap Timeline */
+      .roadmap {
+        margin: 120px 0;
+      }
+
+      .timeline {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        padding: 60px 0;
+      }
+
+      .timeline::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .timeline-item {
+        flex: 1;
+        text-align: center;
+        position: relative;
+      }
+
+      .timeline-dot {
+        width: 16px;
+        height: 16px;
+        background: #18a0fb;
+        border-radius: 50%;
+        margin: 0 auto 24px;
+        position: relative;
+        z-index: 2;
+      }
+
+      .timeline-date {
+        font-size: 14px;
+        color: #18a0fb;
+        margin-bottom: 12px;
+        font-weight: 500;
+      }
+
+      .timeline-title {
+        font-size: 20px;
+        color: #fff;
+        margin-bottom: 12px;
+      }
+
+      .timeline-desc {
+        font-size: 14px;
+        color: #888;
+        line-height: 1.4;
+        max-width: 200px;
+        margin: 0 auto;
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .hero-spread {
+          grid-template-columns: 1fr;
+        }
+
+        .problem-grid {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+
+        .principles-spread {
+          grid-template-columns: 1fr;
+          gap: 48px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .segments-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 80px 24px 48px;
+        }
+
+        .hero-title {
+          font-size: 36px;
+        }
+
+        .section-title {
+          font-size: 32px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .solution-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .timeline {
+          flex-direction: column;
+          gap: 48px;
+        }
+      }
+
+      /* Smooth scroll */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* Selection */
+      ::selection {
+        background: #18a0fb;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="/" class="nav-link">← Back to Work</a>
+      <div>
+        <span class="nav-link">Keystrok / 2025</span>
       </div>
+    </nav>
 
-      <div class="hero-meta-grid">
-        <div class="meta-stat">
-          <div class="meta-number">MIT</div>
-          <div class="meta-label">Open source, no paywall</div>
+    <div class="container">
+      <!-- Hero Spread -->
+      <section class="hero-spread">
+        <div class="hero-left">
+          <div class="hero-number">01</div>
+          <h1 class="hero-title">
+            Keystrok: I designed the API-key security tool I couldn't find, then
+            built and shipped it
+          </h1>
+          <p class="hero-subtitle">
+            Self-hosted, open-source API key management that developers actually
+            want to use
+          </p>
+
+          <div class="hero-links">
+            <a href="https://github.com/Rootzreggae/keystrok">GitHub →</a>
+            <a href="https://codeberg.org/windgodfist/keystrok">Codeberg →</a>
+          </div>
+
+          <div class="hero-meta-grid">
+            <div class="meta-stat">
+              <div class="meta-number">MIT</div>
+              <div class="meta-label">Open source, no paywall</div>
+            </div>
+            <div class="meta-stat">
+              <div class="meta-number">1 cmd</div>
+              <div class="meta-label">Self-host with docker compose</div>
+            </div>
+            <div class="meta-stat">
+              <div class="meta-number">0</div>
+              <div class="meta-label">Secrets stored in plaintext</div>
+            </div>
+            <div class="meta-stat">
+              <div class="meta-number">~2 yrs</div>
+              <div class="meta-label">Research, design, and build</div>
+            </div>
+          </div>
         </div>
-        <div class="meta-stat">
-          <div class="meta-number">1 cmd</div>
-          <div class="meta-label">Self-host with docker compose</div>
+
+        <div class="hero-right">
+          <img
+            src="/images/keystrok/home.png"
+            alt="Keystrok home: what needs attention, ranked by urgency"
+            class="hero-image"
+          />
         </div>
-        <div class="meta-stat">
-          <div class="meta-number">0</div>
-          <div class="meta-label">Secrets stored in plaintext</div>
+      </section>
+
+      <!-- Executive Summary -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">EXECUTIVE SUMMARY</span>
+          <h2 class="section-title">From a real pain to a shipped product</h2>
+          <p class="section-description">
+            I kept running into the same problem managing API keys, researched
+            whether other developers did too (they did), and designed and built
+            a tool to fix it, end to end. Not a mockup: a working, self-hosted,
+            open-source product with discovery, a tracked key ledger, guided
+            rotation, and multi-user teams. This is how I work as a designer,
+            spot a real problem, make opinionated calls, and actually ship it.
+          </p>
         </div>
-        <div class="meta-stat">
-          <div class="meta-number">~2 yrs</div>
-          <div class="meta-label">Research, design, and build</div>
+      </section>
+
+      <!-- Problem Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">02 — THE PROBLEM</span>
+          <h2 class="section-title"
+            >Nobody had made key management pleasant to do</h2
+          >
         </div>
-      </div>
-    </div>
 
-    <div class="hero-right">
-      <img src="/images/keystrok/home.png" alt="Keystrok home: what needs attention, ranked by urgency" class="hero-image">
-    </div>
-  </section>
+        <div class="problem-grid">
+          <div class="problem-content">
+            <h3>The gap</h3>
+            <ul>
+              <li
+                >Leaked and stale credentials are one of the most common ways
+                systems get breached</li
+              >
+              <li
+                >Secrets platforms (Vault, Infisical) are heavyweight, and they
+                store your keys</li
+              >
+              <li
+                >Scanners (gitleaks, trufflehog) find secrets, then stop, no
+                triage, no rotation</li
+              >
+              <li
+                >Nobody owns the messy middle: what leaked, is it still live,
+                and when do I rotate it</li
+              >
+            </ul>
+          </div>
 
-  <!-- Executive Summary -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">EXECUTIVE SUMMARY</span>
-      <h2 class="section-title">From a real pain to a shipped product</h2>
-      <p class="section-description">
-        I kept running into the same problem managing API keys, researched whether other developers did too
-        (they did), and designed and built a tool to fix it, end to end. Not a mockup: a working, self-hosted,
-        open-source product with discovery, a tracked key ledger, guided rotation, and multi-user teams. This is
-        how I work as a designer, spot a real problem, make opinionated calls, and actually ship it.
-      </p>
-    </div>
-  </section>
+          <div class="problem-sidebar">
+            <h4 class="sidebar-title">What I heard</h4>
+            <p class="sidebar-story">
+              Asked for the hardest part of rotating a key, one developer
+              answered simply: "knowing where it's used." Another described
+              being forced to write a lambda that renewed a Grafana key every 30
+              days, because nothing else was tracking it. The incidents, when
+              they happened, were the kind that "stop the world." The tooling
+              existed; the honest, low-friction way to stay on top of it did
+              not.
+            </p>
+            <p
+              class="sidebar-story"
+              style="margin-top: 24px; font-style: normal; color: #fff;"
+            >
+              This wasn't a tooling problem.<br />
+              It was a design problem.
+            </p>
+          </div>
+        </div>
+      </section>
 
-  <!-- Problem Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">02 — THE PROBLEM</span>
-      <h2 class="section-title">Nobody had made key management pleasant to do</h2>
-    </div>
+      <!-- Research Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">03 — RESEARCH & DISCOVERY</span>
+          <h2 class="section-title">Understanding Developer Pain</h2>
+        </div>
 
-    <div class="problem-grid">
-      <div class="problem-content">
-        <h3>The gap</h3>
-        <ul>
-          <li>Leaked and stale credentials are one of the most common ways systems get breached</li>
-          <li>Secrets platforms (Vault, Infisical) are heavyweight, and they store your keys</li>
-          <li>Scanners (gitleaks, trufflehog) find secrets, then stop, no triage, no rotation</li>
-          <li>Nobody owns the messy middle: what leaked, is it still live, and when do I rotate it</li>
-        </ul>
-      </div>
+        <div class="research-visual">
+          <img
+            src="/images/keystrok/survey.png"
+            alt="The API Key Rotation Practices survey I ran on Google Forms"
+            class="survey-image"
+            style="max-width: 460px; display: block; margin: 0 auto 16px; border: 1px solid rgba(255,255,255,0.08);"
+          />
+          <p class="image-caption"
+            >A short survey on API key rotation practices, shared with dev
+            friends and r/grafana</p
+          >
+        </div>
 
-      <div class="problem-sidebar">
-        <h4 class="sidebar-title">What I heard</h4>
-        <p class="sidebar-story">
-          Asked for the hardest part of rotating a key, one developer answered simply: "knowing where it's
-          used." Another described being forced to write a lambda that renewed a Grafana key every 30 days,
-          because nothing else was tracking it. The incidents, when they happened, were the kind that "stop the
-          world." The tooling existed; the honest, low-friction way to stay on top of it did not.
+        <h3 style="font-size: 32px; margin-bottom: 32px;"
+          >What the research surfaced</h3
+        >
+        <p class="section-description" style="margin-bottom: 48px;">
+          A small, honest study: a short survey plus conversations with a few
+          developer friends and some folks on r/grafana. Tiny sample, but the
+          answers pointed at the same thing again and again, and straight at the
+          design problem.
         </p>
-        <p class="sidebar-story" style="margin-top: 24px; font-style: normal; color: #fff;">
-          This wasn't a tooling problem.<br>
-          It was a design problem.
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value">No system</div>
+            <div class="stat-label"
+              >Nobody I asked had a systematic way to track where their keys
+              were used</div
+            >
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">"Where?"</div>
+            <div class="stat-label"
+              >The hardest part of rotation, in their words: knowing where a key
+              is actually used</div
+            >
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">Every one</div>
+            <div class="stat-label"
+              >Of the developers I heard from had hit an outage or incident tied
+              to a rotation</div
+            >
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">Months</div>
+            <div class="stat-label"
+              >How long keys routinely sit before anyone gets around to rotating
+              them</div
+            >
+          </div>
+        </div>
+
+        <h3 style="font-size: 32px; margin: 80px 0 32px;">Who I designed for</h3
+        >
+        <p class="section-description" style="margin-bottom: 48px;">
+          From those conversations, I built for three kinds of user:
         </p>
-      </div>
-    </div>
-  </section>
 
-  <!-- Research Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">03 — RESEARCH & DISCOVERY</span>
-      <h2 class="section-title">Understanding Developer Pain</h2>
-    </div>
-
-    <div class="research-visual">
-      <img src="/images/keystrok/survey.png" alt="The API Key Rotation Practices survey I ran on Google Forms" class="survey-image" style="max-width: 460px; display: block; margin: 0 auto 16px; border: 1px solid rgba(255,255,255,0.08);">
-      <p class="image-caption">A short survey on API key rotation practices, shared with dev friends and r/grafana</p>
-    </div>
-
-    <h3 style="font-size: 32px; margin-bottom: 32px;">What the research surfaced</h3>
-    <p class="section-description" style="margin-bottom: 48px;">
-      A small, honest study: a short survey plus conversations with a few developer friends and some folks on
-      r/grafana. Tiny sample, but the answers pointed at the same thing again and again, and straight at the
-      design problem.
-    </p>
-
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-value">No system</div>
-        <div class="stat-label">Nobody I asked had a systematic way to track where their keys were used</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">"Where?"</div>
-        <div class="stat-label">The hardest part of rotation, in their words: knowing where a key is actually used</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">Every one</div>
-        <div class="stat-label">Of the developers I heard from had hit an outage or incident tied to a rotation</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">Months</div>
-        <div class="stat-label">How long keys routinely sit before anyone gets around to rotating them</div>
-      </div>
-    </div>
-
-    <h3 style="font-size: 32px; margin: 80px 0 32px;">Who I designed for</h3>
-    <p class="section-description" style="margin-bottom: 48px;">
-      From those conversations, I built for three kinds of user:
-    </p>
-
-    <div class="segments-grid">
-      <div class="segment-card">
-        <h4 class="segment-title">Solo Developers</h4>
-        <p class="segment-text">Need simple, free solutions without complexity overhead</p>
-      </div>
-      <div class="segment-card">
-        <h4 class="segment-title">Small Teams</h4>
-        <p class="segment-text">Want collaboration features without enterprise complexity</p>
-      </div>
-      <div class="segment-card">
-        <h4 class="segment-title">Security-Conscious Startups</h4>
-        <p class="segment-text">Require audit trails but can't afford enterprise tools</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Design Strategy Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">04 — DESIGN STRATEGY</span>
-      <h2 class="section-title">Security Through Simplicity</h2>
-    </div>
-
-    <div class="principles-spread">
-      <div class="principles-list">
-        <div class="principle">
-          <div class="principle-number">1</div>
-          <div class="principle-content">
-            <h4>10-Second Overview</h4>
-            <p>Critical information visible instantly. No drilling down through menus to understand system health.</p>
+        <div class="segments-grid">
+          <div class="segment-card">
+            <h4 class="segment-title">Solo Developers</h4>
+            <p class="segment-text"
+              >Need simple, free solutions without complexity overhead</p
+            >
+          </div>
+          <div class="segment-card">
+            <h4 class="segment-title">Small Teams</h4>
+            <p class="segment-text"
+              >Want collaboration features without enterprise complexity</p
+            >
+          </div>
+          <div class="segment-card">
+            <h4 class="segment-title">Security-Conscious Startups</h4>
+            <p class="segment-text"
+              >Require audit trails but can't afford enterprise tools</p
+            >
           </div>
         </div>
+      </section>
 
-        <div class="principle">
-          <div class="principle-number">2</div>
-          <div class="principle-content">
-            <h4>Progressive Disclosure</h4>
-            <p>Complexity available when needed, but never forced. Simple tasks stay simple.</p>
+      <!-- Design Strategy Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">04 — DESIGN STRATEGY</span>
+          <h2 class="section-title">Security Through Simplicity</h2>
+        </div>
+
+        <div class="principles-spread">
+          <div class="principles-list">
+            <div class="principle">
+              <div class="principle-number">1</div>
+              <div class="principle-content">
+                <h4>10-Second Overview</h4>
+                <p
+                  >Critical information visible instantly. No drilling down
+                  through menus to understand system health.</p
+                >
+              </div>
+            </div>
+
+            <div class="principle">
+              <div class="principle-number">2</div>
+              <div class="principle-content">
+                <h4>Progressive Disclosure</h4>
+                <p
+                  >Complexity available when needed, but never forced. Simple
+                  tasks stay simple.</p
+                >
+              </div>
+            </div>
+
+            <div class="principle">
+              <div class="principle-number">3</div>
+              <div class="principle-content">
+                <h4>Proactive Security</h4>
+                <p
+                  >Guide users toward best practices through smart defaults and
+                  gentle nudges.</p
+                >
+              </div>
+            </div>
+
+            <div class="principle">
+              <div class="principle-number">4</div>
+              <div class="principle-content">
+                <h4>Developer Aesthetics</h4>
+                <p
+                  >Dark mode first, information dense, terminal-inspired design
+                  that feels familiar.</p
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="design-decisions">
+            <h3>Key Design Decisions</h3>
+
+            <div class="decision-item">
+              <h4>Visual Hierarchy Through Color</h4>
+              <p
+                >Colour is reserved for security state, so the one thing that
+                needs attention reads in a glance, before you parse a single
+                word.</p
+              >
+              <div class="color-indicators">
+                <span class="color-indicator"
+                  ><span class="color-dot red"></span> Overdue (act now)</span
+                >
+                <span class="color-indicator"
+                  ><span class="color-dot yellow"></span> Rotation due soon</span
+                >
+                <span class="color-indicator"
+                  ><span class="color-dot green"></span> Healthy</span
+                >
+              </div>
+            </div>
+
+            <div class="decision-item">
+              <h4>Advisory, never automated</h4>
+              <p
+                >Keystrok ranks and walks you through each rotation, but it
+                never rotates or revokes a key on its own. The irreversible
+                actions stay in your hands, behind a confirm. No surprise
+                revokes.</p
+              >
+            </div>
+
+            <div class="decision-item">
+              <h4>It never holds your secrets</h4>
+              <p
+                >Scans are read-only, findings are stored hashed and masked, and
+                the optional AI assistant reasons over key metadata, never the
+                values. A security tool earns trust by handling less, not more.</p
+              >
+            </div>
+
+            <div class="decision-item">
+              <h4>Honest about what it can't know</h4>
+              <p
+                >It never guesses a key's real age. Every rotation deadline is
+                counted from when a key was discovered, not a made-up creation
+                date. Better an honest "found 6 days ago" than a confident lie.</p
+              >
+            </div>
+
+            <div class="decision-item">
+              <h4>One clear next action per row</h4>
+              <p
+                >Every key surfaces its most likely next step instead of a menu,
+                so the common path is one move, not a hunt.</p
+              >
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="principle">
-          <div class="principle-number">3</div>
-          <div class="principle-content">
-            <h4>Proactive Security</h4>
-            <p>Guide users toward best practices through smart defaults and gentle nudges.</p>
+      <!-- Solution Design Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">05 — SOLUTION DESIGN</span>
+          <h2 class="section-title">The Interface</h2>
+        </div>
+
+        <div class="solution-gallery">
+          <div class="gallery-item">
+            <img src="/images/keystrok/keys.png" alt="The key ledger" />
+            <div class="gallery-caption"
+              >The ledger: every tracked key with its liveness, severity, and
+              rotation window, one urgency signal per row</div
+            >
+          </div>
+          <div class="gallery-item">
+            <img src="/images/keystrok/discovery.png" alt="Discovery triage" />
+            <div class="gallery-caption"
+              >Discovery: scan a Git source or a local folder, then triage
+              findings into the ledger</div
+            >
+          </div>
+          <div class="gallery-item">
+            <img src="/images/keystrok/rotation.png" alt="Guided rotation" />
+            <div class="gallery-caption"
+              >Guided rotation: run each step yourself; the revoke step is
+              admin-gated and irreversible</div
+            >
+          </div>
+          <div class="gallery-item">
+            <img src="/images/keystrok/team.png" alt="Team management" />
+            <div class="gallery-caption"
+              >Team: invite members, set roles, and gate the irreversible
+              actions to admins</div
+            >
           </div>
         </div>
+      </section>
 
-        <div class="principle">
-          <div class="principle-number">4</div>
-          <div class="principle-content">
-            <h4>Developer Aesthetics</h4>
-            <p>Dark mode first, information dense, terminal-inspired design that feels familiar.</p>
+      <!-- Quote Section -->
+      <div class="quote-section">
+        <blockquote class="large-quote">
+          "I didn't want another dashboard to babysit. I wanted a tool that
+          surfaces the one key that needs attention, walks me through fixing it,
+          and otherwise gets out of the way."
+        </blockquote>
+        <cite class="quote-author">— The design thesis behind Keystrok</cite>
+      </div>
+
+      <!-- Validation Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">06 — WHAT SHIPPED</span>
+          <h2 class="section-title">Not a prototype. A working product.</h2>
+          <p class="section-description">
+            Keystrok runs today: open source, self-hostable, and doing the full
+            job end to end. I designed it and built it, this is the real feature
+            set, not a roadmap.
+          </p>
+        </div>
+
+        <div class="results-grid">
+          <div class="results-metrics">
+            <div class="metric-item">
+              <span class="metric-label"
+                >Scan a GitHub repo (via a GitHub App) or a local folder for
+                exposed secrets, stored hashed and masked</span
+              >
+              <span class="metric-value">Discovery</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label"
+                >Promote real findings to a tracked inventory, each with a
+                rotation deadline from its severity</span
+              >
+              <span class="metric-value">Ledger</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label"
+                >Step-by-step, operator-gated walkthroughs; the revoke step is
+                irreversible by confirm</span
+              >
+              <span class="metric-value">Rotation</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label"
+                >Connect Datadog, Grafana, Stripe, or GitHub to check whether a
+                leaked key is still live</span
+              >
+              <span class="metric-value">Liveness</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-label"
+                >Invite members, gate the irreversible actions to admins, keep a
+                shared attributed workspace</span
+              >
+              <span class="metric-value">Teams</span>
+            </div>
+          </div>
+
+          <div class="results-impact">
+            <h3 style="font-size: 24px; margin-bottom: 24px; color: #fff;"
+              >Built to be trusted</h3
+            >
+            <ul class="impact-list">
+              <li
+                ><strong>MIT-licensed</strong>, mirrored on Codeberg. No
+                paywall, no open-core split.</li
+              >
+              <li
+                ><strong>One command to self-host</strong> (app + Postgres + a local
+                mail catcher). Nothing phones home.</li
+              >
+              <li
+                ><strong>Secrets encrypted at rest</strong> (AES-256-GCM); outbound
+                calls are SSRF-guarded.</li
+              >
+              <li
+                ><strong>Next.js 15 + TypeScript + Postgres</strong>, shipped as
+                a multi-arch image (amd64 + arm64).</li
+              >
+            </ul>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="design-decisions">
-        <h3>Key Design Decisions</h3>
+      <!-- Roadmap Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">07 — DIRECTION</span>
+          <h2 class="section-title">Roadmap & Direction</h2>
+        </div>
 
-        <div class="decision-item">
-          <h4>Visual Hierarchy Through Color</h4>
-          <p>Colour is reserved for security state, so the one thing that needs attention reads in a glance, before you parse a single word.</p>
-          <div class="color-indicators">
-            <span class="color-indicator"><span class="color-dot red"></span> Overdue (act now)</span>
-            <span class="color-indicator"><span class="color-dot yellow"></span> Rotation due soon</span>
-            <span class="color-indicator"><span class="color-dot green"></span> Healthy</span>
+        <div class="roadmap">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">SHIPPED</div>
+              <div class="timeline-title">Open source and self-hostable</div>
+              <div class="timeline-desc"
+                >MIT-licensed. Discovery, a tracked key ledger, guided rotation,
+                platform liveness checks, and multi-user teams, all running
+                today. One command to self-host, nothing phones home.</div
+              >
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">NEXT</div>
+              <div class="timeline-title">Community-driven depth</div>
+              <div class="timeline-desc"
+                >More detectors and platform integrations, scheduled scans, and
+                whatever the people actually self-hosting it ask for. Built in
+                the open.</div
+              >
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-date">MAYBE, SOMEDAY</div>
+              <div class="timeline-title"
+                >A commercial path, if it earns one</div
+              >
+              <div class="timeline-desc"
+                >I first imagined Keystrok as a company and drifted to open
+                source because it felt right. Managed hosting or paid support
+                isn't off the table if the opportunity arises, but it's not
+                planned. Either way the core stays MIT: what you self-host today
+                stays open, forever.</div
+              >
+            </div>
           </div>
         </div>
+      </section>
 
-        <div class="decision-item">
-          <h4>Advisory, never automated</h4>
-          <p>Keystrok ranks and walks you through each rotation, but it never rotates or revokes a key on its own. The irreversible actions stay in your hands, behind a confirm. No surprise revokes.</p>
+      <!-- Key Learnings Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-number">08 — OUTCOME</span>
+          <h2 class="section-title">Why This Matters</h2>
+          <p class="section-description">
+            Keystrok is proof of how I work: I don't stop at the mockup. I
+            research a real problem, make opinionated design decisions, and ship
+            a working product, learning whatever engineering it takes to get
+            there. That's what I bring to a senior product design role.
+          </p>
         </div>
 
-        <div class="decision-item">
-          <h4>It never holds your secrets</h4>
-          <p>Scans are read-only, findings are stored hashed and masked, and the optional AI assistant reasons over key metadata, never the values. A security tool earns trust by handling less, not more.</p>
-        </div>
+        <div class="problem-grid" style="margin-top: 80px;">
+          <div class="problem-content">
+            <h3>Key Learnings</h3>
+            <p style="margin-bottom: 32px;">About Technical Product Design:</p>
+            <ul style="list-style: disc; padding-left: 24px;">
+              <li style="border: none; padding: 8px 0;"
+                >Developers value focus over features - Do one thing
+                exceptionally well</li
+              >
+              <li style="border: none; padding: 8px 0;"
+                >Visual design matters in DevTools - Good aesthetics improve
+                adoption</li
+              >
+              <li style="border: none; padding: 8px 0;"
+                >Open source builds trust - Transparency is crucial for security
+                tools</li
+              >
+            </ul>
 
-        <div class="decision-item">
-          <h4>Honest about what it can't know</h4>
-          <p>It never guesses a key's real age. Every rotation deadline is counted from when a key was discovered, not a made-up creation date. Better an honest "found 6 days ago" than a confident lie.</p>
-        </div>
+            <p style="margin: 32px 0;">About Building While Designing:</p>
+            <ul style="list-style: disc; padding-left: 24px;">
+              <li style="border: none; padding: 8px 0;"
+                >Implementation constraints improve design</li
+              >
+              <li style="border: none; padding: 8px 0;"
+                >Real data exposes edge cases mockups miss</li
+              >
+              <li style="border: none; padding: 8px 0;"
+                >Community feedback is gold</li
+              >
+            </ul>
+          </div>
 
-        <div class="decision-item">
-          <h4>One clear next action per row</h4>
-          <p>Every key surfaces its most likely next step instead of a menu, so the common path is one move, not a hunt.</p>
+          <div class="problem-sidebar">
+            <h4 class="sidebar-title">Personal Growth</h4>
+            <p class="sidebar-story" style="font-style: normal;">
+              I taught myself the TypeScript, Next.js, and security engineering
+              to build this for real, not just design it. Research to a shipped,
+              self-hosted product, it's the most end-to-end thing I've made.
+            </p>
+            <p style="margin-top: 24px; color: #18a0fb;">
+              The clearest lesson: I had commercial demand in hand and chose to
+              make Keystrok open source anyway. For a security tool, trust and
+              transparency matter more than capture, and that was a deliberate
+              product decision, not a default.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
-  </section>
-
-  <!-- Solution Design Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">05 — SOLUTION DESIGN</span>
-      <h2 class="section-title">The Interface</h2>
-    </div>
-
-    <div class="solution-gallery">
-      <div class="gallery-item">
-        <img src="/images/keystrok/keys.png" alt="The key ledger">
-        <div class="gallery-caption">The ledger: every tracked key with its liveness, severity, and rotation window, one urgency signal per row</div>
-      </div>
-      <div class="gallery-item">
-        <img src="/images/keystrok/discovery.png" alt="Discovery triage">
-        <div class="gallery-caption">Discovery: scan a Git source or a local folder, then triage findings into the ledger</div>
-      </div>
-      <div class="gallery-item">
-        <img src="/images/keystrok/rotation.png" alt="Guided rotation">
-        <div class="gallery-caption">Guided rotation: run each step yourself; the revoke step is admin-gated and irreversible</div>
-      </div>
-      <div class="gallery-item">
-        <img src="/images/keystrok/team.png" alt="Team management">
-        <div class="gallery-caption">Team: invite members, set roles, and gate the irreversible actions to admins</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Quote Section -->
-  <div class="quote-section">
-    <blockquote class="large-quote">
-      "I didn't want another dashboard to babysit. I wanted a tool that surfaces the one key that needs
-      attention, walks me through fixing it, and otherwise gets out of the way."
-    </blockquote>
-    <cite class="quote-author">— The design thesis behind Keystrok</cite>
-  </div>
-
-  <!-- Validation Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">06 — WHAT SHIPPED</span>
-      <h2 class="section-title">Not a prototype. A working product.</h2>
-      <p class="section-description">
-        Keystrok runs today: open source, self-hostable, and doing the full job end to end. I designed it
-        and built it, this is the real feature set, not a roadmap.
-      </p>
-    </div>
-
-    <div class="results-grid">
-      <div class="results-metrics">
-        <div class="metric-item">
-          <span class="metric-label">Scan a GitHub repo (via a GitHub App) or a local folder for exposed secrets, stored hashed and masked</span>
-          <span class="metric-value">Discovery</span>
-        </div>
-        <div class="metric-item">
-          <span class="metric-label">Promote real findings to a tracked inventory, each with a rotation deadline from its severity</span>
-          <span class="metric-value">Ledger</span>
-        </div>
-        <div class="metric-item">
-          <span class="metric-label">Step-by-step, operator-gated walkthroughs; the revoke step is irreversible by confirm</span>
-          <span class="metric-value">Rotation</span>
-        </div>
-        <div class="metric-item">
-          <span class="metric-label">Connect Datadog, Grafana, Stripe, or GitHub to check whether a leaked key is still live</span>
-          <span class="metric-value">Liveness</span>
-        </div>
-        <div class="metric-item">
-          <span class="metric-label">Invite members, gate the irreversible actions to admins, keep a shared attributed workspace</span>
-          <span class="metric-value">Teams</span>
-        </div>
-      </div>
-
-      <div class="results-impact">
-        <h3 style="font-size: 24px; margin-bottom: 24px; color: #fff;">Built to be trusted</h3>
-        <ul class="impact-list">
-          <li><strong>MIT-licensed</strong>, mirrored on Codeberg. No paywall, no open-core split.</li>
-          <li><strong>One command to self-host</strong> (app + Postgres + a local mail catcher). Nothing phones home.</li>
-          <li><strong>Secrets encrypted at rest</strong> (AES-256-GCM); outbound calls are SSRF-guarded.</li>
-          <li><strong>Next.js 15 + TypeScript + Postgres</strong>, shipped as a multi-arch image (amd64 + arm64).</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Roadmap Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">07 — DIRECTION</span>
-      <h2 class="section-title">Roadmap & Direction</h2>
-    </div>
-
-    <div class="roadmap">
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">SHIPPED</div>
-          <div class="timeline-title">Open source and self-hostable</div>
-          <div class="timeline-desc">MIT-licensed. Discovery, a tracked key ledger, guided rotation, platform liveness checks, and multi-user teams, all running today. One command to self-host, nothing phones home.</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">NEXT</div>
-          <div class="timeline-title">Community-driven depth</div>
-          <div class="timeline-desc">More detectors and platform integrations, scheduled scans, and whatever the people actually self-hosting it ask for. Built in the open.</div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-date">MAYBE, SOMEDAY</div>
-          <div class="timeline-title">A commercial path, if it earns one</div>
-          <div class="timeline-desc">I first imagined Keystrok as a company and drifted to open source because it felt right. Managed hosting or paid support isn't off the table if the opportunity arises, but it's not planned. Either way the core stays MIT: what you self-host today stays open, forever.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Key Learnings Section -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-number">08 — OUTCOME</span>
-      <h2 class="section-title">Why This Matters</h2>
-      <p class="section-description">
-        Keystrok is proof of how I work: I don't stop at the mockup. I research a real problem, make opinionated
-        design decisions, and ship a working product, learning whatever engineering it takes to get there. That's
-        what I bring to a senior product design role.
-      </p>
-    </div>
-
-    <div class="problem-grid" style="margin-top: 80px;">
-      <div class="problem-content">
-        <h3>Key Learnings</h3>
-        <p style="margin-bottom: 32px;">About Technical Product Design:</p>
-        <ul style="list-style: disc; padding-left: 24px;">
-          <li style="border: none; padding: 8px 0;">Developers value focus over features - Do one thing exceptionally well</li>
-          <li style="border: none; padding: 8px 0;">Visual design matters in DevTools - Good aesthetics improve adoption</li>
-          <li style="border: none; padding: 8px 0;">Open source builds trust - Transparency is crucial for security tools</li>
-        </ul>
-
-        <p style="margin: 32px 0;">About Building While Designing:</p>
-        <ul style="list-style: disc; padding-left: 24px;">
-          <li style="border: none; padding: 8px 0;">Implementation constraints improve design</li>
-          <li style="border: none; padding: 8px 0;">Real data exposes edge cases mockups miss</li>
-          <li style="border: none; padding: 8px 0;">Community feedback is gold</li>
-        </ul>
-      </div>
-
-      <div class="problem-sidebar">
-        <h4 class="sidebar-title">Personal Growth</h4>
-        <p class="sidebar-story" style="font-style: normal;">
-          I taught myself the TypeScript, Next.js, and security engineering to build this for real, not just
-          design it. Research to a shipped, self-hosted product, it's the most end-to-end thing I've made.
-        </p>
-        <p style="margin-top: 24px; color: #18a0fb;">
-          The clearest lesson: I had commercial demand in hand and chose to make Keystrok open
-          source anyway. For a security tool, trust and transparency matter more than capture,
-          and that was a deliberate product decision, not a default.
-        </p>
-      </div>
-    </div>
-  </section>
-</div>
-
-</body>
+  </body>
 </html>

@@ -52,21 +52,25 @@ src/components/ui/interactive/
 ## Key Technical Decisions
 
 ### 1. Component Architecture
+
 - **React functional component** with TypeScript for type safety
 - **Props-based configuration** for maximum flexibility
 - **Defensive props handling** to prevent runtime errors
 
 ### 2. Animation System
+
 - **Framer Motion** for physics-based animations
 - **CSS transforms** for hardware acceleration
 - **Spring configuration** optimized for paper-like feel
 
 ### 3. Styling Approach
+
 - **Tailwind CSS v4** classes for consistency
 - **CSS custom properties** for theming
 - **SVG graphics** for crisp corner visualization
 
 ### 4. Accessibility Strategy
+
 - **Keyboard-first design** with intuitive interactions
 - **Screen reader optimization** with descriptive labels
 - **Reduced motion compliance** with graceful degradation
@@ -80,7 +84,7 @@ src/components/ui/interactive/
 import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ---
 
-<div class="relative bg-bg-elevated p-6 rounded-lg">
+<div class="bg-bg-elevated relative rounded-lg p-6">
   <h2>Your Content</h2>
   <p>This card has an interactive folded corner.</p>
 
@@ -106,23 +110,25 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 
 ### Configuration Options
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `cornerSize` | `number` | `32` | Corner size in pixels |
-| `maxUnfold` | `number` | `200` | Maximum unfold distance |
-| `position` | `string` | `'top-right'` | Corner position |
-| `ariaLabel` | `string` | Auto-generated | Accessibility label |
-| `reduceMotion` | `boolean` | `false` | Disable animations |
+| Prop           | Type      | Default        | Description             |
+| -------------- | --------- | -------------- | ----------------------- |
+| `cornerSize`   | `number`  | `32`           | Corner size in pixels   |
+| `maxUnfold`    | `number`  | `200`          | Maximum unfold distance |
+| `position`     | `string`  | `'top-right'`  | Corner position         |
+| `ariaLabel`    | `string`  | Auto-generated | Accessibility label     |
+| `reduceMotion` | `boolean` | `false`        | Disable animations      |
 
 ## Performance Characteristics
 
 ### Achieved Targets
+
 - ✅ **60fps animations** through CSS transforms
 - ✅ **<10ms render time** with efficient React patterns
 - ✅ **<5kb impact** on bundle size (gzipped)
 - ✅ **Minimal memory usage** with proper cleanup
 
 ### Bundle Analysis
+
 - **Component size**: ~119kb (includes Framer Motion)
 - **Gzipped size**: ~39kb
 - **Tree shaking**: Optimized for production builds
@@ -137,6 +143,7 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ## Use Cases
 
 ### Portfolio Applications
+
 1. **Project cards** with hidden technical details
 2. **Contact information** reveals
 3. **Navigation shortcuts** in corners
@@ -144,6 +151,7 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 5. **Interactive help** and tooltips
 
 ### Design Patterns
+
 - **Progressive disclosure** of information
 - **Space-efficient** content revelation
 - **Elegant micro-interactions** for engagement
@@ -152,6 +160,7 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ## Future Enhancements
 
 ### Potential Additions
+
 1. **Multiple content states** with step-through
 2. **Custom animation easing** curves
 3. **Touch gesture recognition** improvements
@@ -159,6 +168,7 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 5. **Sound effects** for interaction feedback
 
 ### Integration Opportunities
+
 1. **CMS integration** for dynamic content
 2. **Analytics tracking** for interaction metrics
 3. **A/B testing** for engagement optimization
@@ -167,17 +177,20 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ## Development Notes
 
 ### Build Integration
+
 - Component builds successfully with Astro 5
 - No TypeScript errors in strict mode
 - Proper tree shaking in production builds
 
 ### Testing Considerations
+
 - Manual accessibility testing completed
 - Keyboard navigation verified
 - Reduced motion tested
 - Cross-browser compatibility confirmed
 
 ### Maintenance
+
 - Component is self-contained with minimal dependencies
 - Uses standard React patterns for easy maintenance
 - Comprehensive TypeScript types for development safety
@@ -186,6 +199,7 @@ import { FoldedCorner } from '../components/ui/interactive/FoldedCorner.tsx';
 ## Conclusion
 
 The Folded Corner component successfully delivers on all specified requirements:
+
 - **Minimalist design** that doesn't distract from content
 - **Performance optimized** with smooth 60fps animations
 - **Accessibility compliant** with WCAG 2.1 AA standards
