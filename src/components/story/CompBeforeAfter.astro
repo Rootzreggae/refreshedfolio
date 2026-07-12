@@ -15,7 +15,7 @@ const {
   height = "500px" 
 } = Astro.props;
 
-const id = `before-after-${Math.random().toString(36).substr(2, 9)}`;
+const id = `before-after-${Math.random().toString(36).slice(2, 11)}`;
 ---
 
 <div class="before-after" id={id} style={`height: ${height}`}>
@@ -118,7 +118,7 @@ const id = `before-after-${Math.random().toString(36).substr(2, 9)}`;
   }
 </style>
 
-<script define:vars={{ id }}>
+<script is:inline define:vars={{ id }}>
   const container = document.getElementById(id);
   const after = container.querySelector('.after');
   const handle = container.querySelector('.slider-handle');

@@ -1,0 +1,12 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+
+# tool config, not our source
+.claude/
+.gemini/
+.vscode/
+
+# doc showing raw component syntax — prettier tries to parse the examples as JSX and crashes
+STORY_DIRECTIVES.md

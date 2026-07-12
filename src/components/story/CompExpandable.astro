@@ -5,7 +5,7 @@ export interface Props {
 }
 
 const { title, defaultOpen = false } = Astro.props;
-const id = `expandable-${Math.random().toString(36).substr(2, 9)}`;
+const id = `expandable-${Math.random().toString(36).slice(2, 11)}`;
 ---
 
 <div class={`expandable ${defaultOpen ? 'open' : ''}`} id={id}>
@@ -89,7 +89,7 @@ const id = `expandable-${Math.random().toString(36).substr(2, 9)}`;
   }
 </style>
 
-<script define:vars={{ id }}>
+<script is:inline define:vars={{ id }}>
   const expandable = document.getElementById(id);
   const trigger = expandable.querySelector('.expand-trigger');
   
