@@ -106,7 +106,6 @@ const { id, images } = Astro.props;
     const carousels = document.querySelectorAll('.comp-carousel');
 
     carousels.forEach((carousel) => {
-      const id = (carousel as HTMLElement).dataset.carouselId;
       const track = carousel.querySelector('.carousel-track') as HTMLElement;
       const dots = carousel.querySelectorAll('.carousel-dot');
       const counter = carousel.querySelector('.carousel-counter');
