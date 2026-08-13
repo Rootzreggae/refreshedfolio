@@ -9,7 +9,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://nilsongaspar.com',
+  site: 'https://nilsongaspar.omg.lol',
   integrations: [
     mdx({
       remarkPlugins: [remarkDirective, storyDirectives],
