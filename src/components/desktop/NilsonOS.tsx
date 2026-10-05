@@ -25,6 +25,7 @@ import {
   type WsId,
 } from '../../lib/desktop/state';
 import { FloatLayer } from './FloatLayer';
+import { Launcher } from './Launcher';
 import { Strip } from './Strip';
 import { Icon, kindIcon } from './icons';
 
@@ -213,13 +214,42 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [panel, setPanel] = useState<null | 'control'>(null);
   const [showDesktop, setShowDesktop] = useState(false);
+  const [launcher, setLauncher] = useState(false);
+  const [recent, setRecent] = useState<string[]>([]);
+  const [mac, setMac] = useState(false);
+  const allNodes = useMemo(() => flatten(tree), [tree]);
 
   const ws = spaces[active];
   const update = (fn: (w: Workspace) => Workspace) => {
     setShowDesktop(false);
     setSpaces((all) => ({ ...all, [active]: fn(all[active]) }));
   };
-  const open = (id: string) => update((w) => openBeside(w, id));
+  const remember = (id: string) =>
+    setRecent((r) => {
+      const next = [id, ...r.filter((x) => x !== id)].slice(0, 6);
+      try {
+        sessionStorage.setItem('nilson-os:recent', JSON.stringify(next));
+      } catch {
+        /* storage blocked: recent list just won't survive a reload */
+      }
+      return next;
+    });
+  const open = (id: string) => {
+    remember(id);
+    update((w) => openBeside(w, id));
+  };
+  /** Shift+Enter in the launcher: the first empty workspace, else the next one. */
+  const openElsewhere = (id: string) => {
+    remember(id);
+    const order = ([1, 2, 3] as WsId[]).filter((x) => x !== active);
+    const target =
+      order.find(
+        (x) => !spaces[x].columns.length && !spaces[x].floating.length
+      ) ?? order[0];
+    setShowDesktop(false);
+    setActive(target);
+    setSpaces((all) => ({ ...all, [target]: openBeside(all[target], id) }));
+  };
 
   // restore: shared URL first, then this tab's session (client only, after hydration)
   useEffect(() => {
@@ -235,8 +265,35 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         [fromUrl.active]: fromUrl.ws,
       }));
     } else if (session) setActive(session.active);
+    try {
+      setRecent(JSON.parse(sessionStorage.getItem('nilson-os:recent') || '[]'));
+    } catch {
+      /* no recent list */
+    }
+    setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
     setReady(true);
   }, []);
+
+  // clicks inside an embedded page never reach the desktop: focus its window when the page takes focus
+  useEffect(() => {
+    const onBlur = () =>
+      setTimeout(() => {
+        const el = document.activeElement;
+        if (!(el instanceof HTMLIFrameElement)) return;
+        const fl = el.closest<HTMLElement>('[data-float]')?.dataset.float;
+        const colKey = el.closest<HTMLElement>('[data-col]')?.dataset.col;
+        setSpaces((all) => {
+          const w = all[active];
+          if (fl) return { ...all, [active]: raiseFloating(w, fl) };
+          const i = w.columns.findIndex((c) => c.key === colKey);
+          return i < 0
+            ? all
+            : { ...all, [active]: { ...w, focus: i, floatFocus: null } };
+        });
+      });
+    window.addEventListener('blur', onBlur);
+    return () => window.removeEventListener('blur', onBlur);
+  }, [active]);
 
   // keep the URL and the session in step with the layout
   useEffect(() => {
@@ -252,8 +309,18 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const combo = e.ctrlKey && e.altKey;
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        !e.altKey &&
+        e.key.toLowerCase() === 'k'
+      ) {
+        e.preventDefault();
+        setLauncher((v) => !v);
+        return;
+      }
       if (e.key === 'Escape') {
-        if (panel) setPanel(null);
+        if (launcher) setLauncher(false);
+        else if (panel) setPanel(null);
         else setSelected(null);
         return;
       }
@@ -281,7 +348,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [panel, active, ws]);
+  }, [panel, active, ws, launcher]);
 
   const focused = ws.columns[ws.focus];
   const floatNode = ws.floatFocus
@@ -295,8 +362,10 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         <div class="os-bar-group">
           <button
             class="os-tray"
-            aria-label="Open launcher (Ctrl K)"
-            title="Launcher, coming in the next phase"
+            aria-label={`Search (${mac ? '⌘' : 'Ctrl'} K)`}
+            title={`Search everything (${mac ? '⌘' : 'Ctrl'} K)`}
+            aria-expanded={launcher}
+            onClick={() => setLauncher(true)}
           >
             <Icon name="search" />
           </button>
@@ -401,7 +470,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
 
       {!ws.columns.length && !ws.floating.length && (
         <div class="os-hint" role="note">
-          <span class="os-kbd">Ctrl K</span>
+          <span class="os-kbd">{mac ? '⌘ K' : 'Ctrl K'}</span>
           search · double-click to open · drag a window by its title to move it
         </div>
       )}
@@ -439,6 +508,16 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
       />
 
       {panel === 'control' && <ControlCenter contact={contact} />}
+
+      {launcher && (
+        <Launcher
+          nodes={allNodes}
+          recent={recent}
+          onOpen={(id, elsewhere) => (elsewhere ? openElsewhere(id) : open(id))}
+          onStats={() => setPanel('control')}
+          onClose={() => setLauncher(false)}
+        />
+      )}
     </>
   );
 }

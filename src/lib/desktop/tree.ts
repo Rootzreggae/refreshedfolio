@@ -31,6 +31,8 @@ export interface FsNode {
   locked?: boolean;
   /** Placeholder content, waiting for Nilson. */
   todo?: boolean;
+  /** Text shown natively in the window (about, principles), from the homepage copy. */
+  body?: { heading?: string; text: string }[];
   children?: FsNode[];
 }
 
@@ -167,7 +169,20 @@ const about: Spec = {
       name: 'about.md',
       kind: 'md',
       title: 'About',
-      summary: 'Senior Product Designer in Lisbon.',
+      summary:
+        'Product designer for developer tools and observability platforms.',
+      body: [
+        {
+          text: "I'm a product designer specializing in developer tools and observability platforms. My broad design background helps me create technical products that feel surprisingly human.",
+        },
+        {
+          text: 'There\'s nothing quite like making a developer say "finally, this makes sense!"',
+        },
+        {
+          heading: 'Why technical products',
+          text: 'Complex problems energize me. Transforming observability data into actionable insights at Grafana taught me that the harder the technical challenge, the more impactful good design becomes.',
+        },
+      ],
     },
     {
       name: 'principles.md',
@@ -175,6 +190,20 @@ const about: Spec = {
       title: 'Principles',
       summary:
         'Real-time impact at scale · Collaboration with brilliant minds · Art and science',
+      body: [
+        {
+          heading: 'Real-time impact at scale',
+          text: "When the work ships, it's not a mock — it's thousands of engineers moving faster every day.",
+        },
+        {
+          heading: 'Collaboration with brilliant minds',
+          text: 'Working with engineers sharpened how I think. I ask "what\'s possible?" before "what\'s ideal?"',
+        },
+        {
+          heading: 'Art and science',
+          text: 'Visualizing millions of data points needs both aesthetic sense and a deep grasp of how developers work.',
+        },
+      ],
     },
     {
       name: 'nilson-gaspar-cv.pdf',

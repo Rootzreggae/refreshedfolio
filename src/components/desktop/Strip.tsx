@@ -105,6 +105,7 @@ export function Strip(props: Props) {
     let startX = e.clientX;
     const startY = e.clientY;
     let reordered = false;
+    document.documentElement.classList.add('os-gesture');
     let last = { dx: 0, dy: 0 };
     const move = (ev: PointerEvent) => {
       const { ws: cur, widths: w } = live.current;
@@ -131,6 +132,7 @@ export function Strip(props: Props) {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
+      document.documentElement.classList.remove('os-gesture');
       const i = live.current.ws.columns.findIndex((c) => c.key === key);
       const el = host.current?.querySelector<HTMLElement>(
         `[data-col="${key}"]`
@@ -154,6 +156,7 @@ export function Strip(props: Props) {
     e.stopPropagation();
     const x0 = e.clientX;
     const w0 = widths[col];
+    document.documentElement.classList.add('os-gesture');
     const move = (ev: PointerEvent) => {
       const px = Math.max(MIN_COL, w0 + ev.clientX - x0);
       onResize(col, (px + GAP) / vw);
@@ -161,6 +164,7 @@ export function Strip(props: Props) {
     const up = () => {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
+      document.documentElement.classList.remove('os-gesture');
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);

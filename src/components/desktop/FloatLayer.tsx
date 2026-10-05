@@ -53,6 +53,7 @@ export function FloatLayer(props: Props) {
     const x0 = e.clientX;
     const y0 = e.clientY;
     const start = { ...f };
+    document.documentElement.classList.add('os-gesture');
     const move = (ev: PointerEvent) => {
       const dx = ev.clientX - x0;
       const dy = ev.clientY - y0;
@@ -100,6 +101,7 @@ export function FloatLayer(props: Props) {
       window.removeEventListener('pointermove', move);
       window.removeEventListener('pointerup', up);
       window.removeEventListener('pointercancel', up);
+      document.documentElement.classList.remove('os-gesture');
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
@@ -114,6 +116,7 @@ export function FloatLayer(props: Props) {
         return (
           <section
             key={f.key}
+            data-float={f.key}
             role="dialog"
             aria-label={node.title ?? node.name}
             class={cx('os-float', focus === f.key && 'is-focused')}
