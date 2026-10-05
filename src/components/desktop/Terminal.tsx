@@ -28,7 +28,7 @@ const FACTS: [string, string][] = [
   ['Side project', 'Keystrok (keystrok.dev)'],
   ['WM', 'niri, Noctalia'],
   ['Location', 'Lisbon, PT'],
-  ['Contact', 'hello@nilsongaspar.com'],
+  ['Contact', 'nilsongaspar@omg.lol'],
 ];
 const SWATCHES = [
   '#0a1626',
