@@ -41,17 +41,36 @@ const SWATCHES = [
   '#b07cff',
 ];
 
-/** Career as commits. Dates Nilson hasn't confirmed stay marked TODO. */
+/** Career as commits, newest first. Roles and dates from Nilson's CV (2026). */
 const GIT_LOG: [string, string][] = [
   [
     'a1f3c09',
-    'feat(dynatrace): developer tooling for observability at scale · after Grafana Labs',
+    'feat(dynatrace): Senior Product Designer · Spaces, Settings Platform · Oct 2025 to Apr 2026',
+  ],
+  [
+    '9e41d2a',
+    'feat(keystrok): designer and developer, open source secrets hygiene · Jul 2024 to now',
   ],
   [
     '7c2e4b1',
-    'feat(grafana-labs): APM, RUM and Cloud Onboarding · May 2022 to Jul 2024',
+    'feat(grafana-labs): Senior Product Designer · APM, Frontend Observability, onboarding · May 2022 to Jul 2024',
   ],
-  ['3b9d0e7', '[TODO] earlier roles in technical products'],
+  [
+    '5d80f3e',
+    'feat(ki-challengers): Senior Product Designer · data driven products for Fortune 500 clients · Aug 2020 to May 2022',
+  ],
+  [
+    '4b1a7c6',
+    'feat(jungle): Lead Product Designer · Jungle.AI end to end · Sep 2019 to Aug 2020',
+  ],
+  [
+    '3f2e9b0',
+    'feat(comparamais): UX lead · price comparison platform · 2018 to Sep 2019',
+  ],
+  [
+    '2c7d4a1',
+    'feat(aptoide): UX/UI Designer · Android app store · Jan 2016 to Dec 2017',
+  ],
   ['0000001', 'init: the comic book kid starts drawing'],
 ];
 
