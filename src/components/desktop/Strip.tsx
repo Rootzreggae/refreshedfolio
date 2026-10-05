@@ -19,6 +19,7 @@ interface Props {
   onClose: (col: number, win: number) => void;
   onGo: (col: number, win: number, id: string) => void;
   onOpenBeside: (col: number, id: string) => void;
+  onMove: (from: number, to: number) => void;
 }
 
 /** niri-like preset widths: folders a third, documents half the screen. */
@@ -33,11 +34,15 @@ export function Strip({
   onClose,
   onGo,
   onOpenBeside,
+  onMove,
 }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(1280);
   const [scroll, setScroll] = useState(0);
   const [closing, setClosing] = useState<string | null>(null);
+  // drag-to-move (niri interactive move): the grabbed column follows the pointer, neighbours make room
+  const [drag, setDrag] = useState<{ key: string; dx: number } | null>(null);
+  const live = useRef({ ws, widths: [] as number[] });
 
   useLayoutEffect(() => {
     const el = host.current;
@@ -54,6 +59,48 @@ export function Strip({
   );
   const total = widths.reduce((a, w) => a + w + GAP, 0) - GAP;
   const maxScroll = Math.max(0, total - vw);
+  live.current = { ws, widths };
+
+  const startDrag = (e: PointerEvent, key: string) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    let startX = e.clientX;
+    const leftOf = (_ws: Workspace, w: number[], i: number) =>
+      w.slice(0, i).reduce((a, x) => a + x + GAP, 0);
+    const move = (ev: PointerEvent) => {
+      const { ws: cur, widths: w } = live.current;
+      const i = cur.columns.findIndex((c) => c.key === key);
+      if (i < 0) return;
+      const dx = ev.clientX - startX;
+      const center = leftOf(cur, w, i) + w[i] / 2 + dx;
+      let j = i;
+      for (let k = 0; k < w.length; k++) {
+        const l = leftOf(cur, w, k);
+        if (center >= l && center <= l + w[k]) j = k;
+      }
+      if (j !== i) {
+        // reorder now and shift the anchor so the column stays under the pointer
+        const order = [...w];
+        const [mw] = order.splice(i, 1);
+        order.splice(j, 0, mw);
+        startX += leftOf(cur, order, j) - leftOf(cur, w, i);
+        onMove(i, j);
+      }
+      setDrag({ key, dx: ev.clientX - startX });
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      setDrag(null);
+      const i = live.current.ws.columns.findIndex((c) => c.key === key);
+      if (i >= 0) onFocus(i);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+    setDrag({ key, dx: 0 });
+  };
 
   // keep the focused column in view (niri: scroll the minimum needed)
   useEffect(() => {
@@ -120,11 +167,17 @@ export function Strip({
               aria-label={first?.title ?? first?.name ?? 'Window'}
               class={cx(
                 'os-col',
+                drag?.key === c.key && 'is-dragging',
                 ci === ws.focus && 'is-focused',
                 closing === c.key && 'is-closing'
               )}
-              style={{ width: `${widths[ci]}px` }}
+              style={{
+                width: `${widths[ci]}px`,
+                transform:
+                  drag?.key === c.key ? `translateX(${drag.dx}px)` : undefined,
+              }}
               onMouseDown={() => ci !== ws.focus && onFocus(ci)}
+              onPointerDown={(e) => e.altKey && startDrag(e, c.key)}
               onFocusIn={() => ci !== ws.focus && onFocus(ci)}
             >
               {c.windows.map((id, wi) => {
@@ -132,6 +185,12 @@ export function Strip({
                 if (!node) return null;
                 return (
                   <div class="os-win" key={`${id}-${wi}`}>
+                    <div
+                      class="os-grip"
+                      title="Drag to move this window (or Alt + drag anywhere)"
+                      aria-hidden="true"
+                      onPointerDown={(e) => startDrag(e, c.key)}
+                    />
                     <button
                       class="os-close"
                       aria-label={`Close ${node.name}`}

@@ -8,6 +8,7 @@ import {
   emptyWorkspaces,
   encode,
   loadSession,
+  moveColumn,
   navigate,
   openBeside,
   saveSession,
@@ -251,6 +252,10 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
       if (!combo) return;
       const k = e.key.toLowerCase();
       if (['1', '2', '3'].includes(e.key)) setActive(Number(e.key) as WsId);
+      else if (e.shiftKey && e.key === 'ArrowLeft')
+        update((w) => moveColumn(w, w.focus, w.focus - 1));
+      else if (e.shiftKey && e.key === 'ArrowRight')
+        update((w) => moveColumn(w, w.focus, w.focus + 1));
       else if (e.key === 'ArrowLeft')
         update((w) => ({ ...w, focus: Math.max(0, w.focus - 1) }));
       else if (e.key === 'ArrowRight')
@@ -394,6 +399,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         onOpenBeside={(col, id) =>
           update((w) => openBeside({ ...w, focus: col }, id))
         }
+        onMove={(from, to) => update((w) => moveColumn(w, from, to))}
       />
 
       {panel === 'control' && <ControlCenter contact={contact} />}

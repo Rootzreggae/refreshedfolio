@@ -606,3 +606,49 @@
   pointer-events: none;
   transition: left 0.28s ease;
 }
+
+/* ---------- drag to move + left strut ---------- */
+/* niri "strut": the strip never covers the desktop icon column on wide screens */
+@media (min-width: 900px) {
+  .os-strip {
+    left: 140px;
+  }
+}
+.os-grip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 40px;
+  height: 18px;
+  cursor: grab;
+  touch-action: none;
+  z-index: 2;
+  background: linear-gradient(var(--os-border), var(--os-border)) center 7px /
+    36px 3px no-repeat;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.os-win:hover .os-grip,
+.os-col.is-focused .os-grip {
+  opacity: 1;
+}
+.os-grip:hover {
+  background-image: linear-gradient(var(--os-accent), var(--os-accent));
+}
+.os-col.is-dragging {
+  position: relative;
+  z-index: 3;
+  cursor: grabbing;
+  transition: none;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  user-select: none;
+}
+.os-col.is-dragging .os-win {
+  border-color: var(--os-accent);
+}
+.os-col:not(.is-dragging) {
+  transition:
+    width 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.2s ease;
+}

@@ -147,3 +147,13 @@ export function saveSession(active: WsId, spaces: Workspaces) {
     /* private mode or storage blocked: the URL still carries the layout */
   }
 }
+
+/** Move a column to another slot (drag or Ctrl+Alt+Shift+arrows) and keep it focused. */
+export function moveColumn(ws: Workspace, from: number, to: number): Workspace {
+  const target = Math.max(0, Math.min(to, ws.columns.length - 1));
+  if (from === target || !ws.columns[from]) return ws;
+  const columns = [...ws.columns];
+  const [col] = columns.splice(from, 1);
+  columns.splice(target, 0, col);
+  return { columns, focus: target };
+}
