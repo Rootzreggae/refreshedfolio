@@ -944,3 +944,169 @@
 .os-launcher-field input:focus-visible {
   outline: none;
 }
+
+/* ---------- wallpaper + Breeze-style icons ---------- */
+/* Wallpaper: Lagoa das Sete Cidades, São Miguel, Azores. Public domain, by José Luís Ávila Silveira /
+   Pedro Noronha e Costa (Wikimedia Commons). Bright photo, so the bar gets a soft dark fade behind it. */
+.os::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 120px;
+  background: linear-gradient(rgba(10, 22, 38, 0.55), rgba(10, 22, 38, 0));
+  pointer-events: none;
+}
+.os-icon-tile {
+  width: 64px;
+  height: 64px;
+  background: none;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+.os-icon:hover .os-icon-tile {
+  background: rgba(255, 255, 255, 0.12);
+}
+.os-icon[aria-pressed='true'] .os-icon-tile {
+  outline: none;
+  background: rgba(84, 224, 166, 0.28);
+}
+.os-icon-label {
+  font-weight: 500;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 6px rgba(0, 0, 0, 0.6);
+}
+.os-file-icon {
+  flex: none;
+}
+
+/* ---------- phase 5: terminal + trash ---------- */
+.os-term {
+  min-height: 100%;
+  padding: 16px 20px 24px;
+  background: var(--os-bg-deep);
+  font-family: var(--os-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--os-text);
+  cursor: text;
+}
+.os-term-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.os-term-fetch {
+  display: flex;
+  gap: 24px;
+  margin: 4px 0 10px;
+}
+.os-term-logo {
+  margin: 0;
+  color: var(--os-accent);
+  font-family: var(--os-mono);
+  font-size: 12px;
+  line-height: 1.15;
+}
+.os-term-facts,
+.os-term-help {
+  display: flex;
+  flex-direction: column;
+}
+.os-term-swatches {
+  display: flex;
+  margin-top: 10px;
+}
+.os-term-swatches span {
+  width: 18px;
+  height: 18px;
+}
+.os-term-accent {
+  color: var(--os-accent);
+}
+.os-term-yellow {
+  color: var(--os-yellow);
+}
+.os-term-dim {
+  color: var(--os-text-label);
+}
+.os-term-faint {
+  color: var(--os-text-faint);
+}
+.os-term-strong {
+  color: #fff;
+  font-weight: 600;
+}
+.os-term-ls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.os-term-dir {
+  color: var(--os-accent);
+}
+.os-term-locked {
+  color: var(--os-yellow);
+}
+.os-term-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.os-term-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  caret-color: var(--os-accent);
+}
+.os-trash {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.os-trash-card {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: var(--os-bg-raised);
+}
+.os-trash-thumb {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--os-bg-deep);
+}
+.os-trash-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.os-trash-body p {
+  margin: 0;
+}
+.os-trash-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+}
+.os-trash-why {
+  color: var(--os-pink);
+  font-weight: 600;
+}
+.os-trash-joke {
+  margin: 0;
+  font-family: var(--os-mono);
+  font-size: 11px;
+  color: var(--os-yellow);
+}

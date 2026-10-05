@@ -41,7 +41,7 @@ function describe(n: FsNode): string {
         ? 'Document'
         : n.children
           ? 'Folder'
-          : n.kind === 'app'
+          : n.kind === 'app' || n.kind === 'terminal'
             ? 'App'
             : 'File';
   return `${what} · ${where}${n.summary && !n.todo ? ` · ${n.summary}` : ''}`;

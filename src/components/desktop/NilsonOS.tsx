@@ -1,5 +1,5 @@
 /** Nilson OS shell: bar, desktop icons, control center, and the niri strip per workspace. */
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { flatten, type FsNode } from '../../lib/desktop/tree';
 import {
   closeColumn,
@@ -25,9 +25,10 @@ import {
   type WsId,
 } from '../../lib/desktop/state';
 import { FloatLayer } from './FloatLayer';
+import { FileIcon } from './FileIcon';
 import { Launcher } from './Launcher';
 import { Strip } from './Strip';
-import { Icon, kindIcon } from './icons';
+import { Icon } from './icons';
 
 export interface Contact {
   email: string;
@@ -274,6 +275,19 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
     setReady(true);
   }, []);
 
+  // the terminal asks the desktop to open things / show the contact card
+  const openRef = useRef(open);
+  openRef.current = open;
+  useEffect(() => {
+    const on = (e: Event) => {
+      const d = (e as CustomEvent<{ type: string; id?: string }>).detail;
+      if (d.type === 'control') setPanel('control');
+      if (d.type === 'open' && d.id) openRef.current(d.id);
+    };
+    window.addEventListener('nilson-os', on);
+    return () => window.removeEventListener('nilson-os', on);
+  }, []);
+
   // clicks inside an embedded page never reach the desktop: focus its window when the page takes focus
   useEffect(() => {
     const onBlur = () =>
@@ -456,11 +470,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
               }}
             >
               <span class="os-icon-tile">
-                <Icon
-                  name={kindIcon(node.kind, node.name)}
-                  size={26}
-                  width={1.6}
-                />
+                <FileIcon node={node} size={56} />
               </span>
               <span class="os-icon-label">{node.name}</span>
             </button>

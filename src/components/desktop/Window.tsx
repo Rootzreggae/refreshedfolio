@@ -7,7 +7,8 @@
  */
 import { useState } from 'preact/hooks';
 import type { FsNode } from '../../lib/desktop/tree';
-import { Icon, kindIcon } from './icons';
+import { FileIcon } from './FileIcon';
+import { Terminal } from './Terminal';
 
 export interface WindowApi {
   node: FsNode;
@@ -54,11 +55,7 @@ function Files(api: WindowApi) {
               title={k.children ? 'Open folder' : 'Open beside'}
             >
               <span class="os-file-icon">
-                <Icon
-                  name={k.locked ? 'lock' : kindIcon(k.kind, k.name)}
-                  size={18}
-                  width={1.6}
-                />
+                <FileIcon node={k} size={30} />
               </span>
               <span class="os-file-text">
                 <span class="os-file-name">{k.name}</span>
@@ -127,6 +124,52 @@ function PageFrame(api: WindowApi) {
   );
 }
 
+/** Trash: explorations that didn't ship, with the reason. Evidence of judgement, not just output. */
+function TrashView(api: WindowApi) {
+  const { node } = api;
+  const [restored, setRestored] = useState<string | null>(null);
+  return (
+    <div class="os-files">
+      <div class="os-files-head">
+        <h2 class="os-files-path">~/Trash</h2>
+        <p class="os-sub">{node.summary}</p>
+      </div>
+      <ul class="os-trash">
+        {(node.children ?? []).map((k) => (
+          <li class="os-trash-card" key={k.id}>
+            <div class="os-trash-thumb" aria-hidden="true">
+              <FileIcon node={k} size={40} />
+            </div>
+            <div class="os-trash-body">
+              <span class="os-label">{k.killed?.project}</span>
+              <h3 class="os-trash-title">{k.title}</h3>
+              <p class="os-body">{k.summary}</p>
+              <p class="os-body">
+                <strong class="os-trash-why">Killed because</strong>{' '}
+                {k.killed?.because}
+              </p>
+              {k.killed?.learned && (
+                <p class="os-body">
+                  <strong class="os-trash-why">Learned</strong>{' '}
+                  {k.killed.learned}
+                </p>
+              )}
+              <button class="os-btn" onClick={() => setRestored(k.id)}>
+                Restore
+              </button>
+              {restored === k.id && (
+                <p class="os-trash-joke" role="status">
+                  Some ideas should stay in the trash.
+                </p>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function Doc(api: WindowApi) {
   const { node } = api;
   return (
@@ -155,6 +198,8 @@ function Doc(api: WindowApi) {
 
 export function WindowBody(api: WindowApi) {
   const { node } = api;
+  if (node.kind === 'terminal') return <Terminal {...api} />;
+  if (node.kind === 'trash') return <TrashView {...api} />;
   if (node.children) return <Files {...api} />;
   if (node.url && !node.todo) return <PageFrame {...api} />;
   return <Doc {...api} />;

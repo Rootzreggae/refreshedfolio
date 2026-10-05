@@ -8,6 +8,7 @@
  */
 
 export type NodeKind =
+  | 'terminal'
   | 'folder'
   | 'case'
   | 'md'
@@ -33,6 +34,13 @@ export interface FsNode {
   todo?: boolean;
   /** Text shown natively in the window (about, principles), from the homepage copy. */
   body?: { heading?: string; text: string }[];
+  /** Trash entries: an exploration that didn't ship, and why. */
+  killed?: {
+    project: string;
+    because: string;
+    learned?: string;
+    date?: string;
+  };
   children?: FsNode[];
 }
 
@@ -218,14 +226,27 @@ const about: Spec = {
 const trash: Spec = {
   name: 'Trash',
   kind: 'trash',
-  summary: 'Design explorations that did not ship, and why.',
+  summary: "Design explorations that didn't ship, and why they were killed.",
   children: [1, 2, 3].map((n) => ({
     name: `killed-idea-${n}.md`,
     kind: 'md' as const,
     title: `[TODO] Killed idea ${n}`,
-    summary: '[TODO] What it was, and why it was killed.',
+    summary: '[TODO] What it was.',
     todo: true,
+    killed: {
+      project: '[TODO] Project',
+      because:
+        '[TODO] Why it was killed: the evidence, the constraint, the better option.',
+      learned: '[TODO] What it taught you.',
+    },
   })),
+};
+
+const terminal: Spec = {
+  name: 'terminal',
+  kind: 'terminal',
+  title: 'Terminal',
+  summary: 'whoami, ls, cd, cat, open, git log. Type help.',
 };
 
 function materialise(spec: Spec, parent: string): FsNode {
@@ -257,8 +278,8 @@ export function buildTree(notes: NoteInput[]): FsNode[] {
     summary: '[TODO] Intro video not recorded yet.',
     todo: true,
   };
-  return [intro, caseStudies, sideProjects, essays, about, trash].map((s) =>
-    materialise(s, '')
+  return [intro, caseStudies, sideProjects, essays, about, terminal, trash].map(
+    (s) => materialise(s, '')
   );
 }
 
