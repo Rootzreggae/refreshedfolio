@@ -392,6 +392,7 @@
   background: var(--os-bg);
   border: 2px solid transparent;
   display: flex;
+  flex-direction: column;
 }
 .os-col.is-focused .os-win {
   border-color: var(--os-accent);
@@ -400,28 +401,6 @@
   flex: 1;
   overflow: auto;
   overscroll-behavior: contain;
-}
-.os-close {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 26px;
-  height: 26px;
-  font-size: 16px;
-  line-height: 1;
-  color: var(--os-text-muted);
-  background: var(--os-bg-raised);
-  opacity: 0.6;
-  z-index: 2;
-}
-.os-close:hover,
-.os-close:focus-visible,
-.os-col.is-focused .os-close {
-  opacity: 1;
-}
-.os-close:hover {
-  color: #fff;
-  background: var(--os-bg-hover);
 }
 
 /* files */
@@ -614,27 +593,6 @@
     left: 140px;
   }
 }
-.os-grip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 40px;
-  height: 18px;
-  cursor: grab;
-  touch-action: none;
-  z-index: 2;
-  background: linear-gradient(var(--os-border), var(--os-border)) center 7px /
-    36px 3px no-repeat;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-.os-win:hover .os-grip,
-.os-col.is-focused .os-grip {
-  opacity: 1;
-}
-.os-grip:hover {
-  background-image: linear-gradient(var(--os-accent), var(--os-accent));
-}
 .os-col.is-dragging {
   position: relative;
   z-index: 3;
@@ -651,4 +609,159 @@
     width 0.18s ease,
     opacity 0.18s ease,
     transform 0.2s ease;
+}
+
+/* ---------- title strip, resizing, floating windows ---------- */
+.os-head {
+  flex: none;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-left: 12px;
+  background: var(--os-bg-raised);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.os-head:active {
+  cursor: grabbing;
+}
+.os-head-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--os-mono);
+  font-size: 11px;
+  color: var(--os-text-body);
+}
+.os-col.is-focused .os-head-name,
+.os-float.is-focused .os-head-name {
+  color: #fff;
+}
+.os-head-btns {
+  display: flex;
+  height: 100%;
+}
+.os-head-btn {
+  width: 32px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--os-text-muted);
+  cursor: pointer;
+}
+.os-head-btn:hover {
+  background: var(--os-bg-hover);
+  color: #fff;
+}
+.os-head-btn--close:hover {
+  background: var(--os-pink);
+  color: #fff;
+}
+.os-col {
+  position: relative;
+}
+.os-col-resize {
+  position: absolute;
+  top: 0;
+  right: -5px;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 3;
+}
+.os-col-resize:hover {
+  background: var(--os-accent);
+  opacity: 0.5;
+}
+.os-col.is-dragging {
+  opacity: 0.92;
+}
+.os-float-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+.os-float {
+  position: absolute;
+  display: flex;
+  pointer-events: auto;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+.os-float.is-focused .os-win {
+  border-color: var(--os-accent);
+}
+.os-rz {
+  position: absolute;
+  z-index: 3;
+  touch-action: none;
+}
+.os-rz-n,
+.os-rz-s {
+  left: 8px;
+  right: 8px;
+  height: 8px;
+  cursor: ns-resize;
+}
+.os-rz-n {
+  top: -4px;
+}
+.os-rz-s {
+  bottom: -4px;
+}
+.os-rz-e,
+.os-rz-w {
+  top: 8px;
+  bottom: 8px;
+  width: 8px;
+  cursor: ew-resize;
+}
+.os-rz-e {
+  right: -4px;
+}
+.os-rz-w {
+  left: -4px;
+}
+.os-rz-ne,
+.os-rz-nw,
+.os-rz-se,
+.os-rz-sw {
+  width: 14px;
+  height: 14px;
+}
+.os-rz-ne {
+  top: -4px;
+  right: -4px;
+  cursor: nesw-resize;
+}
+.os-rz-sw {
+  bottom: -4px;
+  left: -4px;
+  cursor: nesw-resize;
+}
+.os-rz-nw {
+  top: -4px;
+  left: -4px;
+  cursor: nwse-resize;
+}
+.os-rz-se {
+  bottom: -4px;
+  right: -4px;
+  cursor: nwse-resize;
+}
+/* the mint window border already shows focus; no second outline on the column itself */
+.os-col:focus,
+.os-col:focus-visible {
+  outline: none;
 }

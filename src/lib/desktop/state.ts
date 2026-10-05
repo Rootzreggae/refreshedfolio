@@ -10,17 +10,38 @@ export type WsId = 1 | 2 | 3;
 export interface Column {
   key: string;
   windows: string[]; // node ids, >1 = stacked
+  /** Width as a fraction of the strip, set by dragging the column edge. Default: by kind. */
+  width?: number;
+}
+/** A window lifted out of the strip (niri floating layer): free position and size, in px. */
+export interface Floating {
+  key: string;
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
 export interface Workspace {
   columns: Column[];
   focus: number;
+  /** Floating windows, back to front (last = on top). */
+  floating: Floating[];
+  /** Key of the focused floating window, or null when a column has focus. */
+  floatFocus: string | null;
 }
 export type Workspaces = Record<WsId, Workspace>;
 
+const emptyWs = (): Workspace => ({
+  columns: [],
+  focus: 0,
+  floating: [],
+  floatFocus: null,
+});
 export const emptyWorkspaces = (): Workspaces => ({
-  1: { columns: [], focus: 0 },
-  2: { columns: [], focus: 0 },
-  3: { columns: [], focus: 0 },
+  1: emptyWs(),
+  2: emptyWs(),
+  3: emptyWs(),
 });
 
 let seq = 0;
@@ -56,7 +77,7 @@ export function openBeside(ws: Workspace, id: string): Workspace {
     newColumn(id),
     ...ws.columns.slice(at),
   ];
-  return { columns, focus: at };
+  return { ...ws, columns, focus: at, floatFocus: null };
 }
 
 /** Replace the window inside a column (in-place navigation, e.g. folder → child, "← parent"). */
@@ -79,7 +100,11 @@ export function closeColumn(ws: Workspace, col: number): Workspace {
   // closing the focused column hands focus to the previous one (handover: "returns focus to the previous column")
   const focus =
     col < ws.focus ? ws.focus - 1 : col === ws.focus ? col - 1 : ws.focus;
-  return { columns, focus: Math.max(0, Math.min(focus, columns.length - 1)) };
+  return {
+    ...ws,
+    columns,
+    focus: Math.max(0, Math.min(focus, columns.length - 1)),
+  };
 }
 
 export function closeWindow(
@@ -128,14 +153,18 @@ export function decode(
     Math.max(Number(q.get('focus') || 0) || 0, 0),
     Math.max(columns.length - 1, 0)
   );
-  return { active: active as WsId, ws: { columns, focus } };
+  return { active: active as WsId, ws: { ...emptyWs(), columns, focus } };
 }
 
 const KEY = 'nilson-os:v1';
 export function loadSession(): { active: WsId; spaces: Workspaces } | null {
   try {
     const raw = sessionStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as { active: WsId; spaces: Workspaces };
+    for (const id of [1, 2, 3] as WsId[])
+      saved.spaces[id] = { ...emptyWs(), ...saved.spaces[id] };
+    return saved;
   } catch {
     return null;
   }
@@ -155,5 +184,91 @@ export function moveColumn(ws: Workspace, from: number, to: number): Workspace {
   const columns = [...ws.columns];
   const [col] = columns.splice(from, 1);
   columns.splice(target, 0, col);
-  return { columns, focus: target };
+  return { ...ws, columns, focus: target, floatFocus: null };
+}
+
+export function resizeColumn(
+  ws: Workspace,
+  col: number,
+  width: number
+): Workspace {
+  const w = Math.max(0.2, Math.min(width, 0.98));
+  return {
+    ...ws,
+    columns: ws.columns.map((c, i) => (i === col ? { ...c, width: w } : c)),
+  };
+}
+
+/** Lift a column out of the strip into a floating window (each stacked window floats on its own). */
+export function floatColumn(
+  ws: Workspace,
+  col: number,
+  rect: Omit<Floating, 'key' | 'id'>
+): Workspace {
+  const c = ws.columns[col];
+  if (!c) return ws;
+  const floats = c.windows.map((id, i) => ({
+    ...rect,
+    x: rect.x + i * 24,
+    y: rect.y + i * 24,
+    id,
+    key: `${c.key}f${i}`,
+  }));
+  const rest = closeColumn(ws, col);
+  return {
+    ...rest,
+    floating: [...ws.floating, ...floats],
+    floatFocus: floats[floats.length - 1].key,
+  };
+}
+
+/** Put a floating window back into the strip, right of the focused column. */
+export function tileFloating(ws: Workspace, key: string): Workspace {
+  const f = ws.floating.find((x) => x.key === key);
+  if (!f) return ws;
+  return openBeside(
+    { ...ws, floating: ws.floating.filter((x) => x.key !== key) },
+    f.id
+  );
+}
+
+export function updateFloating(
+  ws: Workspace,
+  key: string,
+  patch: Partial<Floating>
+): Workspace {
+  return {
+    ...ws,
+    floating: ws.floating.map((f) => (f.key === key ? { ...f, ...patch } : f)),
+  };
+}
+
+/** Focus a floating window and bring it to the front. */
+export function raiseFloating(ws: Workspace, key: string): Workspace {
+  const f = ws.floating.find((x) => x.key === key);
+  if (!f) return ws;
+  return {
+    ...ws,
+    floating: [...ws.floating.filter((x) => x.key !== key), f],
+    floatFocus: key,
+  };
+}
+
+export function closeFloating(ws: Workspace, key: string): Workspace {
+  const floating = ws.floating.filter((x) => x.key !== key);
+  return {
+    ...ws,
+    floating,
+    floatFocus:
+      ws.floatFocus === key ? (floating.at(-1)?.key ?? null) : ws.floatFocus,
+  };
+}
+
+/** Replace the content of a floating window (folder navigation inside it). */
+export function navigateFloating(
+  ws: Workspace,
+  key: string,
+  id: string
+): Workspace {
+  return updateFloating(ws, key, { id });
 }

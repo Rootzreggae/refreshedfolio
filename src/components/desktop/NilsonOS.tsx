@@ -3,20 +3,28 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import { flatten, type FsNode } from '../../lib/desktop/tree';
 import {
   closeColumn,
+  closeFloating,
   closeWindow,
   decode,
   emptyWorkspaces,
   encode,
+  floatColumn,
   loadSession,
   moveColumn,
   navigate,
+  navigateFloating,
   openBeside,
+  raiseFloating,
+  resizeColumn,
   saveSession,
   slugIndex,
+  tileFloating,
+  updateFloating,
   type Workspace,
   type Workspaces,
   type WsId,
 } from '../../lib/desktop/state';
+import { FloatLayer } from './FloatLayer';
 import { Strip } from './Strip';
 import { Icon, kindIcon } from './icons';
 
@@ -263,6 +271,8 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
           ...w,
           focus: Math.min(w.columns.length - 1, w.focus + 1),
         }));
+      else if (k === 'q' && ws.floatFocus)
+        update((w) => closeFloating(w, w.floatFocus!));
       else if (k === 'q' && ws.columns.length)
         update((w) => closeColumn(w, w.focus));
       else if (k === 'd') setShowDesktop((v) => !v);
@@ -274,7 +284,10 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
   }, [panel, active, ws]);
 
   const focused = ws.columns[ws.focus];
-  const focusedNode = focused && byId.get(focused.windows[0]);
+  const floatNode = ws.floatFocus
+    ? byId.get(ws.floating.find((f) => f.key === ws.floatFocus)?.id ?? '')
+    : undefined;
+  const focusedNode = floatNode ?? (focused && byId.get(focused.windows[0]));
 
   return (
     <>
@@ -309,7 +322,11 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
             <button
               key={w.id}
               aria-current={active === w.id}
-              class={spaces[w.id].columns.length ? 'is-busy' : ''}
+              class={
+                spaces[w.id].columns.length || spaces[w.id].floating.length
+                  ? 'is-busy'
+                  : ''
+              }
               aria-label={`Workspace ${w.id}: ${w.name}`}
               title={w.name}
               onClick={() => setActive(w.id)}
@@ -319,7 +336,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
           ))}
         </nav>
         <div class="os-bar-group">
-          {ws.columns.length > 0 && (
+          {(ws.columns.length > 0 || ws.floating.length > 0) && (
             <button
               class="os-pill"
               aria-pressed={showDesktop}
@@ -382,10 +399,10 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         ))}
       </ul>
 
-      {!ws.columns.length && (
+      {!ws.columns.length && !ws.floating.length && (
         <div class="os-hint" role="note">
           <span class="os-kbd">Ctrl K</span>
-          search everything · double-click a folder to open it as a column
+          search · double-click to open · drag a window by its title to move it
         </div>
       )}
 
@@ -393,13 +410,32 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         ws={ws}
         byId={byId}
         hidden={showDesktop}
-        onFocus={(col) => update((w) => ({ ...w, focus: col }))}
+        onFocus={(col) =>
+          update((w) => ({ ...w, focus: col, floatFocus: null }))
+        }
         onClose={(col, win) => update((w) => closeWindow(w, col, win))}
         onGo={(col, win, id) => update((w) => navigate(w, col, win, id))}
         onOpenBeside={(col, id) =>
           update((w) => openBeside({ ...w, focus: col }, id))
         }
         onMove={(from, to) => update((w) => moveColumn(w, from, to))}
+        onFloat={(col, rect) => update((w) => floatColumn(w, col, rect))}
+        onResize={(col, fraction) =>
+          update((w) => resizeColumn(w, col, fraction))
+        }
+      />
+
+      <FloatLayer
+        floating={ws.floating}
+        focus={ws.floatFocus}
+        byId={byId}
+        hidden={showDesktop}
+        onChange={(key, patch) => update((w) => updateFloating(w, key, patch))}
+        onRaise={(key) => update((w) => raiseFloating(w, key))}
+        onTile={(key) => update((w) => tileFloating(w, key))}
+        onClose={(key) => update((w) => closeFloating(w, key))}
+        onGo={(key, id) => update((w) => navigateFloating(w, key, id))}
+        onOpenBeside={(id) => update((w) => openBeside(w, id))}
       />
 
       {panel === 'control' && <ControlCenter contact={contact} />}
