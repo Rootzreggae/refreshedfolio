@@ -217,8 +217,9 @@ const about: Spec = {
       name: 'nilson-gaspar-cv.pdf',
       kind: 'pdf',
       title: 'CV',
-      summary: '[TODO] CV file not in the repo yet.',
-      todo: true,
+      summary:
+        'Senior Product Designer, developer tools, observability and data platforms. 2026.',
+      url: '/nilson-gaspar-cv.pdf',
     },
   ],
 };

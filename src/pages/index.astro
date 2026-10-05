@@ -211,6 +211,43 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
         }
       }
     </style>
+    <!-- Structured data for search engines and AI agents (schema.org Person) -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        name: 'Nilson Gaspar',
+        jobTitle: 'Senior Product Designer',
+        description:
+          'Senior Product Designer, developer tools, observability and data platforms.',
+        url: 'https://nilsongaspar.omg.lol/',
+        email: `mailto:${contact.email}`,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Lisbon',
+          addressCountry: 'PT',
+        },
+        knowsAbout: [
+          'Product design',
+          'Developer tools',
+          'Observability',
+          'Information architecture',
+          'Design systems',
+        ],
+        sameAs: [
+          'https://www.linkedin.com/in/nilsongaspar',
+          contact.github.url,
+          contact.bluesky.url,
+        ],
+      })}
+    />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      title="llms.txt"
+      href="/llms.txt"
+    />
   </head>
   <body>
     <div

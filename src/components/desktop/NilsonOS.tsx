@@ -113,9 +113,9 @@ function ControlCenter({ contact }: { contact: Contact }) {
             <span class="os-sub">Uptime: 14 years in product design</span>
           </div>
         </div>
-        <span class="os-btn" title="CV file coming soon">
-          CV soon
-        </span>
+        <a class="os-btn" href="/nilson-gaspar-cv.pdf" download>
+          CV ↓
+        </a>
       </div>
       <nav class="os-card os-links" aria-label="Contact">
         <a class="os-link" href={`mailto:${contact.email}`}>
