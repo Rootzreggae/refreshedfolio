@@ -1,0 +1,70 @@
+---
+/**
+ * /desktop: Nilson OS, the portfolio as a niri + Noctalia desktop (progressive enhancement).
+ * The classic site stays the canonical one; this page is noindex. Reached from the homepage corner peel.
+ */
+import NilsonOS from '../components/desktop/NilsonOS';
+import { buildTree, flatten } from '../lib/desktop/tree';
+import { getPublishedNotes } from '../lib/notes';
+import { contact } from '../lib/work';
+import '../styles/desktop.css';
+
+const notes = await getPublishedNotes();
+const tree = buildTree(
+  notes.map((n) => ({
+    slug: n.slug,
+    title: n.data.title,
+    description: n.data.description,
+  }))
+);
+const caseCount = flatten(tree).filter(
+  (n) => n.kind === 'case' && !n.todo
+).length;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nilson OS · Nilson Gaspar</title>
+    <meta
+      name="description"
+      content="Nilson Gaspar's portfolio as a Linux desktop: case studies, essays and side projects you can open, search and explore."
+    />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="https://nilsongaspar.omg.lol/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+    />
+    <script
+      is:inline
+      defer
+      src="https://cloud.umami.is/script.js"
+      data-website-id="17a602b8-56cc-4328-83d4-0f16fefc8fd9"></script>
+  </head>
+  <body style="margin:0">
+    <main
+      class="os"
+      style="--os-wallpaper:url(/desktop/wallpaper-placeholder.jpg)"
+    >
+      <noscript>
+        <p style="padding:48px;max-width:40em">
+          This desktop needs JavaScript. <a href="/" style="color:#54e0a6"
+            >The classic site</a
+          > has everything in it.
+        </p>
+      </noscript>
+      <NilsonOS
+        client:load
+        tree={tree}
+        contact={contact}
+        caseCount={caseCount}
+      />
+    </main>
+  </body>
+</html>

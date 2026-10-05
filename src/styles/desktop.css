@@ -1,0 +1,331 @@
+/* Nilson OS (/desktop). Tokens from the homepage palette; scoped to .os so the classic site is untouched.
+   No rounded corners anywhere, on purpose: it matches his real niri desktop. */
+.os {
+  --os-bg-deep: #0a1626;
+  --os-bg: #102237;
+  --os-bg-raised: #182e49;
+  --os-bg-hover: #20395a;
+  --os-wall: #122541;
+  --os-border: #2c476a;
+  --os-glass: rgba(10, 22, 38, 0.82);
+
+  --os-text-strong: #ffffff;
+  --os-text: #e7eaf0;
+  --os-text-body: #c2c9d4;
+  --os-text-muted: #9aa3b0;
+  --os-text-label: #8b94a3;
+  --os-text-faint: #5a6473;
+
+  --os-accent: #54e0a6;
+  --os-on-accent: #0a1626;
+  --os-pink: #ff3d77;
+  --os-yellow: #ffd84d;
+  --os-teal: #1abc9c;
+  --os-orange: #ff7a59;
+  --os-purple: #b07cff;
+
+  --os-sans: 'Helvetica Neue', Helvetica, Arial, 'Segoe UI', sans-serif;
+  --os-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --os-bar-h: 32px;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--os-sans);
+  color: var(--os-text);
+  background: var(--os-wall) var(--os-wallpaper, none) center / cover no-repeat;
+  -webkit-font-smoothing: antialiased;
+}
+.os *,
+.os *::before,
+.os *::after {
+  border-radius: 0 !important;
+  box-sizing: border-box;
+}
+.os button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.os a {
+  color: inherit;
+  text-decoration: none;
+}
+.os :focus-visible {
+  outline: 2px solid var(--os-accent);
+  outline-offset: 1px;
+}
+
+/* bar */
+.os-bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: var(--os-bar-h);
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--os-bg-deep);
+  z-index: 30;
+}
+.os-bar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.os-pill {
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  background: var(--os-bg-raised);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.os-pill--mono {
+  font-family: var(--os-mono);
+  font-size: 10px;
+  color: var(--os-text-label);
+}
+.os-tray {
+  width: 26px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--os-bg-raised);
+}
+.os-tray:hover,
+.os-pill:is(a, button):hover {
+  background: var(--os-bg-hover);
+}
+.os-tray[aria-pressed='true'],
+.os-tray--accent {
+  background: var(--os-accent);
+  color: var(--os-on-accent);
+}
+.os-ws {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.os-ws button {
+  width: 13px;
+  height: 13px;
+  background: var(--os-text-faint);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--os-on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.18s ease;
+}
+.os-ws button[aria-current='true'] {
+  width: 24px;
+  background: var(--os-accent);
+}
+
+/* desktop icons */
+.os-icons {
+  position: absolute;
+  top: 56px;
+  left: 24px;
+  width: 104px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 5;
+}
+.os-icon {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  color: #fff;
+}
+.os-icon-tile {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--os-glass);
+  color: var(--os-accent);
+}
+.os-icon-label {
+  font-size: 12px;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  padding: 1px 4px;
+}
+.os-icon[aria-pressed='true'] .os-icon-tile {
+  outline: 2px solid var(--os-accent);
+}
+.os-icon[aria-pressed='true'] .os-icon-label {
+  background: var(--os-accent);
+  color: var(--os-on-accent);
+  text-shadow: none;
+}
+
+/* hint on the wallpaper */
+.os-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--os-glass);
+  font-size: 12px;
+  color: var(--os-text-body);
+  white-space: nowrap;
+}
+.os-kbd {
+  padding: 2px 6px;
+  background: var(--os-bg-raised);
+  font-family: var(--os-mono);
+  font-size: 11px;
+  color: #fff;
+}
+
+/* control center */
+.os-panel {
+  position: absolute;
+  top: var(--os-bar-h);
+  right: 0;
+  width: 330px;
+  max-height: calc(100% - var(--os-bar-h));
+  overflow: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--os-bg-deep);
+  z-index: 40;
+}
+.os-card {
+  padding: 10px;
+  background: var(--os-bg);
+}
+.os-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.os-avatar {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--os-bg-raised);
+  border: 1px solid var(--os-text-faint);
+  font-family: var(--os-mono);
+  font-size: 13px;
+  color: var(--os-accent);
+}
+.os-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+.os-sub {
+  font-size: 11px;
+  color: var(--os-text-label);
+}
+.os-btn {
+  font-size: 11px;
+  padding: 6px 8px;
+  background: var(--os-bg-raised);
+}
+.os-btn:hover {
+  background: var(--os-bg-hover);
+}
+.os-links {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.os-link {
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: var(--os-bg-raised);
+  font-size: 10px;
+}
+.os-link:first-child {
+  background: var(--os-accent);
+  color: var(--os-on-accent);
+}
+.os-link:not(:first-child):hover {
+  background: var(--os-bg-hover);
+}
+.os-body {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--os-text-body);
+}
+.os-gauges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.os-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.os-gauge-dial {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+.os-gauge-dial span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+.os-label {
+  font-family: var(--os-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--os-text-label);
+}
+.os-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
