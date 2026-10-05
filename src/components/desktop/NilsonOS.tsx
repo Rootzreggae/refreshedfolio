@@ -1,6 +1,22 @@
-/** Nilson OS shell (phase 1): bar, desktop icons, control center. Windows/strip arrive in phase 2. */
-import { useEffect, useState } from 'preact/hooks';
-import type { FsNode } from '../../lib/desktop/tree';
+/** Nilson OS shell: bar, desktop icons, control center, and the niri strip per workspace. */
+import { useEffect, useMemo, useState } from 'preact/hooks';
+import { flatten, type FsNode } from '../../lib/desktop/tree';
+import {
+  closeColumn,
+  closeWindow,
+  decode,
+  emptyWorkspaces,
+  encode,
+  loadSession,
+  navigate,
+  openBeside,
+  saveSession,
+  slugIndex,
+  type Workspace,
+  type Workspaces,
+  type WsId,
+} from '../../lib/desktop/state';
+import { Strip } from './Strip';
 import { Icon, kindIcon } from './icons';
 
 export interface Contact {
@@ -177,24 +193,83 @@ function ControlCenter({ contact }: { contact: Contact }) {
 }
 
 export default function NilsonOS({ tree, contact, caseCount }: Props) {
-  const [ws, setWs] = useState<1 | 2 | 3>(1);
+  const byId = useMemo(
+    () => new Map(flatten(tree).map((n) => [n.id, n])),
+    [tree]
+  );
+  const slugs = useMemo(() => slugIndex(tree), [tree]);
+  const [active, setActive] = useState<WsId>(1);
+  const [spaces, setSpaces] = useState<Workspaces>(emptyWorkspaces);
+  const [ready, setReady] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [panel, setPanel] = useState<null | 'control'>(null);
+  const [showDesktop, setShowDesktop] = useState(false);
+
+  const ws = spaces[active];
+  const update = (fn: (w: Workspace) => Workspace) => {
+    setShowDesktop(false);
+    setSpaces((all) => ({ ...all, [active]: fn(all[active]) }));
+  };
+  const open = (id: string) => update((w) => openBeside(w, id));
+
+  // restore: shared URL first, then this tab's session (client only, after hydration)
+  useEffect(() => {
+    const fromUrl = location.search.includes('open=')
+      ? decode(location.search, slugs.toId)
+      : null;
+    const session = loadSession();
+    if (session) setSpaces(session.spaces);
+    if (fromUrl) {
+      setActive(fromUrl.active);
+      setSpaces((all) => ({
+        ...(session?.spaces ?? all),
+        [fromUrl.active]: fromUrl.ws,
+      }));
+    } else if (session) setActive(session.active);
+    setReady(true);
+  }, []);
+
+  // keep the URL and the session in step with the layout
+  useEffect(() => {
+    if (!ready) return;
+    history.replaceState(
+      null,
+      '',
+      `${location.pathname}${encode(ws, active, slugs.toSlug)}`
+    );
+    saveSession(active, spaces);
+  }, [spaces, active, ready]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const combo = e.ctrlKey && e.altKey;
       if (e.key === 'Escape') {
-        setPanel(null);
-        setSelected(null);
+        if (panel) setPanel(null);
+        else setSelected(null);
+        return;
       }
-      if (e.ctrlKey && e.altKey && ['1', '2', '3'].includes(e.key)) {
-        e.preventDefault();
-        setWs(Number(e.key) as 1 | 2 | 3);
-      }
+      if (!combo) return;
+      const k = e.key.toLowerCase();
+      if (['1', '2', '3'].includes(e.key)) setActive(Number(e.key) as WsId);
+      else if (e.key === 'ArrowLeft')
+        update((w) => ({ ...w, focus: Math.max(0, w.focus - 1) }));
+      else if (e.key === 'ArrowRight')
+        update((w) => ({
+          ...w,
+          focus: Math.min(w.columns.length - 1, w.focus + 1),
+        }));
+      else if (k === 'q' && ws.columns.length)
+        update((w) => closeColumn(w, w.focus));
+      else if (k === 'd') setShowDesktop((v) => !v);
+      else return;
+      e.preventDefault();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [panel, active, ws]);
+
+  const focused = ws.columns[ws.focus];
+  const focusedNode = focused && byId.get(focused.windows[0]);
 
   return (
     <>
@@ -208,29 +283,47 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
             <Icon name="search" />
           </button>
           <Clock />
-          <span
-            class="os-pill os-pill--mono"
-            aria-label="14 years, 3 companies, case study count"
-          >
-            <span>14y</span>
-            <span>3 co</span>
-            <span>{caseCount} cases</span>
-          </span>
+          {focusedNode && !showDesktop ? (
+            <span class="os-pill" aria-label="Focused window">
+              <span class="os-dot" aria-hidden="true" />
+              {slugs.toSlug.get(focusedNode.id)}
+            </span>
+          ) : (
+            <span
+              class="os-pill os-pill--mono"
+              aria-label="14 years, 3 companies, case study count"
+            >
+              <span>14y</span>
+              <span>3 co</span>
+              <span>{caseCount} cases</span>
+            </span>
+          )}
         </div>
         <nav class="os-ws" aria-label="Workspaces">
           {WORKSPACES.map((w) => (
             <button
               key={w.id}
-              aria-current={ws === w.id}
+              aria-current={active === w.id}
+              class={spaces[w.id].columns.length ? 'is-busy' : ''}
               aria-label={`Workspace ${w.id}: ${w.name}`}
               title={w.name}
-              onClick={() => setWs(w.id)}
+              onClick={() => setActive(w.id)}
             >
-              {ws === w.id ? w.id : ''}
+              {active === w.id ? w.id : ''}
             </button>
           ))}
         </nav>
         <div class="os-bar-group">
+          {ws.columns.length > 0 && (
+            <button
+              class="os-pill"
+              aria-pressed={showDesktop}
+              onClick={() => setShowDesktop((v) => !v)}
+              title="Show the desktop (Ctrl Alt D)"
+            >
+              Desktop
+            </button>
+          )}
           <a class="os-pill" href="/">
             Classic site
           </a>
@@ -263,6 +356,13 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
                 node.title ? `${node.name}: ${node.title}` : node.name
               }
               onClick={() => setSelected(node.id)}
+              onDblClick={() => open(node.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && selected === node.id) {
+                  e.preventDefault();
+                  open(node.id);
+                }
+              }}
             >
               <span class="os-icon-tile">
                 <Icon
@@ -277,10 +377,24 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         ))}
       </ul>
 
-      <div class="os-hint" role="note">
-        <span class="os-kbd">Ctrl K</span>
-        search everything · double-click a folder to open it as a column
-      </div>
+      {!ws.columns.length && (
+        <div class="os-hint" role="note">
+          <span class="os-kbd">Ctrl K</span>
+          search everything · double-click a folder to open it as a column
+        </div>
+      )}
+
+      <Strip
+        ws={ws}
+        byId={byId}
+        hidden={showDesktop}
+        onFocus={(col) => update((w) => ({ ...w, focus: col }))}
+        onClose={(col, win) => update((w) => closeWindow(w, col, win))}
+        onGo={(col, win, id) => update((w) => navigate(w, col, win, id))}
+        onOpenBeside={(col, id) =>
+          update((w) => openBeside({ ...w, focus: col }, id))
+        }
+      />
 
       {panel === 'control' && <ControlCenter contact={contact} />}
     </>
