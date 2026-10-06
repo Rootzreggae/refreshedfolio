@@ -10,6 +10,9 @@ interface Props {
   onDragStart: (e: PointerEvent) => void;
   onToggle: () => void;
   onClose: () => void;
+  /** Double-click the title: maximize / restore. */
+  onMax?: () => void;
+  onMenu?: (e: MouseEvent) => void;
 }
 
 const stop = (e: Event) => e.stopPropagation();
@@ -21,12 +24,23 @@ export function WinHead({
   onDragStart,
   onToggle,
   onClose,
+  onMax,
+  onMenu,
 }: Props) {
   return (
     <div
       class={compact ? 'os-head os-head--compact' : 'os-head'}
       onPointerDown={compact ? undefined : onDragStart}
-      title={compact ? undefined : 'Drag to move this window'}
+      onDblClick={compact ? undefined : onMax}
+      onContextMenu={
+        compact || !onMenu
+          ? undefined
+          : (e) => {
+              e.preventDefault();
+              onMenu(e);
+            }
+      }
+      title={compact ? undefined : 'Drag to move, double-click to maximize'}
     >
       <span class="os-head-name">{name}</span>
       <span class="os-head-btns">
@@ -35,6 +49,7 @@ export function WinHead({
             class="os-head-btn"
             onPointerDown={stop}
             onMouseDown={stop}
+            onDblClick={stop}
             onClick={onToggle}
             aria-label={
               mode === 'tiled'
@@ -66,6 +81,7 @@ export function WinHead({
           class="os-head-btn os-head-btn--close"
           onPointerDown={stop}
           onMouseDown={stop}
+          onDblClick={stop}
           onClick={onClose}
           aria-label={`Close ${name}`}
           title="Close"

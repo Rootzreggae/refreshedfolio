@@ -324,6 +324,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .os,
   .os * {
     transition: none !important;
     animation: none !important;

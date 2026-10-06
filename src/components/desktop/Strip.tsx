@@ -8,6 +8,7 @@ import type { FsNode } from '../../lib/desktop/tree';
 import type { Floating, Workspace } from '../../lib/desktop/state';
 import { WindowBody } from './Window';
 import { WinHead } from './WinHead';
+import type { MenuItem } from './Menu';
 
 /** Join class names (kept out of template strings: the Tailwind Prettier plugin trims their spaces). */
 export const cx = (...c: (string | false | null | undefined)[]) =>
@@ -32,7 +33,20 @@ interface Props {
   onMove: (from: number, to: number) => void;
   onFloat: (col: number, rect: FloatRect) => void;
   onResize: (col: number, fraction: number) => void;
+  onMaximize: (col: number) => void;
+  onMenu: (e: MouseEvent, items: MenuItem[]) => void;
 }
+
+/** Shared by tiled and floating windows. */
+export const openInTab = (node: FsNode): MenuItem[] =>
+  node.url && !node.todo
+    ? [
+        {
+          label: 'Open in a new tab',
+          run: () => window.open(node.url, '_blank'),
+        },
+      ]
+    : [];
 
 /** niri-like preset widths: folders a third, documents half the screen, unless the user resized it. */
 const widthOf = (
@@ -69,6 +83,8 @@ export function Strip(props: Props) {
     onMove,
     onFloat,
     onResize,
+    onMaximize,
+    onMenu,
   } = props;
   const host = useRef<HTMLDivElement>(null);
   const [vw, setVw] = useState(1280);
@@ -180,7 +196,7 @@ export function Strip(props: Props) {
       if (lefts[i] + widths[i] > next + vw) next = lefts[i] + widths[i] - vw;
       return Math.max(0, Math.min(next, maxScroll));
     });
-  }, [ws.focus, ws.columns.length, vw]);
+  }, [ws.focus, ws.columns.length, vw, widths[ws.focus]]);
 
   // move keyboard focus into the focused column when it changes
   useEffect(() => {
@@ -277,6 +293,21 @@ export function Strip(props: Props) {
                       onDragStart={(e) => startDrag(e, c.key)}
                       onToggle={() => popOut(ci, c.key)}
                       onClose={() => close(ci, wi)}
+                      onMax={() => onMaximize(ci)}
+                      onMenu={(e) =>
+                        onMenu(e, [
+                          {
+                            label:
+                              (c.width ?? 0) >= 0.97 ? 'Restore' : 'Maximize',
+                            hint: 'double-click',
+                            run: () => onMaximize(ci),
+                          },
+                          { label: 'Pop out', run: () => popOut(ci, c.key) },
+                          ...openInTab(node),
+                          null,
+                          { label: 'Close', run: () => close(ci, wi) },
+                        ])
+                      }
                     />
                     <div class="os-win-scroll">
                       <WindowBody

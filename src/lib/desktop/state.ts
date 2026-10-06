@@ -272,3 +272,13 @@ export function navigateFloating(
 ): Workspace {
   return updateFloating(ws, key, { id });
 }
+
+/** Double-click a title: fill the screen, or go back to the preset width. */
+export function toggleMaximize(ws: Workspace, col: number): Workspace {
+  return {
+    ...ws,
+    columns: ws.columns.map((c, i) =>
+      i === col ? { ...c, width: (c.width ?? 0) >= 0.97 ? undefined : 1 } : c
+    ),
+  };
+}

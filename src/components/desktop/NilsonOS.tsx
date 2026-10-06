@@ -19,6 +19,7 @@ import {
   saveSession,
   slugIndex,
   tileFloating,
+  toggleMaximize,
   updateFloating,
   type Workspace,
   type Workspaces,
@@ -26,9 +27,11 @@ import {
 } from '../../lib/desktop/state';
 import { FloatLayer } from './FloatLayer';
 import { FileIcon } from './FileIcon';
+import { DesktopIcons } from './DesktopIcons';
+import { Menu, type MenuItem, type MenuState } from './Menu';
 import { Launcher } from './Launcher';
 import { Deck } from './Deck';
-import { Strip } from './Strip';
+import { cx, Strip } from './Strip';
 import { Icon } from './icons';
 
 export interface Contact {
@@ -204,6 +207,57 @@ function ControlCenter({ contact }: { contact: Contact }) {
   );
 }
 
+interface Note {
+  id: number;
+  title: string;
+  text?: string;
+}
+
+function NotificationCenter({
+  log,
+  onClear,
+}: {
+  log: Note[];
+  onClear: () => void;
+}) {
+  return (
+    <aside class="os-panel" aria-label="Notifications">
+      <div class="os-row" style="padding:4px 4px 0">
+        <span class="os-label">Notifications</span>
+        {log.length > 0 && (
+          <button class="os-link" onClick={onClear}>
+            Clear
+          </button>
+        )}
+      </div>
+      {log.length ? (
+        log.map((n) => (
+          <div class="os-card os-note" key={n.id}>
+            <span class="os-name" style="font-size:13px">
+              {n.title}
+            </span>
+            {n.text && <p class="os-body">{n.text}</p>}
+          </div>
+        ))
+      ) : (
+        <p class="os-sub" style="padding:4px">
+          Nothing new.
+        </p>
+      )}
+    </aside>
+  );
+}
+
+const once = (key: string) => {
+  try {
+    if (localStorage.getItem(key)) return false;
+    localStorage.setItem(key, '1');
+  } catch {
+    /* storage blocked: show it anyway */
+  }
+  return true;
+};
+
 export default function NilsonOS({ tree, contact, caseCount }: Props) {
   const byId = useMemo(
     () => new Map(flatten(tree).map((n) => [n.id, n])),
@@ -213,8 +267,12 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
   const [active, setActive] = useState<WsId>(1);
   const [spaces, setSpaces] = useState<Workspaces>(emptyWorkspaces);
   const [ready, setReady] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [panel, setPanel] = useState<null | 'control'>(null);
+  const [panel, setPanel] = useState<null | 'control' | 'notes'>(null);
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const [tidy, setTidy] = useState(0);
+  const [toasts, setToasts] = useState<Note[]>([]);
+  const [log, setLog] = useState<Note[]>([]);
+  const [unread, setUnread] = useState(false);
   const [showDesktop, setShowDesktop] = useState(false);
   const [launcher, setLauncher] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
@@ -237,9 +295,80 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
       }
       return next;
     });
+  const notify = (title: string, text?: string) => {
+    const n = { id: Date.now() + Math.random(), title, text };
+    setToasts((t) => [...t, n]);
+    setLog((l) => [n, ...l].slice(0, 20));
+    setUnread(true);
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== n.id)), 6000);
+  };
   const open = (id: string) => {
     remember(id);
     update((w) => openBeside(w, id));
+    if (!mobile && once('nilson-os:tip-windows'))
+      setTimeout(
+        () =>
+          notify(
+            'Tip',
+            'Drag a window by its title to move it. Double-click the title to maximize, right-click it for more.'
+          ),
+        900
+      );
+  };
+  const showMenu = (e: MouseEvent, items: MenuItem[]) =>
+    setMenu({ x: e.clientX, y: e.clientY, items });
+  const linkTo = (id: string) =>
+    `${location.origin}${location.pathname}${encode(openBeside(emptyWorkspaces()[1], id), 1, slugs.toSlug)}`;
+  const iconMenu = (e: MouseEvent, id: string | null) => {
+    const busy = ws.columns.length > 0 || ws.floating.length > 0;
+    if (!id)
+      return showMenu(e, [
+        { label: 'Open terminal', run: () => open('terminal') },
+        {
+          label: 'Search',
+          hint: mac ? '⌘ K' : 'Ctrl K',
+          run: () => setLauncher(true),
+        },
+        null,
+        { label: 'Clean up icons', run: () => setTidy((n) => n + 1) },
+        ...(busy
+          ? [
+              {
+                label: showDesktop ? 'Show windows' : 'Show desktop',
+                run: () => setShowDesktop((v) => !v),
+              },
+            ]
+          : []),
+        null,
+        { label: 'Classic site', run: () => (location.href = '/') },
+      ]);
+    const node = byId.get(id)!;
+    showMenu(e, [
+      { label: 'Open', hint: 'double-click', run: () => open(id) },
+      {
+        label: 'Open in another workspace',
+        run: () => openElsewhere(id),
+      },
+      null,
+      {
+        label: 'Copy link',
+        run: () =>
+          navigator.clipboard
+            .writeText(linkTo(id))
+            .then(() =>
+              notify('Link copied', `Opens ${node.name} on this desktop.`)
+            )
+            .catch(() => notify('Could not copy the link')),
+      },
+      {
+        label: 'Get info',
+        run: () =>
+          notify(
+            node.title ?? node.name,
+            node.summary ?? `${node.children?.length ?? 0} items inside.`
+          ),
+      },
+    ]);
   };
   /** Shift+Enter in the launcher: the first empty workspace, else the next one. */
   const openElsewhere = (id: string) => {
@@ -275,7 +404,37 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
     }
     setMac(/Mac|iPhone|iPad/.test(navigator.userAgent));
     setReady(true);
+    if (once('nilson-os:welcomed'))
+      setTimeout(
+        () =>
+          notify(
+            'Welcome to Nilson OS',
+            'Double-click a folder to open it. Drag things around, right-click for more.'
+          ),
+        1800
+      );
   }, []);
+
+  // switching workspaces slides the windows vertically, like niri
+  const lastWs = useRef(active);
+  useEffect(() => {
+    const dir = Math.sign(active - lastWs.current);
+    lastWs.current = active;
+    if (!dir || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document
+      .querySelectorAll(
+        '.os-strip:not(.os-strip--hidden), .os-float-layer:not(.os-strip--hidden), .os-deck'
+      )
+      .forEach((el) =>
+        el.animate(
+          [
+            { transform: `translateY(${dir * 56}px)`, opacity: 0 },
+            { transform: 'none', opacity: 1 },
+          ],
+          { duration: 300, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+        )
+      );
+  }, [active]);
 
   // phones get the swipe deck; floating windows don't exist there, so tile any that came along
   useEffect(() => {
@@ -350,7 +509,6 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
       if (e.key === 'Escape') {
         if (launcher) setLauncher(false);
         else if (panel) setPanel(null);
-        else setSelected(null);
         return;
       }
       if (!combo) return;
@@ -448,9 +606,15 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
             Classic site
           </a>
           <button
-            class="os-tray"
-            aria-label="Notifications"
+            class={cx('os-tray', unread && 'has-unread')}
+            aria-label={unread ? 'Notifications, new' : 'Notifications'}
             title="Notifications"
+            aria-pressed={panel === 'notes'}
+            aria-expanded={panel === 'notes'}
+            onClick={() => {
+              setUnread(false);
+              setPanel(panel === 'notes' ? null : 'notes');
+            }}
           >
             <Icon name="bell" />
           </button>
@@ -466,37 +630,26 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         </div>
       </header>
 
-      <ul class="os-icons" aria-label="Desktop">
-        {tree.map((node) => (
-          <li key={node.id}>
-            <button
-              class="os-icon"
-              aria-pressed={selected === node.id}
-              aria-label={
-                node.title ? `${node.name}: ${node.title}` : node.name
-              }
-              onClick={() => setSelected(node.id)}
-              onDblClick={() => open(node.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && selected === node.id) {
-                  e.preventDefault();
-                  open(node.id);
-                }
-              }}
-            >
-              <span class="os-icon-tile">
-                <FileIcon node={node} size={56} />
-              </span>
-              <span class="os-icon-label">{node.name}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {!mobile && (
+        <DesktopIcons
+          nodes={tree}
+          tidy={tidy}
+          onOpen={open}
+          onMenu={iconMenu}
+          onMoved={() =>
+            once('nilson-os:tip-icons') &&
+            notify(
+              'Icons stay where you put them',
+              'Right-click the desktop and pick Clean up to put them back.'
+            )
+          }
+        />
+      )}
 
       {!ws.columns.length && !ws.floating.length && (
         <div class="os-hint" role="note">
           <span class="os-kbd">{mac ? '⌘ K' : 'Ctrl K'}</span>
-          search · double-click to open · drag a window by its title to move it
+          search · double-click to open · drag anything · right-click for more
         </div>
       )}
 
@@ -553,6 +706,10 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
             onResize={(col, fraction) =>
               update((w) => resizeColumn(w, col, fraction))
             }
+            onMaximize={(col) =>
+              update((w) => ({ ...toggleMaximize(w, col), focus: col }))
+            }
+            onMenu={showMenu}
           />
 
           <FloatLayer
@@ -568,11 +725,39 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
             onClose={(key) => update((w) => closeFloating(w, key))}
             onGo={(key, id) => update((w) => navigateFloating(w, key, id))}
             onOpenBeside={(id) => update((w) => openBeside(w, id))}
+            onMenu={showMenu}
           />
         </>
       )}
 
       {panel === 'control' && <ControlCenter contact={contact} />}
+      {panel === 'notes' && (
+        <NotificationCenter log={log} onClear={() => setLog([])} />
+      )}
+
+      <div class="os-toasts" role="status" aria-live="polite">
+        {panel !== 'notes' &&
+          toasts.map((n) => (
+            <button
+              key={n.id}
+              class="os-toast"
+              onClick={() => setToasts((t) => t.filter((x) => x.id !== n.id))}
+            >
+              <span class="os-name" style="font-size:13px">
+                {n.title}
+              </span>
+              {n.text && <span class="os-body">{n.text}</span>}
+            </button>
+          ))}
+      </div>
+
+      {menu && (
+        <Menu
+          key={`${menu.x},${menu.y}`}
+          {...menu}
+          onClose={() => setMenu(null)}
+        />
+      )}
 
       {launcher && (
         <Launcher

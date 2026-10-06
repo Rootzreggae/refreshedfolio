@@ -1,0 +1,248 @@
+/* Nilson OS, the "alive" layer: free icons, motion, right-click menus, notifications, first-visit boot.
+   Loaded after desktop.css; everything still scoped to .os, motion still off under reduced motion. */
+
+/* the icon layer is the whole desktop: icons sit on a grid, empty space starts a rubber band */
+.os-icons {
+  inset: var(--os-bar-h) 0 0 0;
+  width: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.os-icon-cell,
+.os-icon-slot {
+  position: absolute;
+  width: 104px;
+  transition:
+    left 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.os-icon-cell.is-lifted {
+  z-index: 2;
+  transition: none;
+  pointer-events: none;
+}
+.os-icon-cell.is-lifted .os-icon-tile {
+  transform: scale(1.08);
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
+}
+.os-icon-slot {
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: 1px dashed rgba(255, 255, 255, 0.45);
+  outline-offset: -4px;
+}
+.os-icon-tile {
+  transition:
+    transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.16s ease,
+    filter 0.16s ease;
+}
+.os-icon:hover .os-icon-tile {
+  transform: translateY(-2px);
+}
+.os-icon:active .os-icon-tile {
+  transform: scale(0.96);
+}
+.os-band {
+  position: absolute;
+  background: rgba(84, 224, 166, 0.14);
+  outline: 1px solid var(--os-accent);
+  pointer-events: none;
+}
+
+/* windows open with a short scale-in; floats close the same way backwards */
+@keyframes os-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.965);
+  }
+}
+.os-col,
+.os-float {
+  animation: os-pop 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-float {
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+.os-float.is-closing {
+  opacity: 0;
+  transform: scale(0.96);
+}
+.os-float.is-morphing {
+  transition:
+    left 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    top 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    width 0.24s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.os-win,
+.os-head-name {
+  transition:
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+/* overlays ease in */
+@keyframes os-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes os-launch {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.98);
+  }
+}
+@keyframes os-slide {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+}
+@keyframes os-menu {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+.os-launcher-scrim {
+  animation: os-fade 0.16s ease backwards;
+}
+.os-launcher {
+  animation: os-launch 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-panel {
+  animation: os-slide 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-hint {
+  animation: os-fade 0.4s 0.2s ease backwards;
+}
+
+/* right-click menu */
+.os-menu {
+  position: fixed;
+  z-index: 80;
+  min-width: 210px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  background: var(--os-bg-deep);
+  border: 1px solid var(--os-border);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  transform-origin: top left;
+  animation: os-menu 0.12s ease-out backwards;
+}
+.os-menu-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 7px 10px;
+  font-size: 13px;
+  text-align: left;
+  color: var(--os-text);
+}
+.os-menu-item:hover,
+.os-menu-item:focus-visible {
+  background: var(--os-accent);
+  color: var(--os-on-accent);
+  outline: none;
+}
+.os-menu-hint {
+  font-family: var(--os-mono);
+  font-size: 11px;
+  opacity: 0.6;
+}
+.os-menu-sep {
+  height: 1px;
+  margin: 4px 6px;
+  border: 0;
+  background: var(--os-border);
+}
+
+/* notifications: toasts bottom right, a dot on the bell, history in the panel */
+.os-toasts {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(340px, calc(100% - 24px));
+  pointer-events: none;
+}
+.os-toast {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  text-align: left;
+  background: var(--os-bg-deep);
+  border-left: 3px solid var(--os-accent);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  animation: os-slide 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-toast .os-body {
+  margin: 0;
+  font-size: 12px;
+}
+.os-tray {
+  position: relative;
+}
+.os-tray.has-unread::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--os-pink);
+}
+.os-note .os-body {
+  margin: 4px 0 0;
+}
+
+/* first visit this session: power on, bar drops in, icons arrive one by one (class set before paint) */
+@keyframes os-power {
+  from {
+    filter: brightness(0);
+  }
+}
+@keyframes os-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+@keyframes os-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.9);
+  }
+}
+.os-boot .os {
+  animation: os-power 1s ease-out backwards;
+}
+.os-boot .os-bar {
+  animation: os-drop 0.45s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-boot .os-icon-cell {
+  animation: os-arrive 0.4s calc(0.75s + var(--i) * 70ms)
+    cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.os-boot .os-hint {
+  animation-delay: 1.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os,
+  .os * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

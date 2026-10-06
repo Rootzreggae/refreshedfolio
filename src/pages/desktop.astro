@@ -8,6 +8,7 @@ import { buildTree, flatten } from '../lib/desktop/tree';
 import { getPublishedNotes } from '../lib/notes';
 import { contact } from '../lib/work';
 import '../styles/desktop.css';
+import '../styles/desktop-alive.css';
 
 const notes = await getPublishedNotes();
 const tree = buildTree(
@@ -41,6 +42,19 @@ const caseCount = flatten(tree).filter(
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     />
+    <script is:inline>
+      // first visit this session gets the power-on sequence (set before paint, so nothing flashes)
+      try {
+        if (!sessionStorage.getItem('nilson-os:booted')) {
+          sessionStorage.setItem('nilson-os:booted', '1');
+          document.documentElement.classList.add('os-boot');
+          setTimeout(
+            () => document.documentElement.classList.remove('os-boot'),
+            3000
+          );
+        }
+      } catch {}
+    </script>
     <script
       is:inline
       defer

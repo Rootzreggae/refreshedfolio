@@ -2,12 +2,13 @@
  * Floating windows (niri's floating layer): move by the title strip, resize from any edge or corner,
  * click to bring to the front, "Tile" to put back in the strip. Positions are px inside the desktop.
  */
-import { useRef } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import type { FsNode } from '../../lib/desktop/tree';
 import type { Floating } from '../../lib/desktop/state';
 import { WindowBody } from './Window';
 import { WinHead } from './WinHead';
-import { cx } from './Strip';
+import { cx, openInTab } from './Strip';
+import type { MenuItem } from './Menu';
 
 const MIN_W = 300;
 const MIN_H = 200;
@@ -26,7 +27,10 @@ interface Props {
   onClose: (key: string) => void;
   onGo: (key: string, id: string) => void;
   onOpenBeside: (id: string) => void;
+  onMenu: (e: MouseEvent, items: MenuItem[]) => void;
 }
+
+const CLOSE_MS = 160;
 
 export function FloatLayer(props: Props) {
   const {
@@ -40,8 +44,56 @@ export function FloatLayer(props: Props) {
     onClose,
     onGo,
     onOpenBeside,
+    onMenu,
   } = props;
   const layer = useRef<HTMLDivElement>(null);
+  /** Size before maximizing, per window, so double-click can restore it. */
+  const before = useRef(new Map<string, Floating>());
+  const [morph, setMorph] = useState<string | null>(null);
+  const [closing, setClosing] = useState<string | null>(null);
+
+  const fullRect = () => {
+    const a = layer.current!.getBoundingClientRect();
+    return {
+      x: 0,
+      y: BAR,
+      w: Math.round(a.width),
+      h: Math.round(a.height - BAR),
+    };
+  };
+  const isMax = (f: Floating) => {
+    const r = fullRect();
+    return f.x === r.x && f.y === r.y && f.w === r.w && f.h === r.h;
+  };
+  const maximize = (f: Floating) => {
+    const r = fullRect();
+    if (isMax(f)) {
+      const old = before.current.get(f.key) ?? {
+        x: Math.round(r.w / 6),
+        y: BAR + 40,
+        w: Math.round((r.w * 2) / 3),
+        h: Math.round(r.h * 0.75),
+      };
+      before.current.delete(f.key);
+      onChange(f.key, { x: old.x, y: old.y, w: old.w, h: old.h });
+    } else {
+      before.current.set(f.key, f);
+      onChange(f.key, r);
+    }
+    setMorph(f.key);
+    setTimeout(() => setMorph(null), 260);
+  };
+  const close = (key: string) => {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setClosing(key);
+    setTimeout(
+      () => {
+        setClosing(null);
+        onClose(key);
+      },
+      reduce ? 0 : CLOSE_MS
+    );
+  };
 
   /** One pointer gesture: moving (edge = null) or resizing from an edge/corner. */
   const gesture = (e: PointerEvent, f: Floating, edge: Edge | null) => {
@@ -119,7 +171,12 @@ export function FloatLayer(props: Props) {
             data-float={f.key}
             role="dialog"
             aria-label={node.title ?? node.name}
-            class={cx('os-float', focus === f.key && 'is-focused')}
+            class={cx(
+              'os-float',
+              focus === f.key && 'is-focused',
+              morph === f.key && 'is-morphing',
+              closing === f.key && 'is-closing'
+            )}
             style={{
               left: `${f.x}px`,
               top: `${f.y}px`,
@@ -134,7 +191,21 @@ export function FloatLayer(props: Props) {
                 mode="floating"
                 onDragStart={(e) => gesture(e, f, null)}
                 onToggle={() => onTile(f.key)}
-                onClose={() => onClose(f.key)}
+                onClose={() => close(f.key)}
+                onMax={() => maximize(f)}
+                onMenu={(e) =>
+                  onMenu(e, [
+                    {
+                      label: isMax(f) ? 'Restore' : 'Maximize',
+                      hint: 'double-click',
+                      run: () => maximize(f),
+                    },
+                    { label: 'Tile', run: () => onTile(f.key) },
+                    ...openInTab(node),
+                    null,
+                    { label: 'Close', run: () => close(f.key) },
+                  ])
+                }
               />
               <div class="os-win-scroll">
                 <WindowBody
