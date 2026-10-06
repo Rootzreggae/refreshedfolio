@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const redirect = Astro.url.searchParams.get('redirect') || '/';
-const hasError = Astro.url.searchParams.has('error');
+// The site is static: ?redirect= and ?error don't exist at build time, so they are read in the
+// browser below. (Reading them here always gave '/' and no error: unlocking sent people home.)
 ---
 
 <BaseLayout
@@ -159,20 +159,35 @@ const hasError = Astro.url.searchParams.has('error');
       action="/.netlify/functions/validate-password"
       method="POST"
     >
-      <input type="hidden" name="redirect" value={redirect} />
+      <input type="hidden" name="redirect" value="/" data-redirect />
       <input
         type="password"
         name="password"
-        class={`password-input${hasError ? ' error' : ''}`}
+        class="password-input"
+        data-password
         placeholder="Password"
         autofocus
         required
         autocomplete="off"
       />
-      {hasError && <p class="error-msg">Incorrect password. Try again.</p>}
+      <p class="error-msg" data-error hidden>Incorrect password. Try again.</p>
       <button type="submit" class="submit-btn">Unlock</button>
     </form>
 
     <a href="/" class="back-link">&larr; Back to portfolio</a>
   </div>
+
+  <script>
+    const q = new URLSearchParams(location.search);
+    const target = q.get('redirect') || '';
+    // only paths on this site (the validator on the server checks again)
+    if (target.startsWith('/') && !target.startsWith('//')) {
+      document.querySelector<HTMLInputElement>('[data-redirect]')!.value =
+        target;
+    }
+    if (q.has('error')) {
+      document.querySelector('[data-error]')?.removeAttribute('hidden');
+      document.querySelector('[data-password]')?.classList.add('error');
+    }
+  </script>
 </BaseLayout>
