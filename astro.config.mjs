@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
+import preact from '@astrojs/preact';
 import remarkDirective from 'remark-directive';
 import rehypeRaw from 'rehype-raw';
 import { storyDirectives } from './src/lib/story-directives.mjs';
@@ -11,6 +12,7 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://nilsongaspar.omg.lol',
   integrations: [
+    preact(),
     mdx({
       remarkPlugins: [remarkDirective, storyDirectives],
       rehypePlugins: [rehypeRaw],
