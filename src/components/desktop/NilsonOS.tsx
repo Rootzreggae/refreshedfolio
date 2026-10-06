@@ -27,6 +27,7 @@ import {
 import { FloatLayer } from './FloatLayer';
 import { FileIcon } from './FileIcon';
 import { Launcher } from './Launcher';
+import { Deck } from './Deck';
 import { Strip } from './Strip';
 import { Icon } from './icons';
 
@@ -218,6 +219,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
   const [launcher, setLauncher] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
   const [mac, setMac] = useState(false);
+  const [mobile, setMobile] = useState(false);
   const allNodes = useMemo(() => flatten(tree), [tree]);
 
   const ws = spaces[active];
@@ -271,9 +273,22 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
     } catch {
       /* no recent list */
     }
-    setMac(/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent));
+    setMac(/Mac|iPhone|iPad/.test(navigator.userAgent));
     setReady(true);
   }, []);
+
+  // phones get the swipe deck; floating windows don't exist there, so tile any that came along
+  useEffect(() => {
+    const mq = matchMedia('(max-width: 768px)');
+    const on = () => setMobile(mq.matches);
+    on();
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  useEffect(() => {
+    if (!mobile || !ws.floating.length) return;
+    update((w) => w.floating.reduce((acc, f) => tileFloating(acc, f.key), w));
+  }, [mobile, ws.floating.length]);
 
   // the terminal asks the desktop to open things / show the contact card
   const openRef = useRef(open);
@@ -485,37 +500,77 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         </div>
       )}
 
-      <Strip
-        ws={ws}
-        byId={byId}
-        hidden={showDesktop}
-        onFocus={(col) =>
-          update((w) => ({ ...w, focus: col, floatFocus: null }))
-        }
-        onClose={(col, win) => update((w) => closeWindow(w, col, win))}
-        onGo={(col, win, id) => update((w) => navigate(w, col, win, id))}
-        onOpenBeside={(col, id) =>
-          update((w) => openBeside({ ...w, focus: col }, id))
-        }
-        onMove={(from, to) => update((w) => moveColumn(w, from, to))}
-        onFloat={(col, rect) => update((w) => floatColumn(w, col, rect))}
-        onResize={(col, fraction) =>
-          update((w) => resizeColumn(w, col, fraction))
-        }
-      />
+      {mobile ? (
+        <>
+          <Deck
+            ws={ws}
+            byId={byId}
+            onFocus={(col) =>
+              update((w) => ({ ...w, focus: col, floatFocus: null }))
+            }
+            onClose={(col, win) => update((w) => closeWindow(w, col, win))}
+            onGo={(col, win, id) => update((w) => navigate(w, col, win, id))}
+            onOpenBeside={(col, id) =>
+              update((w) => openBeside({ ...w, focus: col }, id))
+            }
+          />
+          <nav class="os-dock" aria-label="Folders">
+            {tree.map((node) => (
+              <button
+                key={node.id}
+                class="os-dock-item"
+                aria-label={node.title ?? node.name}
+                onClick={() => {
+                  const i = ws.columns.findIndex(
+                    (c) => c.windows[0] === node.id
+                  );
+                  if (i >= 0) update((w) => ({ ...w, focus: i }));
+                  else open(node.id);
+                }}
+              >
+                <FileIcon node={node} size={30} />
+                <span>{node.name.replace(/ & CV$/, '')}</span>
+              </button>
+            ))}
+          </nav>
+        </>
+      ) : (
+        <>
+          <Strip
+            ws={ws}
+            byId={byId}
+            hidden={showDesktop}
+            onFocus={(col) =>
+              update((w) => ({ ...w, focus: col, floatFocus: null }))
+            }
+            onClose={(col, win) => update((w) => closeWindow(w, col, win))}
+            onGo={(col, win, id) => update((w) => navigate(w, col, win, id))}
+            onOpenBeside={(col, id) =>
+              update((w) => openBeside({ ...w, focus: col }, id))
+            }
+            onMove={(from, to) => update((w) => moveColumn(w, from, to))}
+            onFloat={(col, rect) => update((w) => floatColumn(w, col, rect))}
+            onResize={(col, fraction) =>
+              update((w) => resizeColumn(w, col, fraction))
+            }
+          />
 
-      <FloatLayer
-        floating={ws.floating}
-        focus={ws.floatFocus}
-        byId={byId}
-        hidden={showDesktop}
-        onChange={(key, patch) => update((w) => updateFloating(w, key, patch))}
-        onRaise={(key) => update((w) => raiseFloating(w, key))}
-        onTile={(key) => update((w) => tileFloating(w, key))}
-        onClose={(key) => update((w) => closeFloating(w, key))}
-        onGo={(key, id) => update((w) => navigateFloating(w, key, id))}
-        onOpenBeside={(id) => update((w) => openBeside(w, id))}
-      />
+          <FloatLayer
+            floating={ws.floating}
+            focus={ws.floatFocus}
+            byId={byId}
+            hidden={showDesktop}
+            onChange={(key, patch) =>
+              update((w) => updateFloating(w, key, patch))
+            }
+            onRaise={(key) => update((w) => raiseFloating(w, key))}
+            onTile={(key) => update((w) => tileFloating(w, key))}
+            onClose={(key) => update((w) => closeFloating(w, key))}
+            onGo={(key, id) => update((w) => navigateFloating(w, key, id))}
+            onOpenBeside={(id) => update((w) => openBeside(w, id))}
+          />
+        </>
+      )}
 
       {panel === 'control' && <ControlCenter contact={contact} />}
 

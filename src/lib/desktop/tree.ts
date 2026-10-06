@@ -44,6 +44,9 @@ export interface FsNode {
   children?: FsNode[];
 }
 
+/** Flip to true once intro.mp4 is recorded and in public/desktop/. */
+const INTRO_READY = false;
+
 export interface NoteInput {
   slug: string;
   title: string;
@@ -279,9 +282,9 @@ export function buildTree(notes: NoteInput[]): FsNode[] {
     summary: '[TODO] Intro video not recorded yet.',
     todo: true,
   };
-  return [intro, caseStudies, sideProjects, essays, about, terminal, trash].map(
-    (s) => materialise(s, '')
-  );
+  // intro.mp4 stays hidden until it's recorded (then: set INTRO_READY, add the file + captions)
+  const root = [caseStudies, sideProjects, essays, about, terminal, trash];
+  return (INTRO_READY ? [intro, ...root] : root).map((s) => materialise(s, ''));
 }
 
 /** Every node, depth first (launcher, terminal completion). */
