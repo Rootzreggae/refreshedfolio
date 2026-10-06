@@ -946,8 +946,8 @@
 }
 
 /* ---------- wallpaper + Breeze-style icons ---------- */
-/* Wallpaper: Lagoa das Sete Cidades, São Miguel, Azores. Public domain, by José Luís Ávila Silveira /
-   Pedro Noronha e Costa (Wikimedia Commons). Bright photo, so the bar gets a soft dark fade behind it. */
+/* Wallpaper: "Picturesque mountain valley" by Gabriel Garcia Marengo (Unsplash, via Wikimedia Commons),
+   CC0, no attribution required. Bright photo, so the bar gets a soft dark fade behind it. */
 .os::before {
   content: '';
   position: absolute;
