@@ -41,11 +41,16 @@ export interface FsNode {
     learned?: string;
     date?: string;
   };
+  /** Video only: chapter starts (seconds); `open` is a node id the chapter links to. */
+  chapters?: { at: number; label: string; open?: string }[];
+  /** Video only: poster image and WebVTT captions. */
+  poster?: string;
+  captions?: string;
   children?: FsNode[];
 }
 
-/** Flip to true once intro.mp4 is recorded and in public/desktop/. */
-const INTRO_READY = false;
+/** intro.mp4 recorded 2026-10-08 (public/desktop/intro.mp4 + poster + captions). */
+const INTRO_READY = true;
 
 export interface NoteInput {
   slug: string;
@@ -279,10 +284,28 @@ export function buildTree(notes: NoteInput[]): FsNode[] {
     name: 'intro.mp4',
     kind: 'video',
     title: "Hi, I'm Nilson",
-    summary: '[TODO] Intro video not recorded yet.',
-    todo: true,
+    summary: '1:38 intro.',
+    url: '/desktop/intro.mp4',
+    poster: '/desktop/intro-poster.webp',
+    captions: '/desktop/intro.en.vtt',
+    chapters: [
+      { at: 0, label: 'Hello' },
+      { at: 22.8, label: 'How I work' },
+      {
+        at: 40.5,
+        label: 'Grafana onboarding',
+        open: 'Case studies/Grafana Labs/cloud-onboarding.case',
+      },
+      {
+        at: 47.2,
+        label: 'Two greenfield products',
+        open: 'Case studies/Grafana Labs',
+      },
+      { at: 63.2, label: 'Design systems for AI' },
+      { at: 75.4, label: 'What you get' },
+      { at: 95.1, label: "Let's chat", open: 'About & CV' },
+    ],
   };
-  // intro.mp4 stays hidden until it's recorded (then: set INTRO_READY, add the file + captions)
   const root = [caseStudies, sideProjects, essays, about, terminal, trash];
   return (INTRO_READY ? [intro, ...root] : root).map((s) => materialise(s, ''));
 }

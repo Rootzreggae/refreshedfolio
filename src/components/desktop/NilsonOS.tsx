@@ -409,7 +409,7 @@ export default function NilsonOS({ tree, contact, caseCount }: Props) {
         () =>
           notify(
             'Welcome to Nilson OS',
-            'Double-click a folder to open it. Drag things around, right-click for more.'
+            'Start with intro.mp4, or double-click a folder. Drag things around, right-click for more.'
           ),
         1800
       );

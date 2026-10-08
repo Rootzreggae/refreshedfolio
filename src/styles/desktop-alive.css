@@ -246,3 +246,65 @@
     animation: none !important;
   }
 }
+
+/* intro video: player on top, chapters under it (each can open the case it talks about) */
+.os-video {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: var(--os-bg-deep);
+}
+.os-video-el {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  display: block;
+}
+.os-chapters {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.os-chapters li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.os-chapters li.is-current {
+  background: var(--os-bg-raised);
+  box-shadow: inset 3px 0 0 var(--os-accent);
+}
+.os-chapter {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--os-text);
+}
+.os-chapter:hover {
+  color: #fff;
+}
+.os-chapter-time {
+  min-width: 34px;
+  font-family: var(--os-mono);
+  font-size: 12px;
+  color: var(--os-text-muted);
+}
+.os-chapter-open {
+  flex: none;
+  padding: 6px 10px;
+  font-family: var(--os-mono);
+  font-size: 11px;
+  color: var(--os-accent);
+  white-space: nowrap;
+}
+.os-chapter-open:hover {
+  background: var(--os-accent);
+  color: var(--os-on-accent);
+}

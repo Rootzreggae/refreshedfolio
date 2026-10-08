@@ -3,9 +3,10 @@
  * - folders: the Files list
  * - cases, essays, Keystrok: the real page, embedded (same origin), with the site nav hidden
  * - about / principles: native text from the homepage copy
+ * - the intro video: a player with captions and chapters; chapters can open the case they talk about
  * - placeholders: a short card until Nilson supplies the content
  */
-import { useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import type { FsNode } from '../../lib/desktop/tree';
 import { FileIcon } from './FileIcon';
 import { Terminal } from './Terminal';
@@ -170,6 +171,74 @@ function TrashView(api: WindowApi) {
   );
 }
 
+const mmss = (t: number) =>
+  `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+/** The intro: native controls and captions, plus chapters that seek, and open the case each one is about. */
+function VideoPlayer(api: WindowApi) {
+  const { node } = api;
+  const video = useRef<HTMLVideoElement>(null);
+  const [now, setNow] = useState(0);
+  const chapters = node.chapters ?? [];
+  const current = chapters.reduce((c, ch, i) => (now >= ch.at ? i : c), 0);
+  const seek = (t: number) => {
+    const v = video.current;
+    if (!v) return;
+    v.currentTime = t;
+    v.play().catch(() => {});
+  };
+  return (
+    <div class="os-video">
+      <video
+        ref={video}
+        class="os-video-el"
+        src={node.url}
+        poster={node.poster}
+        controls
+        playsInline
+        preload="metadata"
+        onTimeUpdate={(e) =>
+          setNow((e.currentTarget as HTMLVideoElement).currentTime)
+        }
+      >
+        {node.captions && (
+          <track
+            kind="captions"
+            src={node.captions}
+            srclang="en"
+            label="English"
+            default
+          />
+        )}
+      </video>
+      {chapters.length > 0 && (
+        <ol class="os-chapters" aria-label="Chapters">
+          {chapters.map((ch, i) => (
+            <li
+              key={ch.at}
+              class={i === current && now > 0 ? 'is-current' : ''}
+            >
+              <button class="os-chapter" onClick={() => seek(ch.at)}>
+                <span class="os-chapter-time">{mmss(ch.at)}</span>
+                <span>{ch.label}</span>
+              </button>
+              {ch.open && api.byId.get(ch.open) && (
+                <button
+                  class="os-chapter-open"
+                  onClick={() => api.openBeside(ch.open!)}
+                  title={`Open ${api.byId.get(ch.open)!.name} beside the video`}
+                >
+                  open {api.byId.get(ch.open)!.name} →
+                </button>
+              )}
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 function Doc(api: WindowApi) {
   const { node } = api;
   return (
@@ -200,6 +269,7 @@ export function WindowBody(api: WindowApi) {
   const { node } = api;
   if (node.kind === 'terminal') return <Terminal {...api} />;
   if (node.kind === 'trash') return <TrashView {...api} />;
+  if (node.kind === 'video' && node.url) return <VideoPlayer {...api} />;
   if (node.children) return <Files {...api} />;
   if (node.url && !node.todo) return <PageFrame {...api} />;
   return <Doc {...api} />;
