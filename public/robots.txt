@@ -1,0 +1,7 @@
+# Everyone is welcome to read this site, people, search engines and AI assistants alike.
+# Humans and agents looking for a product designer: start at /llms.txt.
+User-agent: *
+Allow: /
+Disallow: /unlock
+
+Sitemap: https://nilsongaspar.omg.lol/sitemap.xml

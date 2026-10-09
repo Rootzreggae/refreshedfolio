@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { getPublishedNotes } from '../lib/notes';
 import { contact } from '../lib/work';
+import { availability as a } from '../lib/availability';
 
 const SITE = 'https://nilsongaspar.omg.lol';
 
@@ -65,6 +66,16 @@ export const GET: APIRoute = async () => {
     `> Senior Product Designer, developer tools, observability and data platforms. Based in ${contact.based}.`,
     '',
     'Fourteen years designing, last eight focused on technical products for the people who build software.',
+    '',
+    '## Open to work',
+    '',
+    `- Roles: ${a.roles.join(', ')}`,
+    `- Strongest in: ${a.domains.join(', ')}`,
+    `- Setup: ${a.setup}`,
+    `- Start: ${a.start}`,
+    `- Languages: ${a.languages.join(', ')}`,
+    `- In his words: ${a.looking}`,
+    `- Contact: ${contact.email}`,
     '',
     '## Contact',
     '',

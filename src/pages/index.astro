@@ -1,6 +1,7 @@
 ---
 import { getPublishedNotes } from '../lib/notes';
 import { selectedWork, contact } from '../lib/work';
+import { availability } from '../lib/availability';
 
 // Notes seam — latest post from the notes content collection.
 const notes = await getPublishedNotes();
@@ -218,7 +219,7 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
         '@context': 'https://schema.org',
         '@type': 'Person',
         name: 'Nilson Gaspar',
-        jobTitle: 'Senior Product Designer',
+        jobTitle: availability.roles,
         description:
           'Senior Product Designer, developer tools, observability and data platforms.',
         url: 'https://nilsongaspar.omg.lol/',
@@ -234,7 +235,10 @@ const DYNATRACE_URL = 'https://www.dynatrace.com';
           'Observability',
           'Information architecture',
           'Design systems',
+          'Data platforms',
+          'Design engineering',
         ],
+        knowsLanguage: availability.languages,
         sameAs: [
           'https://www.linkedin.com/in/nilsongaspar',
           contact.github.url,
