@@ -25,7 +25,6 @@ interface Props {
 }
 
 const STATS = [
-  { title: 'Time-to-insight −20%', sub: 'About › Impact · Grafana APM' },
   { title: 'Support requests −40%', sub: 'About › Impact · Cloud Onboarding' },
   { title: 'User adoption +25%', sub: 'About › Impact · Cloud Onboarding' },
 ];

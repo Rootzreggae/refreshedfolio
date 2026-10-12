@@ -85,12 +85,6 @@ function Clock() {
 const C = 2 * Math.PI * 18;
 const GAUGES = [
   {
-    pct: 20,
-    value: '−20%',
-    short: 'Time to insight',
-    label: 'Time to insight on Grafana APM',
-  },
-  {
     pct: 40,
     value: '−40%',
     short: 'Support requests',

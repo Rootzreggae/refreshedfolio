@@ -36,16 +36,16 @@ export const selectedWork: WorkItem[] = [
   {
     name: 'Grafana Labs',
     url: '/projects/grafana',
-    caption: 'observability UX · −20% time-to-insight',
+    caption: 'observability UX',
     tenure: 'prev',
-    blurb: 'APM & observability UX. Cut time-to-insight by 20%.',
+    blurb: 'APM & observability UX.',
   },
   {
     name: 'Keystrok',
     url: '/projects/keystrok',
-    caption: 'keyboard-first tools',
+    caption: 'secrets hygiene · self-hosted, open source',
     tenure: 'side',
-    blurb: 'Keyboard-first tools, designed and shipped solo.',
+    blurb: 'Secrets hygiene, self-hosted and open source. Designed and shipped solo.',
   },
   {
     name: 'Open source',
