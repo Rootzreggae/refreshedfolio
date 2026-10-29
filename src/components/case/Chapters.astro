@@ -1,0 +1,209 @@
+---
+// A pinned scroll scene: the hero, then chapters, all on one stage. The prototype is the object that carries through;
+// scroll moves a camera over it (zoom + focus point), switches its screen and hover state, and brings in each chapter's
+// split headline, corner label, ghost word and colour. Phones and reduced motion get a calm stacked version.
+import ProtoFrame from "./ProtoFrame.astro";
+
+export interface Key { at: number; zoom: number; fx: number; fy: number; hash?: string; hover?: string }
+export interface Chapter {
+  id: string;
+  label: string;       // corner label, e.g. "About Welcome"
+  left: string;        // headline half that slides in from the left
+  right: string;       // headline half that slides in from the right (*accent* words allowed)
+  bodyL?: string;
+  bodyR?: string;
+  ghost: string;       // giant background word
+  bg: string;          // background colour
+  keys: Key[];         // camera moments, at = 0..1 within the chapter
+}
+interface Props { src: string; url: string; chapters: Chapter[]; heroBg: string }
+const { src, url, chapters, heroBg } = Astro.props;
+const accent = (s: string) => s.split(/(\*[^*]+\*)/).map((p) => (p.startsWith("*") ? { t: p.slice(1, -1), a: true } : { t: p, a: false }));
+const first = (c: Chapter) => c.keys.find((k) => k.hash)!;
+// the hero is rendered twice: inside the pinned scene, and at the top of the stacked version
+const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
+---
+<section class="chapters" data-chapters data-hero-bg={heroBg} style={`--n:${chapters.length + 1}`}>
+  {chapters.map((c, i) => <span class="anchor" id={c.id} style={`top:calc(${i + 1} * var(--len) + 10vh)`}></span>)}
+  <div class="scene" data-scene>
+    <div class="ghosts" aria-hidden="true">{chapters.map((c, i) => <span class="ghost" data-ch={i + 1}>{c.ghost}</span>)}</div>
+
+    <div class="hero" data-ch="0"><Fragment set:html={hero} /></div>
+
+    {chapters.map((c, i) => (
+      <div class="ch" data-ch={i + 1} aria-hidden="true">
+        <p class="corner l">{c.label}</p>
+        <p class="corner r">Chapter {String(i + 1).padStart(2, "0")}</p>
+        <h2 class="split">
+          <span class="half left">{c.left}</span>
+          <span class="half right">{accent(c.right).map((p) => (p.a ? <em>{p.t}</em> : p.t))}</span>
+        </h2>
+        {c.bodyL && <p class="body bl">{c.bodyL}</p>}
+        {c.bodyR && <p class="body br">{c.bodyR}</p>}
+      </div>
+    ))}
+
+    <div class="stage" data-stage-cam aria-hidden="true">
+      <div class="cam" data-cam><iframe src={src} title="" tabindex="-1" data-cam-frame></iframe></div>
+    </div>
+  </div>
+
+  <!-- The same story without the pinned scene: phones and reduced motion -->
+  <div class="stacked">
+    <div class="hero-flat"><Fragment set:html={hero} /></div>
+    {chapters.map((c, i) => (
+      <article class="flat" id={`${c.id}-flat`} style={`--bg:${c.bg}`}>
+        <p class="corner-flat">{c.label} · Chapter {String(i + 1).padStart(2, "0")}</p>
+        <h2>{c.left} {accent(c.right).map((p) => (p.a ? <em>{p.t}</em> : p.t))}</h2>
+        {c.bodyL && <p>{c.bodyL}</p>}
+        {c.bodyR && <p>{c.bodyR}</p>}
+        <ProtoFrame src={`${src.split("#")[0]}${first(c).hash}`} url={url} hover={c.keys.find((k) => k.hover)?.hover} />
+      </article>
+    ))}
+  </div>
+
+  <script type="application/json" data-chapter-data set:html={JSON.stringify(chapters.map((c) => ({ bg: c.bg, keys: c.keys })))} />
+</section>
+
+<script>
+  type Key = { at: number; zoom: number; fx: number; fy: number; hash?: string; hover?: string };
+  const root = document.querySelector<HTMLElement>("[data-chapters]")!;
+  const data: { bg: string; keys: Key[] }[] = JSON.parse(root.querySelector("[data-chapter-data]")!.textContent!);
+  const stage = root.querySelector<HTMLElement>("[data-stage-cam]")!;
+  const cam = root.querySelector<HTMLElement>("[data-cam]")!;
+  const frame = root.querySelector<HTMLIFrameElement>("[data-cam-frame]")!;
+  const layers = [...root.querySelectorAll<HTMLElement>(".hero, .ch")];
+  const ghosts = [...root.querySelectorAll<HTMLElement>(".ghost")];
+  const heroBg = root.dataset.heroBg!;
+  const pinned = () => matchMedia("(min-width: 901px) and (prefers-reduced-motion: no-preference)").matches;
+
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const range = (t: number, a: number, b: number) => ease(clamp((t - a) / (b - a)));
+  const mix = (a: number, b: number, t: number) => a + (b - a) * t;
+  const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const mixColor = (a: string, b: string, t: number) => `rgb(${hex(a).map((v, i) => Math.round(mix(v, hex(b)[i], t))).join(",")})`;
+
+  // Prototype screen + hover, applied only when they change
+  let shownHash = "", shownHover = "";
+  function show(hash?: string, hover?: string) {
+    const win = frame.contentWindow, doc = frame.contentDocument;
+    if (!win || !doc) return;
+    if (hash && hash !== shownHash) { shownHash = hash; shownHover = ""; win.location.hash = hash; }
+    if ((hover ?? "") !== shownHover) {
+      shownHover = hover ?? "";
+      setTimeout(() => {
+        doc.querySelectorAll(".is-hover").forEach((e) => e.classList.remove("is-hover"));
+        const el = hover ? doc.querySelector<HTMLElement>(hover) : null;
+        if (el) { el.classList.add("is-hover"); el.dispatchEvent(new MouseEvent("mouseenter")); }
+        else doc.querySelector(".active .cards")?.dispatchEvent(new MouseEvent("mouseleave"));
+      }, 250);
+    }
+  }
+
+  // Camera: zoom around a focus point, never showing past the prototype's edges
+  function aim(zoom: number, fx: number, fy: number, w: number, h: number) {
+    const tx = clamp(w / 2 - zoom * fx * w, w - zoom * w, 0);
+    const ty = clamp(h / 2 - zoom * fy * h, h - zoom * h, 0);
+    cam.style.transform = `translate(${tx}px, ${ty}px) scale(${zoom})`;
+  }
+
+  function frameAt(keys: Key[], t: number) {
+    let a = keys[0], b = keys[0];
+    for (const k of keys) { if (k.at <= t) a = k; if (k.at >= t) { b = k; break; } b = k; }
+    const u = a === b ? 0 : ease(clamp((t - a.at) / (b.at - a.at)));
+    // the latest screen/hover at or before t
+    const past = keys.filter((k) => k.at <= t);
+    const hash = [...past].reverse().find((k) => k.hash)?.hash ?? keys.find((k) => k.hash)?.hash;
+    const hoverKey = [...past].reverse().find((k) => k.hash || k.hover !== undefined);
+    return { zoom: mix(a.zoom, b.zoom, u), fx: mix(a.fx, b.fx, u), fy: mix(a.fy, b.fy, u), hash, hover: hoverKey?.hover };
+  }
+
+  function render() {
+    if (!pinned()) return;
+    const len = innerHeight * 1.8;
+    const p = clamp(-root.getBoundingClientRect().top / len, 0, data.length + 0.999); // 0 = hero, 1.. = chapters
+    const i = Math.floor(p), t = p - i;
+    const w = stage.clientWidth, h = stage.clientHeight;
+    const k = w / 1440;
+    frame.style.transform = `scale(${k})`;
+
+    // Background colour drifts from one chapter to the next near the boundary
+    const cols = [heroBg, ...data.map((d) => d.bg)];
+    root.style.backgroundColor = mixColor(cols[i], cols[Math.min(i + 1, cols.length - 1)], range(t, 0.82, 1));
+
+    // Stage: rises out of the hero, then holds
+    const rise = i === 0 ? range(t, 0.05, 0.75) : 1;
+    stage.style.translate = `0 ${mix(innerHeight * 0.5, 0, rise)}px`;
+    stage.style.scale = String(mix(0.86, 1, rise));
+
+    // Camera
+    if (i === 0) { aim(1, 0.5, 0.5, w, h); show(data[0].keys.find((k) => k.hash)?.hash); }
+    else { const f = frameAt(data[i - 1].keys, t); aim(f.zoom, f.fx, f.fy, w, h); show(f.hash, f.hover); }
+
+    // Layers: hero text leaves; each chapter's headline halves slide in from the edges, then lift away
+    layers.forEach((el, n) => {
+      const local = p - n;
+      const inT = n === 0 ? 1 : range(local, 0, 0.22);
+      const outT = range(local, n === 0 ? 0.08 : 0.8, n === 0 ? 0.5 : 0.98);
+      const on = local > -0.05 && local < 1.02;
+      el.style.visibility = on ? "visible" : "hidden";
+      el.style.opacity = String(Math.min(inT, 1 - outT));
+      el.style.setProperty("--in", String(inT));
+      el.style.setProperty("--out", String(outT));
+      el.classList.toggle("live", on && outT < 0.5);
+    });
+    ghosts.forEach((g, n) => {
+      const local = p - (n + 1);
+      g.style.opacity = String(local > -0.3 && local < 1.1 ? 0.07 * Math.min(range(local, -0.3, 0.1), 1 - range(local, 0.85, 1.1)) / 1 : 0);
+      g.style.translate = `${mix(12, -12, clamp(local))}vw 0`;
+    });
+    document.dispatchEvent(new CustomEvent("chapter", { detail: { index: i } }));
+  }
+
+  let raf = 0;
+  const tick = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); };
+  addEventListener("scroll", tick, { passive: true });
+  addEventListener("resize", tick);
+  frame.addEventListener("load", () => { shownHash = ""; tick(); });
+  render();
+</script>
+
+<style>
+  .chapters { --len: 180vh; position: relative; height: calc(var(--n) * var(--len) + 100vh); transition: background-color .2s linear; }
+  .anchor { position: absolute; left: 0; width: 1px; height: 1px; }
+  .scene { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+
+  .ghosts { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .ghost { grid-area: 1 / 1; font-family: "NB International", sans-serif; font-size: 28vw; line-height: 1; white-space: nowrap; color: #fff; opacity: 0; }
+
+  .hero { position: absolute; inset: 0; z-index: 3; }
+  .ch { position: absolute; inset: 0; z-index: 3; pointer-events: none; visibility: hidden; }
+  .corner { position: absolute; top: 26px; margin: 0; font-size: 13px; letter-spacing: .04em; color: rgba(255, 255, 255, .72); }
+  .corner.l { left: clamp(24px, 4vw, 64px); } .corner.r { right: clamp(24px, 4vw, 64px); }
+
+  /* The split headline: halves travel in from opposite edges */
+  .split { position: absolute; left: 0; right: 0; top: 7vh; margin: 0; padding: 0 clamp(24px, 4vw, 64px); display: flex; justify-content: space-between; align-items: flex-start; gap: 4vw; font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(34px, 4.6vw, 86px); line-height: 1.02; letter-spacing: -.02em; }
+  .half { max-width: 46%; translate: calc((1 - var(--in, 0)) * -40vw) calc(var(--out, 0) * -8vh); }
+  .half.right { text-align: right; translate: calc((1 - var(--in, 0)) * 40vw) calc(var(--out, 0) * -8vh); }
+  .half em { font-style: normal; color: #ffb27a; }
+  .body { position: absolute; bottom: 7vh; margin: 0; max-width: 30ch; font-size: 15px; line-height: 1.55; color: rgba(255, 255, 255, .8); translate: 0 calc((1 - var(--in, 0)) * 20px); }
+  .bl { left: clamp(24px, 4vw, 64px); } .br { right: clamp(24px, 4vw, 64px); text-align: right; }
+
+  .stage { position: absolute; left: 50%; top: 52%; z-index: 2; width: min(64vw, 100vh); aspect-ratio: 1440 / 900; margin: calc(min(64vw, 100vh) * -.3125) 0 0 calc(min(64vw, 100vh) * -.5); border-radius: 18px; overflow: hidden; background: #181b1f; box-shadow: 0 10px 40px rgba(0, 0, 0, .22), 0 0 0 1px rgba(255, 255, 255, .1); }
+  .cam { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; transition: transform .12s linear; }
+  .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
+
+  .stacked { display: none; }
+  @media (max-width: 900px), (prefers-reduced-motion: reduce) {
+    .chapters { height: auto; }
+    .scene, .anchor { display: none; }
+    .stacked { display: block; }
+    .flat { padding: 72px 16px 56px; background: var(--bg); }
+    .flat h2 { margin: 6px 0 16px; font-family: "NB International", sans-serif; font-weight: 400; font-size: 34px; line-height: 1.08; }
+    .flat h2 em { font-style: normal; color: #ffb27a; }
+    .flat > p { color: rgba(255, 255, 255, .8); margin: 0 0 12px; }
+    .corner-flat { font-size: 13px; letter-spacing: .04em; color: rgba(255, 255, 255, .72); }
+    .flat :global(.pf) { margin-top: 24px; }
+  }
+</style>

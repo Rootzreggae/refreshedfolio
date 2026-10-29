@@ -1,11 +1,11 @@
 ---
-// Case study: Grafana Cloud onboarding. Try-before-read: the live prototype leads, a guided demo plays it with captions,
-// the story pins the prototype beside it, and the process is folded away for those who want depth.
-import PrototypeStage, { type Step } from "../../components/case/PrototypeStage.astro";
+// Case study: Grafana Cloud onboarding. The page is one pinned scene: the prototype rises out of the hero and a camera
+// moves over it chapter by chapter, with headlines sliding in from the edges and the colour shifting. The details peel
+// up over it at the end. Play opens a full-screen theatre with the guided demo; Try it opens the prototype in a tab.
+import { type Step } from "../../components/case/PrototypeStage.astro";
+import Chapters, { type Chapter } from "../../components/case/Chapters.astro";
+import Theater from "../../components/case/Theater.astro";
 import Dock from "../../components/case/Dock.astro";
-import StoryLine from "../../components/case/StoryLine.astro";
-import ProtoFrame from "../../components/case/ProtoFrame.astro";
-import { words } from "../../components/case/words";
 
 // The guided demo: what the cursor does and what the caption says (voice clips can be added per step later)
 const steps: Step[] = [
@@ -20,27 +20,23 @@ const steps: Step[] = [
   { caption: "That’s the flow. Your turn: click anything.", wait: 2600 },
 ];
 
-// The story: one short statement per beat (accent words in *asterisks*), a line or two of why, and its own visual
-type Beat = { title: string; body: string[]; frame?: { hash: string; hover?: string }; images?: [string, string][] };
-const beats: Beat[] = [
-  { title: "Nobody knew what *Loki, Mimir and Tempo* were.",
-    body: ["In 2022 Grafana Cloud kept adding products, and research kept showing the same thing: new users didn’t know what they were for.", "The people who needed the documentation most were the ones who never opened it."],
-    images: [["https://i.postimg.cc/jS15ZYq0/feedback-onboard.png", "What users told us"]] },
-  { title: "Answer the question *before asking anything.*",
-    body: ["The welcome screen does one job: explain what Grafana Cloud is, in five lines and one picture.", "I drew the illustration from scratch, one object for each part of the platform."],
-    frame: { hash: "#welcome" } },
-  { title: "Ask what they came to do, *not which product.*",
-    body: ["Goals: send metrics, monitor Kubernetes, build a dashboard, set up on-call.", "A new user knows what they want to do long before they know what Tempo is."],
-    frame: { hash: "#setup" } },
-  { title: "The docs *come to them.*",
-    body: ["Point at a path and the panel explains it, with a link for anyone who wants more.", "I brought the docs into the flow because the users who needed them most never opened them."],
-    frame: { hash: "#setup", hover: '.active .card[data-path="kube"]' } },
-  { title: "Every path ends *somewhere real.*",
-    body: ["A short confirmation, then the actual product page with the next step ready.", "The menu entry pulses, so people know where onboarding lives when they want it again."],
-    frame: { hash: "#dest-kube" } },
-  { title: "The login starts *answering too.*",
-    body: ["Before anyone signs in, the login already says what Grafana Cloud is and what’s inside."],
-    images: [["https://i.postimg.cc/pLY6QzDg/old-login.png", "Before"], ["https://i.postimg.cc/jjM3mT3c/proposed-login.png", "After"]] },
+// The story in three chapters. Camera keys: at = 0..1 through the chapter, zoom around the focus point (fx, fy)
+const chapters: Chapter[] = [
+  { id: "ch-question", label: "About the question", bg: "#1d3a5f", ghost: "?",
+    left: "Nobody knew what", right: "*Loki, Mimir or Tempo* were.",
+    bodyL: "In 2022 Grafana Cloud kept adding products, and research kept showing the same thing: new users didn’t know what they were for.",
+    bodyR: "So the welcome screen does one job: explain what Grafana Cloud is, in five lines and one picture I drew from scratch.",
+    keys: [{ at: 0, hash: "#welcome", zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.35, zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.72, zoom: 1, fx: 0.5, fy: 0.5 }] },
+  { id: "ch-goals", label: "About setup", bg: "#3a2d5e", ghost: "Goals",
+    left: "Ask what they came to do,", right: "*then bring the docs to them.*",
+    bodyL: "Goals, not product names: send metrics, monitor Kubernetes, build a dashboard, set up on-call.",
+    bodyR: "Point at a path and the panel explains it. The people who needed the docs most were the ones who never opened them.",
+    keys: [{ at: 0, hash: "#setup", zoom: 1.4, fx: 0.68, fy: 0.52 }, { at: 0.38, zoom: 1.4, fx: 0.68, fy: 0.52, hover: '.active .card[data-path="kube"]' }, { at: 0.7, zoom: 1.65, fx: 0.16, fy: 0.5 }] },
+  { id: "ch-real", label: "About the landing", bg: "#1e4848", ghost: "Real",
+    left: "Every path ends", right: "*somewhere real.*",
+    bodyL: "A short confirmation, then the actual product page with the next step ready.",
+    bodyR: "The menu entry pulses, so people know where onboarding lives when they want it again.",
+    keys: [{ at: 0, hash: "#dest-kube", zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.35, zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.76, zoom: 2.6, fx: 0.02, fy: 0.52 }] },
 ];
 
 const shipped = [
@@ -138,167 +134,171 @@ const facts: [string, string][] = [
     <link rel="preload" href="/font/NB International Regular.otf" as="font" type="font/otf" crossorigin />
   </head>
   <body>
-    <nav class="nav">
-      <a href="/projects/grafana" class="back">← Grafana projects</a>
-    </nav>
+    <nav class="nav"><a href="/projects/grafana" class="back">← Grafana projects</a></nav>
 
-    <!-- Hero: the live prototype leads; the guided demo plays here -->
-    <header class="hero" id="hero">
-      <div class="hero-text">
+    <Chapters src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" heroBg="#1d3a5f" chapters={chapters}>
+      <div slot="hero" class="hero-in">
         <p class="eyebrow">Grafana Labs · 2022</p>
-        <h1>Grafana Cloud onboarding</h1>
+        <h1 class="hero-title"><span>Grafana Cloud</span> <span>onboarding</span></h1>
         <p class="lede">New users signed up without knowing what they’d signed up for. I redesigned their first ten minutes around one question: what is Grafana Cloud?</p>
-        <p class="facts">Product Designer · Grafana Labs · 2022 · Shipped</p>
         <div class="actions">
           <button class="watch" data-watch><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Watch the demo · 35s</button>
           <a class="try" href="/prototypes/grafana-onboarding/" target="_blank" rel="noopener">Try it yourself ↗</a>
         </div>
+        <p class="facts">Product Designer · Grafana Labs · 2022 · Shipped</p>
       </div>
-      <div class="hero-stage">
-        <PrototypeStage src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" steps={steps} />
-      </div>
-    </header>
+    </Chapters>
 
-    <!-- The story: one line drawn as you scroll, each beat hanging off it with its own visual -->
-    <StoryLine id="story" heading="One question to answer: *what is Grafana Cloud?*">
-      {beats.map((b) => (
-        <div class="beat">
-          <div class="beat-text">
-            <span class="dot" aria-hidden="true"></span>
-            <h3>{words(b.title).map(({ w, accent }) => <span class:list={["w", { accent }]}>{w} </span>)}</h3>
-            {b.body.map((p) => <p>{p}</p>)}
+    <!-- The details peel up over the scene -->
+    <div class="rest">
+      <section class="block" id="shipped">
+        <p class="kicker">What shipped</p>
+        <h2>The first ten minutes, rebuilt.</h2>
+        <p class="sub">By rethinking the first ten minutes, we lowered the barrier of entry for new users, especially non-technical ones.</p>
+        <ul class="shipped">
+          {shipped.map(([k, v]) => <li><span>{k}</span>{v}</li>)}
+        </ul>
+      </section>
+
+      <section class="block" id="process">
+        <details>
+          <summary><span>How I got there</span><small>Research, iterations, the login, the illustration</small></summary>
+          <div class="process">
+            <h3>The approach</h3>
+            <p>The critical outcome from our team workshops was the idea to visually answer: “What is Grafana Cloud?”</p>
+            <ol class="principles">
+              {principles.map(([t, d]) => <li><strong>{t}</strong><span>{d}</span></li>)}
+            </ol>
+
+            <h3>What users told us</h3>
+            <figure class="wipe"><img src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png" alt="User feedback highlighting confusion with product offerings" loading="lazy" /><figcaption>User feedback highlighting confusion with product offerings</figcaption></figure>
+
+            <h3>The login starts answering too</h3>
+            <div class="duo">
+              <figure class="wipe"><img src="https://i.postimg.cc/pLY6QzDg/old-login.png" alt="Before: the old login" loading="lazy" /><figcaption>Before</figcaption></figure>
+              <figure class="wipe"><img src="https://i.postimg.cc/jjM3mT3c/proposed-login.png" alt="After: a login that introduces the product" loading="lazy" /><figcaption>After</figcaption></figure>
+            </div>
+
+            <h3>Welcome screen iterations</h3>
+            <div class="trio">
+              {iterations.map(([src, cap]) => <figure class="wipe"><img src={src} alt={cap} loading="lazy" /><figcaption>{cap}</figcaption></figure>)}
+            </div>
+
+            <h3>The illustration</h3>
+            <figure class="wipe"><img src="/images/grafana/welcome-illustration-affinity.webp" alt="The welcome screen illustration open in Affinity Designer, with its layers" loading="lazy" /><figcaption>Drawn from scratch in Affinity Designer: the Grafana core with the cloud above it and one object for each part of the platform around it.</figcaption></figure>
+
+            <h3>Walkthroughs</h3>
+            <div class="videos">
+              {videos.map(([src, title]) => <iframe src={src} title={title} loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>)}
+            </div>
           </div>
-          <div class="beat-visual">
-            {b.frame && <ProtoFrame src={`/prototypes/grafana-onboarding/${b.frame.hash}`} url="grafana.com/cloud" hover={b.frame.hover} />}
-            {b.images && (
-              <div class:list={["shots", { pair: b.images.length > 1 }]}>
-                {b.images.map(([src, label]) => <figure><img src={src} alt={label} loading="lazy" /><figcaption>{label}</figcaption></figure>)}
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-    </StoryLine>
+        </details>
+      </section>
 
-    <section class="block" id="shipped">
-      <h2>What shipped</h2>
-      <p class="sub">By rethinking the first ten minutes, we lowered the barrier of entry for new users, especially non-technical ones.</p>
-      <ul class="shipped">
-        {shipped.map(([k, v]) => <li><span>{k}</span>{v}</li>)}
-      </ul>
-    </section>
+      <section class="block" id="change">
+        <p class="kicker">Reflection</p>
+        <h2>What I’d change</h2>
+        <p>We shipped it and the feedback from users was good. But I didn’t agree on a baseline metric with the PM before we started, so today I can describe the impact better than I can prove it.</p>
+        <p>Now I set the metric and the baseline first, and I write my own notes while the work is fresh. It’s the first thing I’d change, and it’s the habit I took from this project into every one after it.</p>
+      </section>
 
-    <section class="block" id="process">
-      <details>
-        <summary><span>How I got there</span><small>Research, iterations, the illustration</small></summary>
-        <div class="process">
-          <h3>The approach</h3>
-          <p>The critical outcome from our team workshops was the idea to visually answer: “What is Grafana Cloud?”</p>
-          <ol class="principles">
-            {principles.map(([t, d]) => <li><strong>{t}</strong><span>{d}</span></li>)}
-          </ol>
+      <footer class="foot"><a href="/projects/grafana" class="back">← Grafana projects</a></footer>
+    </div>
 
-          <h3>What users told us</h3>
-          <figure><img src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png" alt="User feedback highlighting confusion with product offerings" loading="lazy" /><figcaption>User feedback highlighting confusion with product offerings</figcaption></figure>
-
-          <h3>Welcome screen iterations</h3>
-          <div class="trio">
-            {iterations.map(([src, cap]) => <figure><img src={src} alt={cap} loading="lazy" /><figcaption>{cap}</figcaption></figure>)}
-          </div>
-
-          <h3>The illustration</h3>
-          <figure><img src="/images/grafana/welcome-illustration-affinity.webp" alt="The welcome screen illustration open in Affinity Designer, with its layers" loading="lazy" /><figcaption>Drawn from scratch in Affinity Designer: the Grafana core with the cloud above it and one object for each part of the platform around it.</figcaption></figure>
-
-          <h3>Walkthroughs</h3>
-          <div class="videos">
-            {videos.map(([src, title]) => <iframe src={src} title={title} loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>)}
-          </div>
-        </div>
-      </details>
-    </section>
-
-    <section class="block" id="change">
-      <h2>What I’d change</h2>
-      <p>We shipped it and the feedback from users was good. But I didn’t agree on a baseline metric with the PM before we started, so today I can describe the impact better than I can prove it.</p>
-      <p>Now I set the metric and the baseline first, and I write my own notes while the work is fresh. It’s the first thing I’d change, and it’s the habit I took from this project into every one after it.</p>
-    </section>
-
-    <footer class="foot"><a href="/projects/grafana" class="back">← Grafana projects</a></footer>
-
-    <Dock after="#hero" sections={[["#story", "The story"], ["#shipped", "What shipped"], ["#process", "How I got there"], ["#change", "What I’d change"]]} facts={facts} />
+    <Theater src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" steps={steps} />
+    <Dock after=".hero-in" sections={[["#ch-question", "The question"], ["#ch-goals", "Goals and docs"], ["#ch-real", "Somewhere real"], ["#shipped", "What shipped"], ["#process", "How I got there"], ["#change", "What I’d change"]]} facts={facts} />
 
     <script>
-      // Hero button starts the demo
-      document.querySelector("[data-watch]")!.addEventListener("click", () => document.dispatchEvent(new Event("demo:play")));
+      import Lenis from "lenis";
+      import "lenis/dist/lenis.css";
+      // Smooth, inertial scrolling (skipped when the reader asks for less motion)
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) new Lenis({ autoRaf: true, anchors: true });
+      document.querySelectorAll("[data-watch]").forEach((b) => b.addEventListener("click", () => document.dispatchEvent(new Event("theater:open"))));
+      // Images in the details wipe into view
+      const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { rootMargin: "0px 0px -10% 0px" });
+      document.querySelectorAll(".wipe").forEach((f) => io.observe(f));
+      // Open the details when someone jumps to them from the dock
+      document.querySelector('a[href="#process"]')?.addEventListener("click", () => ((document.querySelector("#process details") as HTMLDetailsElement).open = true));
     </script>
 
     <style>
       @font-face { font-family: "NB International"; src: url("/font/NB International Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
       body { background: #1d3a5f; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
-      h1, h2, .beat h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
+      h1, h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
       a { color: inherit; }
 
-      .nav { padding: 24px clamp(24px, 11vw, 320px); }
-      .back { color: rgba(255, 255, 255, .7); text-decoration: none; font-size: 15px; }
+      .nav { position: absolute; top: 0; left: 0; z-index: 10; padding: 22px clamp(24px, 4vw, 64px); }
+      .back { color: rgba(255, 255, 255, .8); text-decoration: none; font-size: 15px; }
       .back:hover { color: #fff; }
 
-      .hero { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; min-height: calc(100vh - 80px); padding: 0 clamp(24px, 11vw, 320px) 64px; }
-      .eyebrow { color: #ff8833; font-size: 15px; letter-spacing: .04em; margin-bottom: 18px; }
-      .hero h1 { font-size: clamp(40px, 4.6vw, 68px); line-height: 1.05; margin-bottom: 26px; }
-      .lede { font-size: clamp(19px, 1.5vw, 23px); line-height: 1.5; color: rgba(255, 255, 255, .86); max-width: 34ch; }
-      .facts { margin-top: 22px; color: rgba(255, 255, 255, .64); font-size: 15px; }
-      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
-      .watch, .try { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; }
+      /* Hero, inside the pinned scene: huge title lines rise in, the prototype peeks from below */
+      .hero-in { position: absolute; left: clamp(24px, 4vw, 64px); right: clamp(24px, 4vw, 64px); top: 13vh; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 0 4vw; align-items: end; }
+      .eyebrow { grid-column: 1 / -1; color: #ffb27a; font-size: 15px; letter-spacing: .04em; margin-bottom: 14px; }
+      .hero-title { grid-column: 1; font-size: clamp(48px, 7.4vw, 136px); line-height: .95; letter-spacing: -.03em; }
+      .hero-title span { display: inline-block; animation: up .9s cubic-bezier(.2, .7, .2, 1) both; }
+      .hero-title span + span { animation-delay: .12s; }
+      @keyframes up { from { opacity: 0; translate: 0 60px; } }
+      .lede { grid-column: 2; grid-row: 2; font-size: clamp(17px, 1.3vw, 21px); line-height: 1.5; color: rgba(255, 255, 255, .88); max-width: 36ch; animation: up .9s .25s cubic-bezier(.2, .7, .2, 1) both; }
+      .actions { grid-column: 1; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; animation: up .9s .35s cubic-bezier(.2, .7, .2, 1) both; }
+      .facts { grid-column: 2; margin-top: 30px; align-self: center; color: rgba(255, 255, 255, .72); font-size: 15px; }
+      .watch, .try { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; transition: translate .2s ease, scale .2s ease, background .2s ease, border-color .2s ease; }
       .watch { border: 0; background: #fff; color: #1d3a5f; }
-      .watch:hover { background: #e8edf3; }
-      .try { border: 1px solid rgba(255, 255, 255, .25); color: #fff; }
-      .try:hover { border-color: rgba(255, 255, 255, .6); }
-      .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ff8833; outline-offset: 3px; }
+      .watch:hover { translate: 0 -2px; scale: 1.03; }
+      .watch:hover svg { rotate: -8deg; transition: rotate .2s ease; }
+      .try { border: 1px solid rgba(255, 255, 255, .35); color: #fff; }
+      .try:hover { border-color: #fff; translate: 0 -2px; }
+      .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
 
-      .shots img { width: 100%; display: block; border-radius: 16px; box-shadow: 0 6px 20px rgba(0, 0, 0, .16); }
-      .shots figcaption { margin-top: 8px; color: rgba(255, 255, 255, .64); font-size: 14px; }
-      .shots.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-      .block { max-width: 1200px; margin: 0 auto; padding: 96px clamp(16px, 4vw, 72px) 0; }
-      .block h2 { font-size: clamp(30px, 3vw, 44px); line-height: 1.15; margin-bottom: 18px; }
-      .block > p { max-width: 62ch; color: rgba(255, 255, 255, .8); margin-bottom: 14px; }
-      .sub { color: rgba(255, 255, 255, .7); margin-bottom: 28px; }
+      /* The details: a light card that peels up over the scene */
+      .rest { position: relative; z-index: 2; margin-top: -14vh; padding-bottom: 140px; border-radius: 36px 36px 0 0; background: #f4f1ec; color: #17212b; box-shadow: 0 -10px 40px rgba(0, 0, 0, .18); }
+      .rest .back { color: rgba(23, 33, 43, .75); }
+      .rest .back:hover { color: #17212b; }
+      .block { max-width: 1200px; margin: 0 auto; padding: 96px clamp(24px, 4vw, 64px) 0; }
+      .kicker { color: #9a4609; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+      .block h2 { font-size: clamp(34px, 4vw, 64px); line-height: 1.05; letter-spacing: -.02em; margin-bottom: 18px; }
+      .block > p { max-width: 62ch; color: rgba(23, 33, 43, .8); margin-bottom: 14px; }
+      .sub { color: rgba(23, 33, 43, .75); margin-bottom: 28px; }
       .shipped { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-      .shipped li { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); font-size: 16px; line-height: 1.45; }
-      .shipped span { color: #ff8833; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+      .shipped li { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 18px; background: #fff; font-size: 16px; line-height: 1.45; transition: translate .25s ease, box-shadow .25s ease; }
+      .shipped li:hover { translate: 0 -3px; box-shadow: 0 8px 24px rgba(23, 33, 43, .08); }
+      .shipped span { color: #9a4609; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
 
-      details { border-top: 1px solid rgba(255, 255, 255, .12); border-bottom: 1px solid rgba(255, 255, 255, .12); }
+      details { border-top: 1px solid rgba(23, 33, 43, .14); border-bottom: 1px solid rgba(23, 33, 43, .14); }
       summary { display: flex; align-items: baseline; gap: 16px; padding: 28px 0; cursor: pointer; list-style: none; }
       summary::-webkit-details-marker { display: none; }
-      summary span { font-family: "NB International", sans-serif; font-size: clamp(26px, 2.6vw, 38px); }
-      summary small { color: rgba(255, 255, 255, .64); font-size: 16px; }
-      summary::after { content: "+"; margin-left: auto; font-size: 32px; line-height: 1; color: rgba(255, 255, 255, .6); transition: rotate .25s ease; }
+      summary span { font-family: "NB International", sans-serif; font-size: clamp(28px, 3vw, 44px); letter-spacing: -.01em; }
+      summary small { color: rgba(23, 33, 43, .7); font-size: 16px; }
+      summary::after { content: "+"; margin-left: auto; font-size: 34px; line-height: 1; color: rgba(23, 33, 43, .6); transition: rotate .25s ease; }
       details[open] summary::after { rotate: 45deg; }
       .process { padding-bottom: 48px; }
-      .process h3 { margin: 40px 0 14px; font-size: 20px; font-weight: 500; }
-      .process > p { color: rgba(255, 255, 255, .78); max-width: 62ch; }
-      .process figure img { width: 100%; border-radius: 10px; display: block; }
-      .process figcaption { margin-top: 8px; color: rgba(255, 255, 255, .64); font-size: 14px; }
+      .process h3 { margin: 44px 0 14px; font-size: 20px; font-weight: 500; }
+      .process > p { color: rgba(23, 33, 43, .8); max-width: 62ch; }
+      .process figure img { width: 100%; border-radius: 14px; display: block; }
+      .process figcaption { margin-top: 8px; color: rgba(23, 33, 43, .7); font-size: 14px; }
       .principles { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; counter-reset: p; }
-      .principles li { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 12px; background: rgba(255, 255, 255, .05); counter-increment: p; }
-      .principles li::before { content: "0" counter(p); color: #ff8833; font-size: 13px; }
-      .principles span { color: rgba(255, 255, 255, .72); font-size: 16px; }
+      .principles li { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 16px; background: #fff; counter-increment: p; }
+      .principles li::before { content: "0" counter(p); color: #9a4609; font-size: 13px; }
+      .principles span { color: rgba(23, 33, 43, .78); font-size: 16px; }
+      .duo, .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
       .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-      .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-      .videos iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; }
+      .videos iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; }
+      /* images wipe in from the left as they arrive */
+      .wipe img { clip-path: inset(0 100% 0 0 round 14px); transition: clip-path 1.1s cubic-bezier(.6, 0, .2, 1); }
+      .wipe.in img { clip-path: inset(0 0 0 0 round 14px); }
+      .foot { max-width: 1200px; margin: 0 auto; padding: 72px clamp(24px, 4vw, 64px) 0; }
 
-      .foot { max-width: 1200px; margin: 0 auto; padding: 72px clamp(16px, 4vw, 72px) 140px; }
-
-      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-      @media (max-width: 1000px) {
-        .nav { padding: 18px 16px; }
-        .hero { grid-template-columns: 1fr; gap: 28px; min-height: 0; padding: 24px 16px 40px; }
-        .shots.pair { grid-template-columns: 1fr; }
-        .block { padding: 72px 16px 0; }
-        .shipped, .principles, .trio, .videos { grid-template-columns: 1fr; }
-        .foot { padding: 56px 16px 120px; }
+      @media (prefers-reduced-motion: reduce) { .hero-title span, .lede, .actions { animation: none; } .wipe img { clip-path: none; transition: none; } }
+      @media (max-width: 900px) {
+        .nav { position: static; padding: 18px 16px; }
+        .hero-in { position: static; display: block; padding: 24px 16px 48px; }
+        .hero-title { font-size: 48px; margin-bottom: 18px; }
+        .lede { margin-top: 0; }
+        .facts { margin-top: 18px; }
+        .rest { margin-top: 0; border-radius: 24px 24px 0 0; }
+        .block { padding: 64px 16px 0; }
+        .shipped, .principles, .trio, .duo, .videos { grid-template-columns: 1fr; }
+        .foot { padding: 56px 16px 0; }
       }
     </style>
   </body>

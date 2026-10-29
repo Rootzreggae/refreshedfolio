@@ -30,11 +30,14 @@ const { sections, facts, after } = Astro.props;
   const hero = document.querySelector(dock.dataset.after!);
   if (hero) new IntersectionObserver(([e]) => dock.classList.toggle("on", !e.isIntersecting), { threshold: 0.15 }).observe(hero);
 
-  play.addEventListener("click", () => document.dispatchEvent(new Event("demo:toggle")));
+  // Play opens the theatre; while the demo runs, the same button pauses it
+  let playing = false;
+  play.addEventListener("click", () => document.dispatchEvent(new Event(playing ? "demo:pause" : "theater:open")));
   document.addEventListener("demo:state", (e) => {
-    const { playing, done } = (e as CustomEvent).detail;
-    play.setAttribute("aria-pressed", String(playing));
-    label.textContent = playing ? "Pause" : done ? "Watch again" : "Resume demo";
+    const { playing: on, done } = (e as CustomEvent).detail;
+    playing = on;
+    play.setAttribute("aria-pressed", String(on));
+    label.textContent = on ? "Pause" : done ? "Watch again" : "Watch the demo";
   });
 
   // Popovers: one open at a time, close on outside click or Escape
@@ -62,7 +65,9 @@ const { sections, facts, after } = Astro.props;
   .dock.on { translate: -50% 0; opacity: 1; }
   .dock button { font: inherit; color: #fff; border: 0; cursor: pointer; }
   .play { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; height: 40px; padding: 0 20px 0 16px; border-radius: 10px; background: #fff; color: #0c121c !important; font-weight: 500; }
-  .play:hover { background: #e8edf3; }
+  .play { transition: translate .2s ease, background .2s ease; }
+  .play:hover { background: #e8edf3; translate: 0 -2px; }
+  .play:hover svg { rotate: -8deg; scale: 1.1; transition: rotate .2s ease, scale .2s ease; }
   .i-pause, .play[aria-pressed="true"] .i-play { display: none; }
   .play[aria-pressed="true"] .i-pause { display: block; }
   .icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, .08); font-weight: 600; }
