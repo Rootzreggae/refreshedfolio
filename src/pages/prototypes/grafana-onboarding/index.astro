@@ -1,5 +1,7 @@
 ---
-// Grafana Cloud onboarding, rebuilt in code from the original Figma file (2022).
+// Grafana Cloud onboarding, rebuilt in code from the original Figma file (2022) and refined.
+import ChoiceScreen from "../../../components/onboarding/ChoiceScreen.astro";
+
 const A = "/prototypes/grafana-onboarding";
 const benefits = [
   "Enjoy all the benefits of a fully-managed cloud environment- true horizontal scalability, instant upgrades, security patches, and backups",
@@ -9,18 +11,74 @@ const benefits = [
   "Manage your on-call rotations through simpler workflows and interfaces",
 ];
 
-// Four ways in, each card says what it takes. Hovering or focusing a card brings its docs into the left panel.
-const paths = [
-  { id: "mlt", icon: "icon-mlt", title: "Send metrics, logs and traces", body: "Connect Prometheus, Loki or Tempo, or point an agent you already run at your stack.", meta: ["~10 min", "access to your hosts"],
+const intro = {
+  title: "What is Grafana Cloud",
+  body: "A fully managed observability platform for your applications and infrastructure: one place for all your metrics, logs and traces, wherever the data lives.",
+  links: ["Grafana Cloud fundamentals", "Quick starts", "Integrations"],
+};
+
+// Each card says what it takes. Looking at a card (hover or focus) brings its docs into the left panel.
+const setup = [
+  { id: "mlt", icon: "icon-mlt.svg", to: "mlt", title: "Send metrics, logs and traces", body: "Connect Prometheus, Loki or Tempo, or point an agent you already run at your stack.", meta: ["~10 min", "access to your hosts"],
     doc: { title: "Made for you, managed by us", body: "Grafana Cloud integrates metrics, traces and logs with Grafana. Use Prometheus, Loki and Tempo without installing, maintaining or scaling them yourself.", link: "Learn more on metrics, logs and traces" } },
-  { id: "kube", icon: "icon-kube", title: "Monitor Kubernetes", body: "Install the agent on your cluster and get cluster, node and pod views out of the box.", meta: ["~15 min", "kubectl access"],
+  { id: "kube", icon: "icon-kube.svg", to: "done-kube", title: "Monitor Kubernetes", body: "Install the agent on your cluster and get cluster, node and pod views out of the box.", meta: ["~15 min", "kubectl access"],
     doc: { title: "Monitoring Kubernetes with Grafana", body: "Install the Grafana Agent on your cluster and in minutes your metrics, logs and Kubernetes events arrive in Grafana Cloud, with prebuilt dashboards and alerts.", link: "Learn more on Kubernetes with Grafana" } },
-  { id: "dashboard", icon: "icon-dash", title: "Build a dashboard", body: "Start from sample data, or connect a data source you already use.", meta: ["~5 min", "no setup needed"],
+  { id: "dashboard", icon: "icon-dash.svg", to: "dashboard", title: "Build a dashboard", body: "Start from sample data, or connect a data source you already use.", meta: ["~5 min", "no setup needed"],
     doc: { title: "Dashboards", body: "Query, visualize and alert on your metrics no matter where they are stored, then share the dashboard with your team.", link: "Learn more on creating your first dashboard" } },
-  { id: "oncall", icon: "icon-oncall", title: "Set up on-call", body: "Create a schedule, add your team and route alerts to whoever is on shift.", meta: ["~10 min", "your teammates’ emails"],
+  { id: "oncall", icon: "icon-oncall.svg", to: "done-oncall", title: "Set up on-call", body: "Create a schedule, add your team and route alerts to whoever is on shift.", meta: ["~10 min", "your teammates’ emails"],
     doc: { title: "On-call, without the toil", body: "Grafana OnCall gives engineers simpler schedules, escalations and alert routing, right next to the dashboards that fired them.", link: "Learn more about on-call management" } },
 ];
-const tour = { id: "explore", doc: { title: "Explore Grafana Cloud", body: "A short guided tour of Grafana Cloud with sample data. Connect your own data whenever you are ready." } };
+
+const sources = [
+  { id: "prom", icon: "ds-prom.png", to: "done-prom", title: "Prometheus metrics", body: "Remote-write from your Prometheus, or let the agent scrape for you.", meta: ["metrics", "~10 min"],
+    doc: { title: "Prometheus", body: "An open source monitoring system with a multidimensional data model and PromQL. Grafana Cloud stores your Prometheus metrics long term, highly available, with nothing to run.", link: "Learn more about Prometheus" } },
+  { id: "loki", icon: "ds-loki.png", to: "done-loki", title: "Logs with Loki", body: "Ship logs from files, containers or systemd. Loki indexes labels, not content, so it stays cheap.", meta: ["logs", "~10 min"],
+    doc: { title: "Grafana Loki", body: "A horizontally scalable log aggregation system inspired by Prometheus. It indexes a set of labels for each stream instead of the full text, which keeps it cost effective and easy to operate.", link: "Learn more about Grafana Loki" } },
+  { id: "tempo", icon: "ds-tempo.png", to: "done-tempo", title: "Traces with Tempo", body: "Send OpenTelemetry, Jaeger or Zipkin traces and jump from a trace to its logs.", meta: ["traces", "~10 min"],
+    doc: { title: "Grafana Tempo", body: "A high-scale distributed tracing backend that only needs object storage, deeply integrated with Grafana, Prometheus and Loki.", link: "Learn more about Grafana Tempo" } },
+  { id: "graphite", icon: "ds-graphite.png", to: "done-graphite", title: "Graphite metrics", body: "Point your existing Graphite setup at a hosted, horizontally scalable backend.", meta: ["metrics", "~10 min"],
+    doc: { title: "Graphite", body: "Keep your Graphite metrics and lose the maintenance: a replicated, horizontally scalable service with fast queries and access policies for your data.", link: "Learn more about Graphite" } },
+];
+
+const dataFor = [
+  { id: "agent", icon: "ds-agent.png", to: "done-console", title: "Install the agent", body: "Collect data with ready-made integrations, dashboards and alerts.", meta: ["~10 min", "access to your hosts"],
+    doc: { title: "Grafana Agent", body: "The agent runs on your hosts, collects Prometheus-style metrics and logs, and sends them to Grafana Cloud.", link: "Learn more on installing the Grafana Agent" } },
+  { id: "external", icon: "ds-external.png", to: "done-console-ext", title: "Connect an external data source", body: "Query data where it already lives, without copying it.", meta: ["~5 min", "the source’s URL and credentials"],
+    doc: { title: "Data sources", body: "Grafana connects natively to dozens of databases and services, and community plugins cover many more. Search for yours in Integrations and Connections and follow the steps.", link: "Learn more about installing data sources" } },
+];
+
+const explore = [
+  { id: "tour", icon: "ex-tour.png", to: "done-home", title: "Take a product tour", body: "An interactive walkthrough of the main features.", meta: ["~2 min", "nothing to install"],
+    doc: { title: "Product tour", body: "See where dashboards, Explore, alerting and your data sources live, then try them on sample data." } },
+  { id: "demo", icon: "ex-demo.png", to: "done-play", title: "Try a demo environment", body: "A sandbox full of sample data to click around in.", meta: ["~5 min", "nothing to install"],
+    doc: { title: "Demo environment", body: "A live Grafana with real-looking data and ready-made dashboards. Change anything, nothing breaks." } },
+  { id: "easy", icon: "ex-data.png", to: "connect", title: "Connect data you already have", body: "Start with something close at hand, like your own machine.", meta: ["~5 min"],
+    doc: { title: "Your own data, quickly", body: "The fastest way to see your own data in Grafana Cloud is the machine you are on, or a ready-made source like TestData.", link: "Learn more on connecting your data" } },
+];
+
+const connect = [
+  { id: "linux", icon: "os-linux.png", to: "done-console-paid", title: "Linux server" },
+  { id: "windows", icon: "os-windows.png", to: "done-console-paid", title: "Windows" },
+  { id: "macos", icon: "os-macos.png", to: "done-console-paid", title: "macOS" },
+  { id: "testdata", icon: "os-testdata.png", to: "done-console-paid", title: "TestData DB" },
+  { id: "synthetic", icon: "os-synthetic.png", to: "done-console-paid", title: "Synthetic monitoring" },
+  { id: "other", icon: "os-other.png", to: "done-console-paid", title: "Something else" },
+];
+
+// Where each path lands: the Grafana screen, the Restart button on it, and the onboarding entry in the menu.
+const dests = {
+  kube: { w: 1440, h: 1000, restart: [1233, 866] },
+  oncall: { w: 1723, h: 1000, restart: [1367, 866] },
+  prom: { w: 1552, h: 1024, restart: [1367, 866], pulse: [23, 453] },
+  loki: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
+  tempo: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
+  graphite: { w: 1600, h: 1024, restart: [1367, 866], pulse: [23, 453] },
+  play: { w: 1655, h: 950, restart: [1492, 866], pulse: [23, 453] },
+  console: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
+  "console-ext": { w: 1600, h: 1000, restart: [1367, 866], pulse: [21, 453] },
+  "console-paid": { w: 1600, h: 1024, restart: [1367, 866], pulse: [23, 453] },
+  home: { w: 1440, h: 1000, restart: [1247, 866] },
+};
 ---
 <!doctype html>
 <html lang="en">
@@ -76,52 +134,43 @@ const tour = { id: "explore", doc: { title: "Explore Grafana Cloud", body: "A sh
     </section>
   </main>
 
-  <!-- 2. Setup: pick a way in. The left panel answers "what is this?" for the path you are looking at -->
-  <main class="setup" data-screen="setup">
-    <aside class="side">
-      <img class="side-logo" src={`${A}/logo-stacked.svg`} alt="Grafana" width="46" height="61" />
-      <div class="doc" data-doc="intro">
-        <h2>What is Grafana Cloud</h2>
-        <p>A fully managed observability platform for your applications and infrastructure: one place for all your metrics, logs and traces, wherever the data lives.</p>
-        <ul class="doc-links">
-          {["Grafana Cloud fundamentals", "Quick starts", "Integrations"].map((l) => (
-            <li><a href="#setup">{l}<img src={`${A}/arrow.svg`} alt="" width="20" height="20" /></a></li>
-          ))}
-        </ul>
-      </div>
-      {[...paths, tour].map((p) => (
-        <div class="doc" data-doc={p.id} hidden>
-          <h2>{p.doc.title}</h2>
-          <p>{p.doc.body}</p>
-          {"link" in p.doc && <a class="doc-link" href="#setup">{p.doc.link}<img src={`${A}/arrow.svg`} alt="" width="20" height="20" /></a>}
-        </div>
-      ))}
-      <img class="plugs" src={`${A}/plugs.svg`} alt="" width="478" height="478" aria-hidden="true" />
-    </aside>
+  <!-- 2. Pick a way in, then narrow it down -->
+  <ChoiceScreen id="setup" title="How would you like to begin?" lede="Pick what matters most right now. We’ll walk you through it." intro={intro} options={setup}>
+    <div slot="docs" class="doc" data-doc="explore" hidden>
+      <h2>Explore Grafana Cloud</h2>
+      <p>A short guided tour, a demo environment, or your own data in a few minutes. No commitment either way.</p>
+    </div>
+    <p class="tour">
+      <img src={`${A}/icon-explore.svg`} alt="" width="28" height="26" />
+      Not sure yet? <a href="#explore" data-path="explore">Take a 2-minute tour of Grafana Cloud</a>
+    </p>
+  </ChoiceScreen>
 
-    <section class="main">
-      <a class="skip" href="#home">Skip to Home<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
-      <div class="column">
-        <h1>How would you like to begin?</h1>
-        <p class="lede">Pick what matters most right now. We’ll walk you through it.</p>
-        <div class="cards">
-          {paths.map((p) => (
-            <a class="card" href={`#${p.id}`} data-path={p.id}>
-              <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
-              <img class="card-go" src={`${A}/arrow.svg`} alt="" width="20" height="20" />
-              <strong>{p.title}</strong>
-              <span class="card-body">{p.body}</span>
-              <span class="card-meta">{p.meta[0]}<i aria-hidden="true">·</i>{p.meta[1]}</span>
-            </a>
-          ))}
-        </div>
-        <p class="tour">
-          <img src={`${A}/icon-explore.svg`} alt="" width="28" height="26" />
-          Not sure yet? <a href="#explore" data-path="explore">Take a 2-minute tour of Grafana Cloud</a>
-        </p>
-      </div>
-    </section>
+  <ChoiceScreen id="mlt" back="setup" title="Which data do you want to send first?" lede="Start with one. You can add the others from Connections at any time." intro={setup[0].doc} options={sources} />
+  <ChoiceScreen id="dashboard" back="setup" title="Where does the data for your dashboard live?" lede="Bring it into Grafana Cloud, or leave it where it is and query it." intro={setup[2].doc} options={dataFor} />
+  <ChoiceScreen id="explore" back="setup" title="How do you want to explore?" lede="The first two need no data at all." intro={{ title: "Explore Grafana Cloud", body: "Explore Grafana Cloud with a guided tour and become acquainted with some of its features. Connect your data to the cloud to get the most out of it." }} options={explore} columns={3} />
+  <ChoiceScreen id="connect" back="explore" title="What do you want to connect?" lede="Start with the machine in front of you, or a ready-made source." intro={explore[2].doc} options={connect} columns={3} compact />
+
+  <!-- 3. Done: a short confirmation, then straight into the product -->
+  <main class="done" data-screen="done">
+    <div class="done-inner" role="status">
+      <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="none" stroke="#6ccf8e" stroke-width="3" /><path d="M18 29l7 7 13-15" fill="none" stroke="#6ccf8e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      <h1>Awesome work</h1>
+      <p>Now let’s start your Grafana journey!</p>
+    </div>
   </main>
+
+  <!-- 4. The product, with a way back into onboarding -->
+  <main class="dest" data-screen="dest">
+    <div class="shot">
+      <img class="shot-img" alt="" />
+      <span class="pulse" aria-hidden="true"></span>
+      <p class="hint" aria-hidden="true">Restart your onboarding here</p>
+      <a class="restart" href="#welcome" aria-label="Restart onboarding"></a>
+    </div>
+  </main>
+
+  <script type="application/json" id="dests" set:html={JSON.stringify(dests)} />
 
   <style>
     /* ---------- 1. Welcome ---------- */
@@ -159,58 +208,41 @@ const tour = { id: "explore", doc: { title: "Explore Grafana Cloud", body: "A sh
     }
     .button:hover { background: var(--primary-hover); }
     .button:active { background: #3563c2; }
-    .button:focus-visible, .skip:focus-visible, .tour a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .button:focus-visible, .tour a:focus-visible, .restart:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
-    /* ---------- 2. Setup ---------- */
-    .setup { grid-template-columns: 440px 1fr; min-height: 100vh; background: var(--canvas); }
-
-    .side { position: relative; overflow: hidden; background: var(--bg); padding: 40px; display: flex; flex-direction: column; }
-    .side > .doc { margin-block: auto; }
-    .side-logo { display: block; }
-    .plugs { position: absolute; left: -32px; bottom: -28px; width: 478px; height: 478px; pointer-events: none; }
-    .doc {
-      position: relative; z-index: 1; padding: 24px; border-radius: 4px; animation: in .2s linear;
-      background: rgba(61, 113, 217, .1); display: flex; flex-direction: column; gap: 16px;
-    }
-    .doc[hidden] { display: none; }
-    .doc h2 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; }
-    .doc p { margin: 0; font-size: 14px; line-height: 21px; }
-    .doc-links { list-style: none; margin: 4px 0 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
-    .doc-links li { position: relative; }
-    .doc-links li::before { content: ""; position: absolute; left: -14px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
-    .doc-links a, .doc-link { display: inline-flex; align-items: center; gap: 6px; color: var(--link); font-size: 14px; line-height: 22px; text-decoration: none; }
-    .doc-links a:hover, .doc-link:hover { text-decoration: underline; }
-    .doc-links a img, .doc-link img { transition: transform .15s ease; }
-    .doc-links a:hover img, .doc-link:hover img { transform: translateX(3px); }
-
-    /* One centred column instead of the fixed 1440 frame */
-    .main { position: relative; display: flex; align-items: center; justify-content: center; padding: 96px 56px; }
-    .column { width: 100%; max-width: 920px; }
-    .skip { position: absolute; right: 36px; top: 36px; display: inline-flex; align-items: center; color: var(--primary); font-weight: 700; font-size: 16px; line-height: 20px; text-decoration: none; }
-    .skip img { margin-left: 4px; transition: transform .15s ease; }
-    .skip:hover img { transform: translateX(3px); }
-
-    .setup h1 { margin: 0; font-size: 28px; line-height: 36px; font-weight: 500; color: var(--text); }
-    .lede { margin: 8px 0 32px; color: var(--text-dim); font-size: 16px; line-height: 22px; }
-    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    .card {
-      position: relative; display: flex; flex-direction: column; padding: 24px; border-radius: 2px;
-      background: var(--bg); color: var(--text); text-decoration: none;
-      transition: box-shadow .15s ease;
-    }
-    .card:hover, .card:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
-    .card-icon { height: 26px; width: auto; align-self: flex-start; margin-bottom: 16px; }
-    .card-go { position: absolute; right: 22px; top: 24px; opacity: .45; transition: opacity .15s ease, transform .15s ease; filter: grayscale(1) brightness(1.6); }
-    .card:hover .card-go, .card:focus-visible .card-go { opacity: 1; transform: translateX(3px); filter: none; }
-    .card strong { font-size: 16px; line-height: 24px; font-weight: 700; }
-    .card-body { margin-top: 6px; font-size: 14px; line-height: 20px; }
-    .card-meta { margin-top: auto; padding-top: 16px; display: flex; gap: 6px; color: var(--text-dim); font-size: 12px; line-height: 16px; }
-    .card-meta i { font-style: normal; }
-
+    /* ---------- 2. Tour link under the setup cards ---------- */
     .tour { display: flex; align-items: center; gap: 10px; margin: 32px 0 0; color: var(--text-dim); font-size: 14px; line-height: 20px; }
     .tour a { color: var(--link); text-decoration: none; }
     .tour a:hover { text-decoration: underline; }
     .tour img { height: 18px; width: auto; }
+
+    /* ---------- 3. Done ---------- */
+    .done { min-height: 100vh; place-items: center; background: var(--canvas); }
+    .done-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .done svg circle { stroke-dasharray: 164; stroke-dashoffset: 164; animation: draw .5s ease-out forwards; }
+    .done svg path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw .3s .4s ease-out forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .done h1 { margin: 20px 0 6px; font-size: 24px; line-height: 32px; font-weight: 500; }
+    .done p { margin: 0; color: var(--text-dim); font-size: 14px; line-height: 20px; }
+
+    /* ---------- 4. Destination ---------- */
+    .dest { min-height: 100vh; background: #111217; align-content: start; }
+    .shot { position: relative; width: 100%; }
+    .shot-img { display: block; width: 100%; height: auto; }
+    .restart { position: absolute; width: calc(109 / var(--w) * 100%); aspect-ratio: 109 / 32; border-radius: 2px; }
+    .restart:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
+    .pulse { position: absolute; width: calc(25 / var(--w) * 100%); aspect-ratio: 1; border-radius: 50%; pointer-events: none; }
+    .pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 0 rgba(108, 207, 142, .7); animation: pulse 1.8s ease-out infinite; }
+    @keyframes pulse { to { box-shadow: 0 0 0 14px rgba(108, 207, 142, 0); } }
+    .hint {
+      position: absolute; margin: 0; padding: 8px 12px; border-radius: 4px; white-space: nowrap;
+      background: #2c3235; color: var(--text); font-size: 13px; line-height: 18px; box-shadow: 0 4px 16px rgba(0, 0, 0, .45);
+      opacity: 0; animation: hint .5s 1s ease-out forwards, bob 2.4s 1.5s ease-in-out infinite;
+    }
+    .hint::before { content: ""; position: absolute; left: -6px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 0; border-right-color: #2c3235; }
+    @keyframes hint { from { opacity: 0; translate: 8px 0; } to { opacity: 1; translate: 0 0; } }
+    @keyframes bob { 50% { translate: 4px 0; } }
+    .shot[data-pulse="none"] .pulse, .shot[data-pulse="none"] .hint { display: none; }
 
     @media (max-width: 900px) {
       .welcome { grid-template-columns: 1fr; }
@@ -219,39 +251,66 @@ const tour = { id: "explore", doc: { title: "Explore Grafana Cloud", body: "A sh
       .content { padding: 40px 16px 56px; }
       .welcome h1 { margin-left: 0; white-space: normal; font-size: 30px; line-height: 40px; }
       .welcome ul { gap: 24px; }
-
-      .setup { grid-template-columns: 1fr; }
-      .side { order: 2; padding: 24px 16px 40px; }
-      .side-logo, .plugs { display: none; }
-      .main { padding: 72px 16px 32px; }
-      .skip { top: 26px; right: 16px; }
-      .setup h1 { font-size: 24px; line-height: 32px; }
-      .cards { grid-template-columns: 1fr; gap: 12px; }
       .tour { flex-wrap: wrap; }
+      .hint { display: none; }
     }
   </style>
 
   <script>
-    // Hash router: #welcome (default), #setup. A step that isn't built yet keeps you where you are.
+    type Dest = { w: number; h: number; restart: [number, number]; pulse?: [number, number] };
+    const dests: Record<string, Dest> = JSON.parse(document.getElementById("dests")!.textContent!);
     const screens = [...document.querySelectorAll<HTMLElement>("[data-screen]")];
+    const shot = document.querySelector<HTMLElement>(".shot")!;
+    let timer = 0;
+
+    // Hash router. #done-x shows the confirmation, then lands on #dest-x. Unknown steps keep you where you are.
     function show() {
-      const id = location.hash.slice(1);
+      clearTimeout(timer);
+      const hash = location.hash.slice(1);
+      const [, kind, dest] = hash.match(/^(done|dest)-(.+)$/) ?? [];
+      const known = Boolean(kind && dests[dest]);
+      if (known && kind === "done") timer = window.setTimeout(() => location.replace(`#dest-${dest}`), 1700);
+      if (known && kind === "dest") land(dest);
+      const id = known ? kind : hash;
       const target = screens.find((s) => s.dataset.screen === id) ?? screens.find((s) => s.classList.contains("active")) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       scrollTo(0, 0);
     }
+
+    // Place the Restart hotspot and the onboarding pointer on the product screenshot, in percentages so it scales.
+    function land(id: string) {
+      const d = dests[id];
+      const pct = (v: number, of: number) => `${(v / of) * 100}%`;
+      shot.style.setProperty("--w", String(d.w));
+      shot.querySelector<HTMLImageElement>(".shot-img")!.src = `/prototypes/grafana-onboarding/dest/${id}.webp`;
+      Object.assign(shot.querySelector<HTMLElement>(".restart")!.style, { left: pct(d.restart[0], d.w), top: pct(d.restart[1], d.h) });
+      shot.dataset.pulse = d.pulse ? "on" : "none";
+      if (d.pulse) {
+        const hint = shot.querySelector<HTMLElement>(".hint")!;
+        Object.assign(shot.querySelector<HTMLElement>(".pulse")!.style, { left: pct(d.pulse[0], d.w), top: pct(d.pulse[1], d.h) });
+        Object.assign(hint.style, { left: pct(d.pulse[0] + 44, d.w), top: `calc(${pct(d.pulse[1] + 12.5, d.h)} - 17px)` });
+        // replay the hint on every landing
+        hint.style.animation = "none";
+        void hint.offsetWidth;
+        hint.style.animation = "";
+      }
+    }
     addEventListener("hashchange", show);
     show();
 
-    // Setup: looking at a path (hover or keyboard focus) brings its docs into the left panel
-    const docs = [...document.querySelectorAll<HTMLElement>("[data-doc]")];
-    function showDoc(id: string) { docs.forEach((d) => (d.hidden = d.dataset.doc !== id)); }
-    document.querySelectorAll<HTMLElement>(".setup [data-path]").forEach((el) => {
-      const id = el.dataset.path!;
-      el.addEventListener("mouseenter", () => showDoc(id));
-      el.addEventListener("focus", () => showDoc(id));
-    });
-    document.querySelector(".setup .cards")!.addEventListener("mouseleave", () => showDoc("intro"));
+    // Looking at a path (hover or keyboard focus) brings its docs into that screen's left panel
+    for (const screen of document.querySelectorAll<HTMLElement>(".setup")) {
+      const docs = [...screen.querySelectorAll<HTMLElement>("[data-doc]")];
+      const showDoc = (id: string) => {
+        const target = docs.some((d) => d.dataset.doc === id) ? id : "intro";
+        docs.forEach((d) => (d.hidden = d.dataset.doc !== target));
+      };
+      screen.querySelectorAll<HTMLElement>("[data-path]").forEach((el) => {
+        el.addEventListener("mouseenter", () => showDoc(el.dataset.path!));
+        el.addEventListener("focus", () => showDoc(el.dataset.path!));
+      });
+      screen.querySelector(".cards")?.addEventListener("mouseleave", () => showDoc("intro"));
+    }
   </script>
 </body>
 </html>
