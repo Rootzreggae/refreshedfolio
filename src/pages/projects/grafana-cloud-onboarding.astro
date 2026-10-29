@@ -154,7 +154,6 @@ const facts: [string, string][] = [
           <button class="watch" data-watch><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Watch the demo · 35s</button>
           <a class="try" href="/prototypes/grafana-onboarding/" target="_blank" rel="noopener">Try it yourself ↗</a>
         </div>
-        <p class="note">Rebuilt in 2026 from my 2022 designs.</p>
       </div>
       <div class="hero-stage">
         <PrototypeStage src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" steps={steps} />
@@ -242,11 +241,11 @@ const facts: [string, string][] = [
       h1, h2, .beat h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
       a { color: inherit; }
 
-      .nav { padding: 24px 48px; }
+      .nav { padding: 24px clamp(16px, 4vw, 72px); }
       .back { color: rgba(255, 255, 255, .7); text-decoration: none; font-size: 15px; }
       .back:hover { color: #fff; }
 
-      .hero { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; max-width: 1600px; min-height: calc(100vh - 80px); margin: 0 auto; padding: 0 48px 64px; }
+      .hero { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: center; min-height: calc(100vh - 80px); padding: 0 clamp(16px, 4vw, 72px) 64px; }
       .eyebrow { color: #ff8833; font-size: 15px; letter-spacing: .04em; margin-bottom: 18px; }
       .hero h1 { font-size: clamp(40px, 4.6vw, 68px); line-height: 1.05; margin-bottom: 26px; }
       .lede { font-size: clamp(19px, 1.5vw, 23px); line-height: 1.5; color: rgba(255, 255, 255, .86); max-width: 34ch; }
@@ -258,13 +257,12 @@ const facts: [string, string][] = [
       .try { border: 1px solid rgba(255, 255, 255, .25); color: #fff; }
       .try:hover { border-color: rgba(255, 255, 255, .6); }
       .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ff8833; outline-offset: 3px; }
-      .note { margin-top: 18px; color: rgba(255, 255, 255, .45); font-size: 14px; }
 
-      .shots img { width: 100%; display: block; border-radius: 10px; box-shadow: 0 24px 60px rgba(0, 0, 0, .4); }
+      .shots img { width: 100%; display: block; border-radius: 10px; box-shadow: 0 6px 20px rgba(0, 0, 0, .16); }
       .shots figcaption { margin-top: 8px; color: rgba(255, 255, 255, .5); font-size: 14px; }
       .shots.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
-      .block { max-width: 1040px; margin: 0 auto; padding: 96px 48px 0; }
+      .block { max-width: 1200px; margin: 0 auto; padding: 96px clamp(16px, 4vw, 72px) 0; }
       .block h2 { font-size: clamp(30px, 3vw, 44px); line-height: 1.15; margin-bottom: 18px; }
       .block > p { max-width: 62ch; color: rgba(255, 255, 255, .8); margin-bottom: 14px; }
       .sub { color: rgba(255, 255, 255, .7); margin-bottom: 28px; }
@@ -292,7 +290,7 @@ const facts: [string, string][] = [
       .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
       .videos iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; }
 
-      .foot { max-width: 1040px; margin: 0 auto; padding: 72px 48px 140px; }
+      .foot { max-width: 1200px; margin: 0 auto; padding: 72px clamp(16px, 4vw, 72px) 140px; }
 
       @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
       @media (max-width: 1000px) {
