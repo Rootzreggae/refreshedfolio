@@ -116,20 +116,47 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     ))}
   </aside>
 
-  <!-- 1. Home -->
-  <main class="screen home" data-screen="home" data-crumb="Home">
-    <div class="home-head">
-      <h1>Welcome to <b>Grafana Cloud</b> <span class="plan">Free plan</span></h1>
-      <a class="btn primary" href="#services-empty">+ Connect data</a>
+  <!-- 1. Home: one checklist that says what to do first, usage and account on the side -->
+  <main class="screen home2" data-screen="home" data-crumb="Home">
+    <h1 class="title">Welcome to Grafana Cloud, Nilson</h1>
+    <p class="home-sub">Your stack <code>nilson.grafana.net</code> is ready · Free plan</p>
+    <div class="home-grid">
+      <div>
+        <section class="getstarted">
+          <header><h2>Get started</h2><span class="gs-progress">1 of 4 done <i><em style="width:25%"></em></i></span></header>
+          <div class="gs-step done"><span class="gs-n">✓</span><s>Create your stack</s></div>
+          <div class="gs-step current">
+            <span class="gs-n">2</span>
+            <div class="gs-body">
+              <b>Connect your first data</b>
+              <span>Everything else on this page lights up once something is reporting.</span>
+              <div class="gs-cards">
+                {[
+                  ["pulse", "Send metrics, logs and traces", "From Prometheus, an agent or OpenTelemetry", "#services-empty"],
+                  ["code", "Instrument an app", "Latency, errors and traces for Java, Go, Python and more", "#services-empty"],
+                  ["hex", "Monitor Kubernetes", "One Helm chart, cluster to pod views", "#services-empty"],
+                  ["db", "Query a database or cloud", "Postgres, CloudWatch, BigQuery and 150+ more", "#home"],
+                ].map(([ic, t, d, href]) => (
+                  <a class="gs-card" href={href}><span class:list={["gs-ic", ic]} aria-hidden="true"></span><span><b>{t}</b><small>{d}</small></span></a>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div class="gs-step"><span class="gs-n">3</span><div class="gs-body"><b>See it in a dashboard</b><span>We pick a prebuilt one that matches what you connect</span></div></div>
+          <div class="gs-step"><span class="gs-n">4</span><div class="gs-body"><b>Get alerted when something breaks</b><span>Start from recommended alert rules, then tune</span></div></div>
+        </section>
+        <section class="demo-box"><div><b>Not ready to connect anything?</b><span>Poke around a live demo stack with real data first.</span></div><a class="btn ghost-lg" href="#services">Open the demo</a></section>
+      </div>
+      <aside class="home-side">
+        <section class="usage2"><header><b>Free tier usage</b><small>This month</small></header>
+          {[["Metrics", "0 of 10k series", 0], ["Logs", "0 of 50 GB", 0], ["Traces", "0 of 50 GB", 0], ["Users", "1 of 3", 33]].map(([k, v, pct]) => (
+            <div class="meter"><span>{k}</span><span>{v}</span><i><em style={`width:${pct}%`}></em></i></div>
+          ))}
+        </section>
+        <section class="links-box"><b>Account</b>{["Invite teammates", "Access policies and tokens", "Stacks", "Billing and plan"].map((l) => <a href="#home">{l}</a>)}</section>
+        <section class="links-plain"><b>Help</b>{["Documentation", "Community forum", "Contact support"].map((l) => <a href="#home">{l}</a>)}</section>
+      </aside>
     </div>
-    <nav class="home-links">{["Stacks", "Users", "API keys", "Billing/Usage dashboard", "Manage subscription"].map((l) => <a href="#home">{l}</a>)}</nav>
-    <section class="panel usage"><div><b>Current usage</b><small>*Month to date</small></div><ul><li><em>9.5k</em> Metrics*</li><li><em>1GB</em> Logs*</li><li><em>21</em> Alerts*</li><li><em>1</em> Users</li></ul></section>
-    <div class="trio">
-      <section class="panel box"><header><h2>Data connections</h2><a href="#services-empty">All connections →</a></header><div class="empty-s"><p>No data connections yet</p><a class="btn primary" href="#services-empty">+ Connect data</a></div></section>
-      <section class="panel box"><header><h2>Dashboards</h2><a href="#home">All dashboards →</a></header><div class="empty-s"><p>No dashboards yet</p></div></section>
-      <section class="panel box"><header><h2>Alerts</h2><a href="#home">All alerts →</a></header><div class="empty-s"><p>No alerts yet</p></div></section>
-    </div>
-    <p class="hint-tip">Open the menu (☰) and pick <b>Observability</b>, or Connect data.</p>
   </main>
 
   <!-- Observability app frame: sidebar + content (screens 2 to 6) -->
@@ -677,6 +704,37 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     .page .tbl { font-size: 15px; } .page .tbl th { color: var(--dim); font-weight: 500; } .page .tbl td { padding: 12px 10px; }
     .page .chart { border-radius: 8px; } .page .tab { font-size: 15px; } .page .sec { font-size: 18px; font-weight: 600; color: #fff; margin: 18px 0 12px; }
     @media (max-width: 1200px) { .jvm-grid { grid-template-columns: 1fr; } .rail { position: static; } .langs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    /* ---------- Home ---------- */
+    .home2 { max-width: 1500px; padding: 44px clamp(24px, 4vw, 72px) 96px; }
+    .home-sub { margin: 0 0 30px; font-size: 18px; color: var(--dim); } .home-sub code { border: 0; background: none; padding: 0; font-size: 17px; color: var(--text); }
+    .home-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
+    .getstarted { border: 1px solid var(--line); border-radius: 10px; background: #181b1f; overflow: hidden; }
+    .getstarted header { display: flex; align-items: center; justify-content: space-between; padding: 24px 28px; border-bottom: 1px solid var(--line); }
+    .getstarted h2 { margin: 0; font-size: 21px; font-weight: 600; color: #fff; }
+    .gs-progress { display: flex; align-items: center; gap: 14px; color: var(--dim); } .gs-progress i { width: 220px; height: 6px; border-radius: 3px; background: #2c3035; overflow: hidden; } .gs-progress em { display: block; height: 100%; background: #3cc39a; }
+    .gs-step { display: flex; gap: 16px; padding: 20px 28px; border-bottom: 1px solid var(--line); } .gs-step:last-child { border-bottom: 0; }
+    .gs-n { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .3); font-size: 14px; color: var(--text); }
+    .gs-step.done { align-items: center; } .gs-step.done .gs-n { border-color: rgba(60, 195, 154, .5); background: rgba(60, 195, 154, .12); color: #3cc39a; } .gs-step.done s { font-size: 17px; color: var(--dim); }
+    .gs-step.current { background: #1b1e23; } .gs-step.current .gs-n { border-color: transparent; background: var(--blue); color: #fff; }
+    .gs-body { display: flex; flex-direction: column; flex: 1; } .gs-body b { font-size: 17px; font-weight: 600; color: #fff; } .gs-step:not(.current) .gs-body b { font-weight: 500; color: var(--text); } .gs-body > span { color: var(--dim); font-size: 15px; }
+    .gs-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+    .gs-card { display: flex; gap: 14px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #111217; text-decoration: none; transition: border-color .15s ease, translate .15s ease; }
+    .gs-card:hover { border-color: rgba(87, 148, 242, .6); translate: 0 -2px; } .gs-card b { display: block; margin-bottom: 4px; font-size: 16px; font-weight: 600; color: #fff; } .gs-card small { display: block; color: var(--text); font-size: 14px; line-height: 1.45; }
+    .gs-ic { flex: none; width: 40px; height: 40px; border-radius: 8px; background: rgba(255, 136, 51, .12) center / 20px no-repeat; }
+    .gs-ic.pulse { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 12h4l3-7 6 14 3-7h4' fill='none' stroke='%23ff8833' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+    .gs-ic.code { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 7l-5 5 5 5M15 7l5 5-5 5' fill='none' stroke='%23ff8833' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+    .gs-ic.hex { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5 20.5 7v10L12 21.5 3.5 17V7Z' fill='none' stroke='%23ff8833' stroke-width='1.8'/%3E%3Ccircle cx='12' cy='12' r='3' fill='none' stroke='%23ff8833' stroke-width='1.8'/%3E%3C/svg%3E"); }
+    .gs-ic.db { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cellipse cx='12' cy='5.5' rx='7' ry='2.5' fill='none' stroke='%23ff8833' stroke-width='1.8'/%3E%3Cpath d='M5 5.5v13c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-13M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5' fill='none' stroke='%23ff8833' stroke-width='1.8'/%3E%3C/svg%3E"); }
+    .demo-box { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 24px; padding: 22px 28px; border: 1px dashed rgba(204, 204, 220, .25); border-radius: 10px; }
+    .demo-box div { display: flex; flex-direction: column; } .demo-box b { font-size: 17px; color: #fff; } .demo-box span { color: var(--dim); }
+    .ghost-lg { height: 44px; padding: 0 22px; border-radius: 6px; background: none; border-color: rgba(204, 204, 220, .3); font-size: 16px; color: #fff; }
+    .home-side { display: flex; flex-direction: column; gap: 22px; }
+    .usage2, .links-box { padding: 22px 26px; border: 1px solid var(--line); border-radius: 10px; background: #181b1f; }
+    .usage2 header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; } .usage2 b, .links-box b, .links-plain b { font-size: 18px; font-weight: 600; color: #fff; } .usage2 small { color: var(--dim); font-size: 14px; }
+    .meter { display: grid; grid-template-columns: 1fr auto; gap: 8px 0; margin-bottom: 16px; font-size: 16px; } .meter span:nth-child(2) { color: var(--text); } .meter i { grid-column: 1 / -1; height: 5px; border-radius: 3px; background: #2c3035; overflow: hidden; } .meter em { display: block; height: 100%; background: var(--blue); }
+    .links-box, .links-plain { display: flex; flex-direction: column; gap: 14px; } .links-plain { padding: 0 26px; }
+    .links-box a, .links-plain a { color: var(--text); text-decoration: none; font-size: 16px; } .links-box a:hover, .links-plain a:hover { color: #fff; }
+    @media (max-width: 1200px) { .home-grid { grid-template-columns: 1fr; } .gs-cards { grid-template-columns: 1fr 1fr; } }
   </style>
 </body>
 </html>
