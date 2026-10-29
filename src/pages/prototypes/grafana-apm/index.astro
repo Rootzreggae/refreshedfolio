@@ -118,8 +118,16 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
 
   <!-- 1. Home: one checklist that says what to do first, usage and account on the side -->
   <main class="screen home2" data-screen="home" data-crumb="Home">
-    <h1 class="title">Welcome to Grafana Cloud, Nilson</h1>
-    <p class="home-sub">Your stack <code>nilson.grafana.net</code> is ready · Free plan</p>
+    <div class="home-top">
+      <div><h1 class="title">Welcome to <b>Grafana Cloud</b>, Nilson <span class="plan">Free plan</span></h1>
+      <p class="home-sub">Your stack <code>nilson.grafana.net</code> is ready</p></div>
+      <a class="btn primary" href="#services-empty">+ Connect data</a>
+    </div>
+    <section class="strip">
+      <div><b>Free tier usage</b><small>This month</small></div>
+      <ul>{[["0", "of 10k", "Metrics"], ["0", "of 50 GB", "Logs"], ["0", "of 50 GB", "Traces"], ["1", "of 3", "Users"]].map(([n, of, k]) => <li><em>{n}</em> <span>{of}</span> {k}</li>)}</ul>
+      <a class="plink" href="#home">Billing and plan →</a>
+    </section>
     <div class="home-grid">
       <div>
         <section class="getstarted">
@@ -148,13 +156,8 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
         <section class="demo-box"><div><b>Not ready to connect anything?</b><span>Poke around a live demo stack with real data first.</span></div><a class="btn ghost-lg" href="#services">Open the demo</a></section>
       </div>
       <aside class="home-side">
-        <section class="usage2"><header><b>Free tier usage</b><small>This month</small></header>
-          {[["Metrics", "0 of 10k series", 0], ["Logs", "0 of 50 GB", 0], ["Traces", "0 of 50 GB", 0], ["Users", "1 of 3", 33]].map(([k, v, pct]) => (
-            <div class="meter"><span>{k}</span><span>{v}</span><i><em style={`width:${pct}%`}></em></i></div>
-          ))}
-        </section>
-        <section class="links-box"><b>Account</b>{["Invite teammates", "Access policies and tokens", "Stacks", "Billing and plan"].map((l) => <a href="#home">{l}</a>)}</section>
-        <section class="links-plain"><b>Help</b>{["Documentation", "Community forum", "Contact support"].map((l) => <a href="#home">{l}</a>)}</section>
+        <section class="links-box"><header><b>Account</b><a class="plink" href="#home">Manage →</a></header>{["Invite teammates", "Access policies and tokens", "Stacks", "Billing and plan"].map((l) => <a href="#home">{l}</a>)}</section>
+        <section class="links-box"><header><b>Help</b><a class="plink" href="#home">Docs →</a></header>{["Documentation", "Community forum", "Contact support"].map((l) => <a href="#home">{l}</a>)}</section>
       </aside>
     </div>
   </main>
@@ -735,6 +738,34 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     .links-box, .links-plain { display: flex; flex-direction: column; gap: 14px; } .links-plain { padding: 0 26px; }
     .links-box a, .links-plain a { color: var(--text); text-decoration: none; font-size: 16px; } .links-box a:hover, .links-plain a:hover { color: #fff; }
     @media (max-width: 1200px) { .home-grid { grid-template-columns: 1fr; } .gs-cards { grid-template-columns: 1fr 1fr; } }
+    /* ---------- Grafana visual language (from the original file): 2px corners, flat panels, lighter headings ---------- */
+    .page { margin: 0 auto; max-width: 1560px; }
+    .home2 { margin: 0 auto; max-width: 1560px; }
+    .title { font-size: 30px; font-weight: 400; letter-spacing: 0; } .title b { font-weight: 600; }
+    .q, .stepcard h2, .getstarted h2, .gs-body b, .gs-card b, .demo-box b, .lang b, .links-box b, .rail b, .callout-k b { font-weight: 500; }
+    .getstarted, .stepcard, .lang, .gs-card, .demo-box, .links-box, .rail-box, .skeleton, .callout-k, .codebox, .listen, .field, .btn, .btn.big, .ghost-lg, .seg.big, .seg.big button, .copy, .side-group a { border-radius: 2px; }
+    .getstarted, .stepcard, .links-box, .rail-box, .skeleton { background: #181b1f; border-color: rgba(204, 204, 220, .12); }
+    .lang, .gs-card { border: 0; background: #22252b; transition: box-shadow .15s ease; translate: none; }
+    .lang:not(.off):hover, .gs-card:hover { translate: none; box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, .8); border-color: transparent; }
+    .lang.dashed { background: transparent; box-shadow: inset 0 0 0 1px rgba(204, 204, 220, .2); }
+    .gs-ic, .lang-ic { border-radius: 2px; }
+    .getstarted header, .links-box header { display: flex; justify-content: space-between; align-items: baseline; }
+    .plink { color: #6e9fff; font-size: 13px; text-decoration: none; white-space: nowrap; } .plink:hover { text-decoration: underline; }
+    .home-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+    .home-top .title { display: block; margin-bottom: 6px; } .plan { margin-left: 10px; padding: 1px 6px; border: 1px solid rgba(204, 204, 220, .25); border-radius: 2px; font-size: 12px; font-weight: 400; color: var(--dim); vertical-align: middle; }
+    .home-sub { margin-bottom: 22px; font-size: 15px; }
+    .strip { display: flex; align-items: center; gap: 48px; margin-bottom: 24px; padding: 22px 26px; border: 1px solid rgba(204, 204, 220, .12); border-radius: 2px; background: #181b1f; }
+    .strip div { display: flex; flex-direction: column; min-width: 140px; } .strip b { font-size: 17px; font-weight: 500; color: #fff; } .strip small { color: var(--dim); font-size: 12px; }
+    .strip ul { display: flex; gap: 52px; margin: 0 auto 0 0; padding: 0; list-style: none; font-size: 16px; color: var(--text); }
+    .strip em { font-style: normal; font-size: 28px; color: #ff9830; } .strip span { color: var(--dim); font-size: 13px; }
+    .home-grid { grid-template-columns: minmax(0, 1fr) 340px; }
+    .getstarted h2 { font-size: 19px; } .gs-step.current { background: transparent; }
+    .gs-progress i { width: 180px; height: 4px; border-radius: 2px; }
+    .links-box { gap: 12px; } .links-box header { margin-bottom: 4px; } .links-box b { font-size: 17px; }
+    .links-box a:not(.plink) { font-size: 15px; }
+    .demo-box { border-radius: 2px; }
+    .stepcard .stepnum, .gs-n, .stepper span { font-weight: 500; }
+    .side-group a.on { border-radius: 2px; }
   </style>
 </body>
 </html>
