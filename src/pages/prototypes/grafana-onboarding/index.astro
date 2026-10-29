@@ -6,6 +6,9 @@ import HostedPrometheus from "../../../components/onboarding/HostedPrometheus.as
 import KubernetesMonitoring from "../../../components/onboarding/KubernetesMonitoring.astro";
 import CloudHome from "../../../components/onboarding/CloudHome.astro";
 import PlayHome from "../../../components/onboarding/PlayHome.astro";
+import IntegrationsConsole from "../../../components/onboarding/IntegrationsConsole.astro";
+import GraphitePlugin from "../../../components/onboarding/GraphitePlugin.astro";
+import OnCall from "../../../components/onboarding/OnCall.astro";
 
 const A = "/prototypes/grafana-onboarding";
 const benefits = [
@@ -70,20 +73,6 @@ const connect = [
   { id: "other", icon: "os-other.svg", to: "done-console-paid", title: "Something else" },
 ];
 
-// Where each path lands: the Grafana screen, the Restart button on it, and the onboarding entry in the menu.
-const dests = {
-  kube: { w: 1440, h: 1000, restart: [1233, 866] },
-  oncall: { w: 1723, h: 1000, restart: [1367, 866] },
-  prom: { w: 1552, h: 1024, restart: [1367, 866], pulse: [23, 453] },
-  loki: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
-  tempo: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
-  graphite: { w: 1600, h: 1024, restart: [1367, 866], pulse: [23, 453] },
-  play: { w: 1655, h: 950, restart: [1492, 866], pulse: [23, 453] },
-  console: { w: 1600, h: 1000, restart: [1367, 866], pulse: [23, 453] },
-  "console-ext": { w: 1600, h: 1000, restart: [1367, 866], pulse: [21, 453] },
-  "console-paid": { w: 1600, h: 1024, restart: [1367, 866], pulse: [23, 453] },
-  home: { w: 1440, h: 1000, restart: [1247, 866] },
-};
 ---
 <!doctype html>
 <html lang="en">
@@ -165,22 +154,18 @@ const dests = {
     </div>
   </main>
 
-  <!-- 4. The product, with a way back into onboarding. Coded where it matters, the original screen elsewhere -->
+  <!-- 4. The product each path lands in, rebuilt in code -->
   <GrafanaShell id="dest-prom"><HostedPrometheus /></GrafanaShell>
   <GrafanaShell id="dest-kube"><KubernetesMonitoring /></GrafanaShell>
   <GrafanaShell id="dest-home"><CloudHome /></GrafanaShell>
   <GrafanaShell id="dest-play"><PlayHome /></GrafanaShell>
-
-  <main class="dest" data-screen="dest">
-    <div class="shot">
-      <img class="shot-img" alt="" />
-      <span class="pulse" aria-hidden="true"></span>
-      <p class="hint" aria-hidden="true">Restart your onboarding here</p>
-      <a class="restart" href="#welcome" aria-label="Restart onboarding"></a>
-    </div>
-  </main>
-
-  <script type="application/json" id="dests" set:html={JSON.stringify(dests)} />
+  <GrafanaShell id="dest-oncall"><OnCall /></GrafanaShell>
+  <GrafanaShell id="dest-graphite"><GraphitePlugin /></GrafanaShell>
+  <GrafanaShell id="dest-loki"><IntegrationsConsole q="loki" /></GrafanaShell>
+  <GrafanaShell id="dest-tempo"><IntegrationsConsole q="tempo" /></GrafanaShell>
+  <GrafanaShell id="dest-console"><IntegrationsConsole /></GrafanaShell>
+  <GrafanaShell id="dest-console-ext"><IntegrationsConsole category="Data source" /></GrafanaShell>
+  <GrafanaShell id="dest-console-paid"><IntegrationsConsole installed /></GrafanaShell>
 
   <style>
     /* ---------- 1. Welcome ---------- */
@@ -218,7 +203,7 @@ const dests = {
     }
     .button:hover { background: var(--primary-hover); }
     .button:active { background: #3563c2; }
-    .button:focus-visible, .tour a:focus-visible, .restart:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .button:focus-visible, .tour a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
     /* ---------- 2. Tour link under the setup cards ---------- */
     .tour { display: flex; align-items: center; gap: 10px; margin: 32px 0 0; color: var(--text-dim); font-size: 14px; line-height: 20px; }
@@ -235,24 +220,6 @@ const dests = {
     .done h1 { margin: 20px 0 6px; font-size: 24px; line-height: 32px; font-weight: 500; }
     .done p { margin: 0; color: var(--text-dim); font-size: 14px; line-height: 20px; }
 
-    /* ---------- 4. Destination ---------- */
-    .dest { min-height: 100vh; background: #111217; align-content: start; }
-    .shot { position: relative; width: 100%; }
-    .shot-img { display: block; width: 100%; height: auto; }
-    .restart { position: absolute; width: calc(109 / var(--w) * 100%); aspect-ratio: 109 / 32; border-radius: 2px; }
-    .restart:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); }
-    .pulse { position: absolute; width: calc(25 / var(--w) * 100%); aspect-ratio: 1; border-radius: 50%; pointer-events: none; }
-    .pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 0 rgba(108, 207, 142, .7); animation: pulse 1.8s ease-out infinite; }
-    @keyframes pulse { to { box-shadow: 0 0 0 14px rgba(108, 207, 142, 0); } }
-    .hint {
-      position: absolute; margin: 0; padding: 8px 12px; border-radius: 4px; white-space: nowrap;
-      background: #2c3235; color: var(--text); font-size: 13px; line-height: 18px; box-shadow: 0 4px 16px rgba(0, 0, 0, .45);
-      opacity: 0; animation: hint .5s 1s ease-out forwards, bob 2.4s 1.5s ease-in-out infinite;
-    }
-    .hint::before { content: ""; position: absolute; left: -6px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 0; border-right-color: #2c3235; }
-    @keyframes hint { from { opacity: 0; translate: 8px 0; } to { opacity: 1; translate: 0 0; } }
-    @keyframes bob { 50% { translate: 4px 0; } }
-    .shot[data-pulse="none"] .pulse, .shot[data-pulse="none"] .hint { display: none; }
 
     @media (max-width: 900px) {
       .welcome { grid-template-columns: 1fr; }
@@ -262,50 +229,24 @@ const dests = {
       .welcome h1 { margin-left: 0; white-space: normal; font-size: 30px; line-height: 40px; }
       .welcome ul { gap: 24px; }
       .tour { flex-wrap: wrap; }
-      .hint { display: none; }
     }
   </style>
 
   <script>
-    type Dest = { w: number; h: number; restart: [number, number]; pulse?: [number, number] };
-    const dests: Record<string, Dest> = JSON.parse(document.getElementById("dests")!.textContent!);
     const screens = [...document.querySelectorAll<HTMLElement>("[data-screen]")];
-    const shot = document.querySelector<HTMLElement>(".shot")!;
+    const has = (id: string) => screens.some((s) => s.dataset.screen === id);
     let timer = 0;
 
     // Hash router. #done-x shows the confirmation, then lands on #dest-x. Unknown steps keep you where you are.
     function show() {
       clearTimeout(timer);
       const hash = location.hash.slice(1);
-      const [, kind, dest] = hash.match(/^(done|dest)-(.+)$/) ?? [];
-      const known = Boolean(kind && dests[dest]);
-      if (known && kind === "done") timer = window.setTimeout(() => location.replace(`#dest-${dest}`), 1700);
-      if (known && kind === "dest" && !screens.some((s) => s.dataset.screen === hash)) land(dest);
-      // a destination rebuilt in code has its own screen; the rest use the original screenshot
-      const coded = kind === "dest" && screens.some((s) => s.dataset.screen === hash);
-      const id = coded ? hash : known ? kind : hash;
+      const dest = hash.match(/^done-(.+)$/)?.[1];
+      if (dest && has(`dest-${dest}`)) timer = window.setTimeout(() => location.replace(`#dest-${dest}`), 1700);
+      const id = dest && has(`dest-${dest}`) ? "done" : hash;
       const target = screens.find((s) => s.dataset.screen === id) ?? screens.find((s) => s.classList.contains("active")) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       scrollTo(0, 0);
-    }
-
-    // Place the Restart hotspot and the onboarding pointer on the product screenshot, in percentages so it scales.
-    function land(id: string) {
-      const d = dests[id];
-      const pct = (v: number, of: number) => `${(v / of) * 100}%`;
-      shot.style.setProperty("--w", String(d.w));
-      shot.querySelector<HTMLImageElement>(".shot-img")!.src = `/prototypes/grafana-onboarding/dest/${id}.webp`;
-      Object.assign(shot.querySelector<HTMLElement>(".restart")!.style, { left: pct(d.restart[0], d.w), top: pct(d.restart[1], d.h) });
-      shot.dataset.pulse = d.pulse ? "on" : "none";
-      if (d.pulse) {
-        const hint = shot.querySelector<HTMLElement>(".hint")!;
-        Object.assign(shot.querySelector<HTMLElement>(".pulse")!.style, { left: pct(d.pulse[0], d.w), top: pct(d.pulse[1], d.h) });
-        Object.assign(hint.style, { left: pct(d.pulse[0] + 44, d.w), top: `calc(${pct(d.pulse[1] + 12.5, d.h)} - 17px)` });
-        // replay the hint on every landing
-        hint.style.animation = "none";
-        void hint.offsetWidth;
-        hint.style.animation = "";
-      }
     }
     addEventListener("hashchange", show);
     show();

@@ -1,5 +1,5 @@
 ---
-// The Grafana app frame a path lands in: side menu with the onboarding entry pulsing, and a way back into onboarding.
+// The Grafana app frame a path lands in: side menu with the onboarding entry pulsing, which leads back into onboarding.
 interface Props { id: string; pulse?: boolean }
 const { id, pulse = true } = Astro.props;
 const N = "/prototypes/grafana-onboarding/nav";
@@ -31,7 +31,6 @@ const items = [
 
   <div class="page"><slot /></div>
 
-  <a class="restart" href="#welcome"><img src={`${N}/restart.svg`} alt="" width="20" height="20" />Restart</a>
 </main>
 
 <style>
@@ -67,17 +66,10 @@ const items = [
 
   .page { min-width: 0; }
 
-  .restart {
-    position: fixed; right: 32px; bottom: 32px; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 2px;
-    background: linear-gradient(90deg, #f55f3e, #ff8833); color: #fff; font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: none;
-    box-shadow: 0 4px 16px rgba(245, 95, 62, .35); transition: filter .15s ease;
-  }
-  .restart:hover { filter: brightness(1.08); }
-  .restart:focus-visible, .item:focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
+  .item:focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
 
   @media (max-width: 900px) {
     .app { grid-template-columns: 1fr; }
     .menu { display: none; }
-    .restart { right: 16px; bottom: 16px; }
   }
 </style>

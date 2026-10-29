@@ -1,0 +1,143 @@
+---
+// Grafana OnCall: where "Set up on-call" lands. Rebuilt from the 2022 screen; adding an integration moves the setup guide on.
+import "./grafana.css";
+const tabs = ["Alert Groups", "Users", "Integrations", "Escalation Chains", "Schedules", "ChatOps", "Outgoing Webhooks", "Maintenance", "Settings"];
+const stats = [["New alert groups", "bell"], ["Acknowledged alert groups", "eye"], ["Resolved alert groups", "check"], ["Silenced alert groups", "mute"]];
+const guide = ["Add integration with a monitoring system", "Setup escalation chain to handle notifications", "Connect to your chat workspace", "Add your team calendar to define an on-call rotation.", "OnCall manages your alerts"];
+const sources = [["Grafana Alerting", "Alerts from this Grafana stack"], ["Alertmanager", "Prometheus Alertmanager"], ["Webhook", "Any system that can POST JSON"], ["Zabbix", "Zabbix triggers"]];
+const icons: Record<string, string> = {
+  bell: `<path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5Zm4 2.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.5"/>`,
+  eye: `<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.5"/>`,
+  check: `<path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="1.8"/>`,
+  mute: `<path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5ZM4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.5"/>`,
+};
+---
+<div class="gp oncall" data-oncall>
+  <header class="top">
+    <span class="mark" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#ff8833" stroke-width="3"/><path d="M20 10 29 27H11Z" fill="none" stroke="#f55f3e" stroke-width="3" stroke-linejoin="round"/></svg></span>
+    <div><h1>Grafana OnCall</h1><p>Developer-friendly incident response (v1.0.4)</p></div>
+    <label class="team">Select Team <select><option>General</option></select></label>
+  </header>
+
+  <div class="tabs" role="tablist">
+    {tabs.map((t, i) => <button class="tab" role="tab" aria-selected={i === 0 ? "true" : "false"} data-tab={t}>{t}</button>)}
+  </div>
+
+  <div class="wrap">
+    <div class="warn" data-warn>
+      <span class="warn-icon" aria-hidden="true">!</span>
+      <div><b>Connectivity Warning</b><p>Slack Integration is not installed. Please fix it in <a class="inline" href="#dest-oncall">Slack Settings</a>. Your phone number is not verified. You can change your configuration in <a class="inline" href="#dest-oncall">User settings</a></p></div>
+      <button class="x" aria-label="Dismiss" data-dismiss><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2 2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <section data-pane="Alert Groups">
+      <div class="filter">Status: <span class="chip">New ×</span><span class="chip">Acknowledged ×</span><input placeholder="Search or filter results…" aria-label="Search alert groups" /></div>
+      <div class="stats">
+        {stats.map(([label, ic]) => <div class="stat"><svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" set:html={icons[ic]} /><div><span>{label}</span><strong>0</strong></div></div>)}
+      </div>
+      <div class="panel empty">
+        <p>No alert groups found, review your filter and team settings. Make sure you have at least one working integration.</p>
+        <button class="primary" data-go="Integrations">Go to integrations page</button>
+        <ol class="guide" data-guide>
+          {guide.map((g, i) => <li data-step={i}><span class="dot" aria-hidden="true"></span>{g}</li>)}
+        </ol>
+      </div>
+    </section>
+
+    <section data-pane="Integrations" hidden>
+      <div class="panel">
+        <h2>Add an integration</h2>
+        <p class="dim">Where do your alerts come from? OnCall receives them, groups them and routes them to whoever is on shift.</p>
+        <ul class="sources">
+          {sources.map(([n, d]) => <li><div><b>{n}</b><span>{d}</span></div><button class="ghost" data-add={n}>Add</button></li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section data-pane="other" hidden><div class="panel"><p class="dim">This part of OnCall isn’t in the prototype. Start with <button class="textlink" data-go="Integrations">Integrations</button>.</p></div></section>
+  </div>
+  <p class="toast" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-oncall]")!;
+  const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const tabs = [...root.querySelectorAll<HTMLElement>("[data-tab]")];
+  function open(id: string) {
+    tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id)));
+    const panes = [...root.querySelectorAll<HTMLElement>("[data-pane]")];
+    const has = panes.some((p) => p.dataset.pane === id);
+    panes.forEach((p) => (p.hidden = p.dataset.pane !== (has ? id : "other")));
+  }
+  tabs.forEach((t) => t.addEventListener("click", () => open(t.dataset.tab!)));
+  root.querySelectorAll<HTMLElement>("[data-go]").forEach((b) => b.addEventListener("click", () => open(b.dataset.go!)));
+  $("[data-dismiss]").addEventListener("click", () => { $("[data-warn]").hidden = true; });
+
+  // Adding an integration completes the first step of the guide and sends you back to see it
+  root.querySelectorAll<HTMLButtonElement>("[data-add]").forEach((b) => b.addEventListener("click", () => {
+    b.textContent = "Added";
+    b.disabled = true;
+    root.querySelector("[data-step='0']")!.classList.add("done");
+    root.querySelector("[data-step='1']")!.classList.add("next");
+    toast(`${b.dataset.add} connected. Next: an escalation chain`);
+    setTimeout(() => open("Alert Groups"), 900);
+  }));
+  root.querySelector("[data-step='0']")!.classList.add("next");
+
+  const toastEl = $(".toast");
+  let toastTimer = 0;
+  function toast(text: string) {
+    toastEl.textContent = text;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toastEl.classList.remove("on"), 2200);
+  }
+</script>
+
+<style>
+  .oncall { padding-bottom: 120px; }
+  .top { display: flex; align-items: center; gap: 12px; padding: 24px 24px 0 24px; }
+  .top h1 { margin: 0; font-size: 22px; line-height: 28px; font-weight: 400; color: #d8d9da; }
+  .top p { margin: 0; font-size: 12px; color: var(--dim); }
+  .team { margin-left: auto; display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+  .oncall .tabs { padding-left: 16px; flex-wrap: wrap; }
+  .wrap { padding: 16px 24px; }
+  .warn { display: flex; align-items: stretch; margin-bottom: 16px; background: #181b1f; border-radius: 2px; overflow: hidden; }
+  .warn[hidden] { display: none; }
+  .warn-icon { display: grid; place-items: center; width: 44px; flex: none; background: #f8d06b; color: #111217; font-weight: 700; font-size: 18px; }
+  .warn > div { flex: 1; padding: 10px 14px; }
+  .warn b { color: #d8d9da; font-weight: 500; }
+  .warn p { margin: 2px 0 0; font-size: 12px; }
+  .x { align-self: flex-start; display: grid; place-items: center; width: 28px; height: 28px; margin: 6px; border: 0; background: none; color: var(--dim); cursor: pointer; }
+  .filter { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 16px; border: 1px solid var(--line); border-radius: 2px; font-size: 12px; }
+  .chip { padding: 1px 6px; border-radius: 2px; background: #2c3235; }
+  .filter input { margin-left: 8px; width: 240px; height: 26px; font-size: 12px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .stat { display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: #181b1f; border-left: 3px solid #ff8833; border-radius: 2px; color: var(--dim); }
+  .stat:nth-child(n + 3) { border-left-color: transparent; }
+  .stat div { display: flex; flex-direction: column; }
+  .stat span { font-size: 12px; }
+  .stat strong { font-size: 20px; font-weight: 500; color: #d8d9da; }
+  .empty { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 56px 24px 64px; text-align: center; }
+  .empty > p { margin: 0; font-size: 12.5px; }
+  .guide { list-style: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; max-width: 900px; margin: 48px 0 0; padding: 0; counter-reset: s; }
+  .guide li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 12px; color: var(--dim); }
+  .guide li + li::before { content: "→"; position: absolute; left: -22px; top: 10px; color: rgba(204, 204, 220, .3); }
+  .dot { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(204, 204, 220, .2); background: #22252b; }
+  .guide .next .dot { border-color: #ff8833; box-shadow: 0 0 0 4px rgba(255, 136, 51, .15); }
+  .guide .done .dot { border-color: #6ccf8e; background: #6ccf8e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='12'%3E%3Cpath d='M1 6l5 5 9-10' fill='none' stroke='%23111217' stroke-width='2.2'/%3E%3C/svg%3E") no-repeat center; }
+  .guide .done { color: #ccccdc; }
+  .panel h2 { margin: 0 0 8px; font-size: 18px; font-weight: 500; color: #d8d9da; }
+  .dim { color: var(--dim); }
+  .sources { list-style: none; margin: 20px 0 0; padding: 0; max-width: 640px; }
+  .sources li { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .sources div { display: flex; flex-direction: column; }
+  .sources b { font-weight: 500; color: #d8d9da; }
+  .sources span { font-size: 12px; color: var(--dim); }
+  .ghost { height: 28px; padding: 0 14px; font: inherit; color: #ccccdc; background: none; border: 1px solid var(--line); border-radius: 2px; cursor: pointer; }
+  .ghost:hover:not(:disabled) { border-color: #5794f2; }
+  .ghost:disabled { color: #6ccf8e; border-color: transparent; }
+  .textlink { padding: 0; font: inherit; color: var(--link); background: none; border: 0; cursor: pointer; }
+  @media (max-width: 1000px) { .stats { grid-template-columns: 1fr 1fr; } .guide { grid-template-columns: 1fr; } .guide li + li::before { display: none; } }
+  @media (max-width: 900px) { .top { flex-wrap: wrap; padding: 20px 16px 0; } .team { margin-left: 0; } .wrap { padding: 16px; } }
+</style>
