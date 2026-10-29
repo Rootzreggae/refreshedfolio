@@ -565,6 +565,8 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       if (id === "app-sessions") { id = "app"; tab = "sessions"; }
       const dd = id.match(/^app-error-(\d+)$/), pd = id.match(/^app-page-(\d+)$/), sd = id.match(/^app-session-(\d+)$/);
       if (sd) { id = "app"; tab = "session"; }
+      const ef = id.match(/^app-error-fly-(\d+)$/); // the errors list with one error's flyout open (used by the case study)
+      if (ef) { id = "app"; tab = "errors"; }
       if (dd) { id = "app"; tab = "drill"; }
       if (pd) { id = "app"; tab = "pdrill"; }
       const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
@@ -580,6 +582,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       if (dd) drillTo(+dd[1]);
       if (pd) pageDrill(+pd[1]);
       if (sd) sessionDrill(+sd[1]);
+      if (ef) requestAnimationFrame(() => openFly("err", +ef[1]));
       scrollTo(0, 0);
     }
     addEventListener("hashchange", show);
@@ -740,7 +743,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       location.hash = fyKind === "err" ? `#app-error-${fyIdx}` : `#app-page-${fyIdx}`;
     });
     addEventListener("keydown", (e) => { if (e.key === "Escape" && fly.classList.contains("on")) closeFly(); });
-    addEventListener("hashchange", () => fly.classList.contains("on") && closeFly());
+    addEventListener("hashchange", () => fly.classList.contains("on") && !location.hash.startsWith("#app-error-fly-") && closeFly());
     document.querySelectorAll<HTMLElement>("[data-watch]").forEach((b) => b.addEventListener("click", () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); b.querySelector("span")!.textContent = on ? "Watching" : "Watch"; }));
     $("[data-sfilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-srow]").forEach((r) => (r.hidden = !r.dataset.srow!.toLowerCase().includes(q))); });
     $("[data-efilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-erow]").forEach((r) => { r.hidden = !r.dataset.erow!.toLowerCase().includes(q); }); });
