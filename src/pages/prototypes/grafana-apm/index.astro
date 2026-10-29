@@ -66,15 +66,19 @@ const spans = [
   { name: "cartservice", op: "postgres SELECT", depth: 2, start: 58, len: 22, ms: "112.4ms", color: "#ff9830" },
 ];
 const languages = [
-  { id: "java", name: "Java", on: true }, { id: "go", name: "Go" }, { id: "node", name: "Nodejs" }, { id: "js", name: "Javascript" },
-  { id: "kube", name: "Kubernetes" }, { id: "net", name: ".NET" }, { id: "python", name: "Python" },
+  { id: "java", ic: "Jv", name: "Java", fw: "Java 8+, Kotlin, Scala", on: true },
+  { id: "go", ic: "Go", name: "Go", fw: "SDK, or zero-code with eBPF" },
+  { id: "python", ic: "Py", name: "Python", fw: "Django, Flask, FastAPI" },
+  { id: "node", ic: "JS", name: "Node.js", fw: "Express, Nest, Fastify" },
+  { id: "net", ic: "C#", name: ".NET", fw: "ASP.NET Core, .NET 6+" },
 ];
 const side = [
-  ["Kubernetes", ["Nodes", "Dashboards", "Alerts", "Cluster Efficiency Ove.."]],
-  ["Application", ["Services", "Service Map", "Configuration"]],
-  ["Frontend", ["Error awareness", "Starred", "Documentation", "Submit feedback"]],
+  ["Kubernetes", ["Nodes", "Dashboards", "Alerts", "Cluster efficiency"]],
+  ["Application", ["Services", "Service map", "Configuration"]],
+  ["Frontend", ["Error awareness", "Starred"]],
   ["Synthetics", ["Data sources", "Infrastructure", "Custom data"]],
 ] as const;
+const steps = ["Pick a language", "Run the agent", "See your data"];
 const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incidents", "Connections", "Observability", "Administration"];
 ---
 <!doctype html>
@@ -97,16 +101,14 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
   </style>
 </head>
 <body>
-  <!-- Top bar and breadcrumb: Grafana 10 shell -->
+  <!-- One top bar: menu, logo and breadcrumb on the left, search on the right -->
   <header class="topbar">
-    <img src={`${A}/grafana.svg`} alt="Grafana" width="24" height="24" />
-    <label class="search"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m10.6 10.6 3.4 3.4" stroke="currentColor" stroke-width="1.4"/></svg><input placeholder="Search or jump to..." aria-label="Search" /><kbd>cmd+k</kbd></label>
-    <span class="tb-icons" aria-hidden="true"><i>?</i><i>⌂</i><i class="avatar"></i></span>
-  </header>
-  <nav class="crumbs">
     <button class="burger" data-menu aria-label="Open menu" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-    <span data-crumbs>Home</span>
-  </nav>
+    <img src={`${A}/grafana.svg`} alt="Grafana" width="26" height="26" />
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <label class="search"><svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m10.6 10.6 3.4 3.4" stroke="currentColor" stroke-width="1.4"/></svg><input placeholder="Search or jump to" aria-label="Search" /><kbd>⌘K</kbd></label>
+    <span class="avatar" aria-hidden="true"></span>
+  </header>
 
   <aside class="mega" data-mega hidden>
     {megamenu.map((m) => (
@@ -118,12 +120,12 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
   <main class="screen home" data-screen="home" data-crumb="Home">
     <div class="home-head">
       <h1>Welcome to <b>Grafana Cloud</b> <span class="plan">Free plan</span></h1>
-      <a class="btn primary" href="#config">+ Connect data</a>
+      <a class="btn primary" href="#services-empty">+ Connect data</a>
     </div>
     <nav class="home-links">{["Stacks", "Users", "API keys", "Billing/Usage dashboard", "Manage subscription"].map((l) => <a href="#home">{l}</a>)}</nav>
     <section class="panel usage"><div><b>Current usage</b><small>*Month to date</small></div><ul><li><em>9.5k</em> Metrics*</li><li><em>1GB</em> Logs*</li><li><em>21</em> Alerts*</li><li><em>1</em> Users</li></ul></section>
     <div class="trio">
-      <section class="panel box"><header><h2>Data connections</h2><a href="#config">All connections →</a></header><div class="empty-s"><p>No data connections yet</p><a class="btn primary" href="#config">+ Connect data</a></div></section>
+      <section class="panel box"><header><h2>Data connections</h2><a href="#services-empty">All connections →</a></header><div class="empty-s"><p>No data connections yet</p><a class="btn primary" href="#services-empty">+ Connect data</a></div></section>
       <section class="panel box"><header><h2>Dashboards</h2><a href="#home">All dashboards →</a></header><div class="empty-s"><p>No dashboards yet</p></div></section>
       <section class="panel box"><header><h2>Alerts</h2><a href="#home">All alerts →</a></header><div class="empty-s"><p>No alerts yet</p></div></section>
     </div>
@@ -133,94 +135,93 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
   <!-- Observability app frame: sidebar + content (screens 2 to 6) -->
   <div class="app" data-app>
     <aside class="side">
-      <p class="side-title"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 9h3l2-6 4 10 2-4h3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>Observability</p>
+      <p class="side-title"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 9h3l2-6 4 10 2-4h3" fill="none" stroke="#ff8833" stroke-width="1.6"/></svg>Observability</p>
       {side.map(([group, items]) => (
         <div class="side-group">
           <p>{group}</p>
-          {items.map((it) => <a href={it === "Services" ? "#services" : it === "Configuration" ? "#config" : it === "Service Map" ? "#svc-map" : "#services"} data-side={it}>{it}</a>)}
+          {items.map((it) => <a href={it === "Services" ? "#services" : it === "Configuration" ? "#services-empty" : it === "Service map" ? "#svc-map" : "#services"} data-side={it}>{it}</a>)}
         </div>
       ))}
+      <div class="side-foot"><a href="#services">Documentation</a><a href="#services">Give feedback</a></div>
     </aside>
 
     <div class="content">
-      <!-- 2. Empty state -->
-      <main class="screen" data-screen="services-empty" data-crumb="Home › Application observability › Services" data-side-on="Services">
-        <div class="panel fill">
-          <a class="btn primary corner" href="#config">+ Add Service</a>
-          <div class="empty">
-            <img src={`${A}/telescope.webp`} alt="" width="314" height="426" />
-            <h2>Your service list is empty</h2>
-            <p>Start by adding a service to learn what's slow, what's broken, as well as what needs to be done to boost performance.</p>
-          </div>
+      <!-- 2. Add your first service: the empty state is the first step of setup -->
+      <main class="screen page" data-screen="services-empty" data-crumb="Home/Application/Services" data-side-on="Services">
+        <p class="eyebrow">Services · 0 reporting</p>
+        <h1 class="title">Add your first service</h1>
+        <p class="lede">Instrument an app and its latency, errors and request rate show up here, usually within a few minutes of it getting traffic.</p>
+        <ol class="stepper" data-step="1">{steps.map((st, i) => <li><span>{i + 1}</span>{st}</li>)}</ol>
+        <h2 class="q">What is your service written in?</h2>
+        <div class="langs">
+          {languages.map((l) => (
+            <a class:list={["lang", { off: !l.on }]} href={l.on ? "#jvm" : "#services-empty"} aria-disabled={!l.on} title={l.on ? undefined : "Java is wired up in this prototype"}>
+              <span class="lang-ic">{l.ic}</span><span><b>{l.name}</b><small>{l.fw}</small></span>
+            </a>
+          ))}
+          <a class="lang dashed off" href="#services-empty" aria-disabled="true"><span class="lang-ic">{"{ }"}</span><span><b>Something else</b><small>Any OpenTelemetry SDK</small></span></a>
         </div>
+        <div class="callout-k">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20.5 7v10L12 21.5 3.5 17V7Z" fill="none" stroke="#6e9fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3" fill="none" stroke="#6e9fff" stroke-width="1.6"/></svg>
+          <div><b>Running on Kubernetes?</b><span>Instrument every service in a namespace at once, no code changes.</span></div>
+          <a href="#services-empty">Use the Kubernetes integration →</a>
+        </div>
+        <p class="minor-h">Once a service reports, it appears here</p>
+        <div class="skeleton"><div class="sk-head"><span>Service</span><span>p95 latency</span><span>Error rate</span><span>Requests</span></div>{[0, 1].map(() => <div class="sk-row"><i></i><i></i><i></i><i></i></div>)}</div>
       </main>
 
-      <!-- 3. Configuration: pick a language -->
-      <main class="screen" data-screen="config" data-crumb="Home › Connections › Configuration" data-side-on="Configuration">
-        <div class="panel fill pad">
-          <h1 class="h1">Configuration instructions</h1>
-          <p class="sub">These are the instrumentation languages that Application supports.</p>
-          <div class="note"><b>Start with Java.</b><span>The other languages follow the same three steps.</span></div>
-          <div class="langs">
-            {languages.map((l) => (
-              <a class:list={["lang", { off: !l.on }]} href={l.on ? "#jvm" : "#config"} aria-disabled={!l.on}><span class="lang-ic">{l.name.slice(0, 2)}</span>{l.name}</a>
-            ))}
-          </div>
-        </div>
-      </main>
+      <!-- 3. Instrument a Java service: three steps, the stack's endpoint and token filled in -->
+      <main class="screen page" data-screen="jvm" data-crumb="Home/Services/Add a Java service" data-side-on="Services">
+        <div class="jvm-grid">
+          <div>
+            <a class="back-link" href="#services-empty">← Change language</a>
+            <h1 class="title">Instrument a Java service</h1>
+            <p class="lede">Three steps. We fill in your stack's endpoint and credentials for you.</p>
 
-      <!-- 4. JVM setup -->
-      <main class="screen" data-screen="jvm" data-crumb="Home › Connections › JVM" data-side-on="Configuration">
-        <div class="panel fill pad jvm">
-          <h1 class="h1"><span class="lang-ic">Ja</span>JVM</h1>
-          <h2 class="step">1. Check prerequisites</h2>
-          <p class="sub">Prerequisites include instructions you may need to follow, based on specific requirements for the integration.</p>
-          <details class="acc" data-track="agent">
-            <summary>Install Grafana Agent<span class="state" data-state>Not started</span></summary>
-            <div class="acc-body callout">
-              <p><b>Before you configure this integration, you need to run Grafana Agent.</b></p>
-              <p class="warn">If you have already run the agent on the machine that you intend to install this integration on, skip this step.</p>
-              <button class="btn primary" data-done="agent">Run the Grafana agent</button>
-              <p class="qlink">ⓘ What is Grafana Agent and why would someone want to use it?</p>
-            </div>
-          </details>
-          <details class="acc" data-track="prereq">
-            <summary>Check prerequisites specific to the JVM integration<span class="state" data-state>Not started</span></summary>
-            <div class="acc-body"><p>Java 8 or newer, and network access from the host to Grafana Cloud.</p><button class="btn" data-done="prereq">Mark as checked</button></div>
-          </details>
-          <h2 class="step">2. Use a Grafana.com API key</h2>
-          <details class="acc" data-track="key">
-            <summary>Follow instructions to generate API<span class="state" data-state>Not started</span></summary>
-            <div class="acc-body"><p>Generate a key with the MetricsPublisher role. It goes into the agent’s configuration below.</p><button class="btn primary" data-key>Generate API key</button><code class="key" data-key-out hidden></code></div>
-          </details>
-          <h2 class="step">3. Automatic instrumentation</h2>
-          <p class="body">Automatic instrumentation with Java uses a Java agent JAR that can be attached to any Java 8+ application. It dynamically injects bytecode to capture telemetry from many popular libraries and frameworks. It can be used to capture telemetry data at the "edges" of an app or service, such as inbound requests, outbound HTTP calls, database calls, and so on. To learn how to manually instrument your service or app code, see <a class="lnk" href="#jvm">Manual instrumentation</a>.</p>
-          <details class="acc" open>
-            <summary>Setup</summary>
-            <div class="acc-body"><p>1. Download <a class="lnk" href="#jvm">opentelemetry-javaagent.jar</a> from <a class="lnk" href="#jvm">Releases</a> of the <code>opentelemetry-java-instrumentation</code> repo and place the JAR in your preferred directory. The JAR file contains the agent and instrumentation libraries.</p></div>
-          </details>
-          <details class="acc" open>
-            <summary>Configuring the agent</summary>
-            <div class="acc-body"><p>The agent is highly configurable. One option is to pass configuration properties via the -D flag. In this example, a zipkin exporter for traces are configured:</p><pre class="code">java -javaagent:path/to/opentelemetry-javaagent.jar \
-  -Dotel.service.name=cartservice \
-  -Dotel.exporter.otlp.endpoint=https://otlp-gateway.grafana.net/otlp \
-  -jar cartservice.jar</pre></div>
-          </details>
-          <div class="send"><span data-wait></span><button class="btn primary" data-send>Start sending data</button></div>
+            <section class="stepcard" data-card="1">
+              <span class="stepnum">1</span>
+              <h2>Create an access token</h2>
+              <label class="lbl" for="tok">Token name</label>
+              <div class="inline"><input id="tok" class="field" value="apm-cart-service" /><button class="btn primary big" data-token>Generate token</button></div>
+              <p class="help" data-token-help>Scoped to write metrics, logs and traces. You can revoke it any time in Access policies.</p>
+            </section>
+
+            <section class="stepcard" data-card="2">
+              <span class="stepnum">2</span>
+              <h2>Run your app with the agent</h2>
+              <label class="lbl" for="svcname">Service name</label>
+              <input id="svcname" class="field mono half" value="cart_service" data-svcname />
+              <div class="seg big" role="tablist">{["JVM flag", "Docker", "Kubernetes"].map((t, i) => <button class:list={{ on: i === 0 }} data-run={i}>{t}</button>)}</div>
+              <div class="codebox"><button class="copy" data-copy>Copy</button><pre data-code></pre></div>
+              <p class="help">Uses the OpenTelemetry Java agent. Auto-instruments HTTP, JDBC, gRPC, Kafka and more. <a class="lnk" href="#jvm">Prefer manual instrumentation?</a></p>
+            </section>
+
+            <section class="stepcard" data-card="3">
+              <span class="stepnum">3</span>
+              <h2>Send some traffic</h2>
+              <div class="listen" data-listen><span class="spin" aria-hidden="true"></span><div><b>Listening for <code data-svcname-out>cart_service</code></b><span>Hit any endpoint on your app. This updates on its own when the first span lands.</span></div></div>
+              <details class="trouble"><summary>Nothing after a few minutes?</summary><ul><li>Check the app can reach the OTLP endpoint over HTTPS.</li><li>Make sure the token is in the headers, not the URL.</li><li>Restart the app after setting the variables.</li></ul></details>
+              <p class="sim"><button class="textbtn" data-simulate>Prototype: simulate first data →</button></p>
+            </section>
+          </div>
+          <aside class="rail">
+            <div class="rail-box"><b>Before you start</b><ul><li>Java 8 or newer</li><li>Outbound HTTPS from the app</li><li>Permission to restart the app</li></ul></div>
+            <div class="rail-plain"><b>You will get</b><ul><li>Latency, errors and request rate per endpoint</li><li>Traces linked to logs</li><li>A service map of what it calls</li></ul></div>
+          </aside>
         </div>
       </main>
 
       <!-- 5. Services -->
-      <main class="screen" data-screen="services" data-crumb="Home › Application observability › Services" data-side-on="Services">
-        <div class="panel fill pad">
-          <div class="row-head"><h1 class="h1">Services</h1><span class="tools"><span class="sel">Environment <b>All</b></span><a class="btn" href="#services">Add Alert</a><a class="btn primary" href="#config">+ Add Service</a></span></div>
+      <main class="screen page" data-screen="services" data-crumb="Home/Application/Services" data-side-on="Services">
+        <div>
+          <div class="row-head"><h1 class="h1">Services</h1><span class="tools"><span class="sel">Environment <b>All</b></span><a class="btn" href="#services">Add Alert</a><a class="btn primary" href="#services-empty">+ Add Service</a></span></div>
           <div class="filterbar"><label class="input grow"><input placeholder="Search by service name" aria-label="Search by service name" data-svc-search /></label><span class="sel">Last 30 minutes <b>UTC</b></span></div>
           <div class="filterbar"><span class="chip">Filters +</span><span class="demo">Demo</span></div>
           <table class="tbl">
             <thead><tr><th>Name</th><th>Namespace</th><th>Duration (p95)</th><th>Errors</th><th>Rate</th></tr></thead>
             <tbody>
               <tr class="click" data-href="#svc" data-name="cartservice">
-                <td><span class="svc-ic"></span>Grafana.cloud.EU/ cartservice</td><td><a class="lnk" href="#svc">payment</a></td>
+                <td><span class="svc-ic"></span><span data-svc-row>cart_service</span></td><td><a class="lnk" href="#svc">payment</a></td>
                 <td><span class="num">20.2ms</span><svg viewBox="0 0 90 22" class="sp"><path d={spark(201, "").d} stroke="#ff9830" /></svg></td>
                 <td><span class="num">28.2req/s</span><svg viewBox="0 0 90 22" class="sp"><path d={spark(202, "").d} stroke="#ff5286" /></svg></td>
                 <td><span class="num">10.9req/s</span><svg viewBox="0 0 90 22" class="sp"><path d={spark(203, "").d} stroke="#3cc39a" /></svg></td>
@@ -231,11 +232,11 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
       </main>
 
       <!-- 6. A service: overview, traces, logs, map -->
-      <main class="screen svc" data-screen="svc" data-crumb="Home › Application observability › Services › cartservice" data-side-on="Services">
-        <div class="panel fill pad">
+      <main class="screen page svc" data-screen="svc" data-crumb="Home/Application/Services/cartservice" data-side-on="Services">
+        <div>
           <div class="row-head">
-            <h1 class="h1">cart_service <span class="badges" aria-hidden="true"><i style="--c:#ff5286">●</i><i style="--c:#ff9830">●</i><i style="--c:#f55f3e">∞</i></span></h1>
-            <span class="tools"><span class="sel">Environment <b>All</b></span><a class="btn" href="#svc">Add Alert</a><a class="btn primary" href="#config">+ Add Service</a></span>
+            <h1 class="h1"><span data-svc-title>cart_service</span> <span class="badges" aria-hidden="true"><i style="--c:#ff5286">●</i><i style="--c:#ff9830">●</i><i style="--c:#f55f3e">∞</i></span></h1>
+            <span class="tools"><span class="sel">Environment <b>All</b></span><a class="btn" href="#svc">Add Alert</a><a class="btn primary" href="#services-empty">+ Add Service</a></span>
           </div>
           <div class="tabs" role="tablist">
             {[["overview", "Overview"], ["traces", "Traces"], ["logs", "Logs"], ["map", "Service map", "22"], ["quality", "Instrumentation Quality", "3"]].map(([id, label, n]) => (
@@ -364,10 +365,12 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
       let id = location.hash.slice(1) || "home";
       let tab = "";
       if (id === "svc-map") { id = "svc"; tab = "map"; }
+      if (id === "config") id = "services-empty";
       const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       app.style.display = target.closest("[data-app]") ? "grid" : "none";
-      crumbs.textContent = target.dataset.crumb ?? "Home";
+      const parts = (target.dataset.crumb ?? "Home").split("/");
+      crumbs.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : `<a href="${p === "Home" ? "#home" : "#services"}">${p}</a>`)).join("<i>/</i>");
       document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "map" ? "Service Map" : target.dataset.sideOn)));
       if (tab) openTab(tab);
       mega.hidden = true; burger.setAttribute("aria-expanded", "false");
@@ -378,27 +381,71 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     burger.addEventListener("click", () => { mega.hidden = !mega.hidden; burger.setAttribute("aria-expanded", String(!mega.hidden)); });
     document.addEventListener("click", (e) => { if (!mega.hidden && !mega.contains(e.target as Node) && !burger.contains(e.target as Node)) { mega.hidden = true; burger.setAttribute("aria-expanded", "false"); } });
 
-    // JVM setup: each step's status moves from Not started to Done
-    const done = new Set<string>();
-    function mark(id: string) {
-      done.add(id);
-      const acc = document.querySelector<HTMLElement>(`[data-track="${id}"]`)!;
-      const st = acc.querySelector<HTMLElement>("[data-state]")!;
-      st.textContent = "Done"; st.classList.add("ok");
-      (acc as HTMLDetailsElement).open = false;
+    // Java setup: token, service name and run mode fill the command; step 3 listens, then the service reports
+    let token = "[token]";
+    const svcInput = document.querySelector<HTMLInputElement>("[data-svcname]")!;
+    const code = document.querySelector<HTMLElement>("[data-code]")!;
+    const endpoint = "https://otlp-gateway-prod-eu-west-2.grafana.net/otlp";
+    let mode = 0;
+    function cmd() {
+      const n = svcInput.value.trim() || "cart_service";
+      document.querySelector("[data-svcname-out]")!.textContent = n;
+      const lines =
+        mode === 0 ? [
+          "curl -Lo opentelemetry-javaagent.jar \\",
+          "  https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar",
+          "",
+          `export OTEL_SERVICE_NAME=${n}`,
+          `export OTEL_EXPORTER_OTLP_ENDPOINT=${endpoint}`,
+          `export OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic ${token}"`,
+          "",
+          "java -javaagent:opentelemetry-javaagent.jar -jar app.jar",
+        ] : mode === 1 ? [
+          "docker run \\",
+          `  -e OTEL_SERVICE_NAME=${n} \\`,
+          `  -e OTEL_EXPORTER_OTLP_ENDPOINT=${endpoint} \\`,
+          `  -e OTEL_EXPORTER_OTLP_HEADERS="Authorization=Basic ${token}" \\`,
+          '  -e JAVA_TOOL_OPTIONS="-javaagent:/otel/opentelemetry-javaagent.jar" \\',
+          "  your-image:latest",
+        ] : [
+          "kubectl create secret generic grafana-otlp \\",
+          `  --from-literal=headers="Authorization=Basic ${token}"`,
+          "",
+          "# then let the operator inject the agent",
+          `kubectl annotate deployment/${n} \\`,
+          "  instrumentation.opentelemetry.io/inject-java=true",
+        ];
+      code.textContent = lines.join("\n");
     }
-    document.querySelectorAll<HTMLElement>("[data-done]").forEach((b) => b.addEventListener("click", () => { mark(b.dataset.done!); toast(b.dataset.done === "agent" ? "Grafana Agent is running" : "Prerequisites checked"); }));
-    document.querySelector("[data-key]")!.addEventListener("click", () => {
-      const out = document.querySelector<HTMLElement>("[data-key-out]")!;
-      out.hidden = false; out.textContent = "glc_eyJvIjoiODQ0MDc2IiwibiI6ImNhcnRzZXJ2aWNlIn0=";
-      mark("key"); toast("API key created");
+    svcInput.addEventListener("input", cmd);
+    document.querySelectorAll<HTMLElement>("[data-run]").forEach((b) => b.addEventListener("click", () => {
+      mode = +b.dataset.run!;
+      b.parentElement!.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+      cmd();
+    }));
+    document.querySelector("[data-token]")!.addEventListener("click", (e) => {
+      token = "glc_eyJvIjoiODQ0MDc2IiwibiI6ImFwbS1jYXJ0LXNlcnZpY2UifQ";
+      (e.currentTarget as HTMLButtonElement).textContent = "Token created ✓";
+      document.querySelector("[data-card='1']")!.classList.add("done");
+      document.querySelector("[data-token-help]")!.textContent = "Created and added to the command below. Scoped to write metrics, logs and traces.";
+      cmd();
     });
-    document.querySelector("[data-send]")!.addEventListener("click", (e) => {
-      const btn = e.currentTarget as HTMLButtonElement;
-      const wait = document.querySelector<HTMLElement>("[data-wait]")!;
-      btn.disabled = true; wait.textContent = "Waiting for the first spans from cartservice…";
-      setTimeout(() => { wait.textContent = ""; btn.disabled = false; toast("cartservice is sending data"); location.hash = "#services"; }, 1800);
+    document.querySelector("[data-copy]")!.addEventListener("click", (e) => {
+      navigator.clipboard?.writeText(code.textContent ?? "").catch(() => {});
+      const b = e.currentTarget as HTMLButtonElement; b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400);
     });
+    document.querySelector("[data-simulate]")!.addEventListener("click", () => {
+      const n = svcInput.value.trim() || "cart_service";
+      const l = document.querySelector<HTMLElement>("[data-listen]")!;
+      l.classList.add("got");
+      l.querySelector("b")!.innerHTML = `First span from <code>${n}</code>`;
+      l.querySelector("div span")!.textContent = "Opening Services…";
+      document.querySelector("[data-svc-row]")!.textContent = n;
+      document.querySelector<HTMLElement>("tr[data-name]")!.dataset.name = n.toLowerCase();
+      document.querySelectorAll<HTMLElement>("[data-svc-title]").forEach((t) => (t.textContent = n));
+      setTimeout(() => { toast(`${n} is reporting`); location.hash = "#services"; }, 1300);
+    });
+    cmd();
 
     // Services: the row opens the service; search filters it
     document.querySelectorAll<HTMLElement>("tr[data-href]").forEach((r) => r.addEventListener("click", (e) => { if (!(e.target as HTMLElement).closest("a")) location.hash = r.dataset.href!; }));
@@ -556,6 +603,80 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     :is(.btn, .tab, .lang, .burger, .mega-item, .side-group a, .seg button):focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
     @media (max-width: 1100px) { .charts, .two, .split { grid-template-columns: 1fr; } .langs { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 800px) { .app { grid-template-columns: 1fr; } .side { display: none; } .trio { grid-template-columns: 1fr; } .usage { flex-wrap: wrap; } }
+    /* ---------- Refined shell, after the browser pass: bigger type, fewer boxes, one top bar ---------- */
+    html, body { font-size: 15px; }
+    .topbar { height: 56px; gap: 14px; padding: 0 20px; background: #16181d; }
+    .topbar .search { order: 4; width: min(440px, 32vw); height: 36px; margin: 0 0 0 auto; border-radius: 6px; background: #111217; }
+    .topbar .search input::placeholder { color: var(--dim); }
+    .topbar .avatar { order: 5; width: 30px; height: 30px; border-radius: 50%; background: #2c3035; }
+    .crumbs { position: static; height: auto; padding: 0; border: 0; background: none; font-size: 16px; color: var(--dim); display: flex; gap: 10px; align-items: center; }
+    .crumbs :global(a) { color: var(--dim); text-decoration: none; } .crumbs :global(a:hover) { color: #fff; } .crumbs :global(b) { font-weight: 500; color: #fff; } .crumbs :global(i) { font-style: normal; opacity: .6; }
+    .mega { top: 56px; }
+    .app { grid-template-columns: 250px minmax(0, 1fr); min-height: calc(100vh - 56px); }
+    .side { top: 56px; height: calc(100vh - 56px); padding: 22px 14px; display: flex; flex-direction: column; background: #16181d; }
+    .side-title { gap: 10px; margin: 0 0 18px 8px; font-size: 19px; font-weight: 600; color: #fff; }
+    .side-group { margin-bottom: 18px; }
+    .side-group p { margin: 0 0 6px 8px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+    .side-group a { padding: 7px 8px; font-size: 15px; color: var(--text); border-radius: 6px; }
+    .side-group a.on { background: #22252b; box-shadow: inset 2px 0 0 #ff8833; color: #fff; }
+    .side-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; }
+    .side-foot a { padding: 7px 8px; color: var(--text); text-decoration: none; font-size: 15px; } .side-foot a:hover { color: #fff; }
+    .content { padding: 0; }
+    .page { padding: 40px clamp(24px, 6vw, 110px) 96px; max-width: 1500px; }
+    .eyebrow { margin: 0 0 8px; color: var(--dim); font-size: 15px; } .eyebrow a, .back-link { color: var(--link); text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 10px; font-size: 15px; } .back-link:hover { text-decoration: underline; }
+    .title { display: flex; align-items: center; gap: 14px; margin: 0 0 12px; font-size: 34px; line-height: 1.2; font-weight: 600; color: #fff; letter-spacing: -.01em; }
+    .lede { max-width: 66ch; margin: 0 0 28px; font-size: 18px; line-height: 1.5; color: var(--text); }
+    .stepper { display: flex; gap: 28px; margin: 0 0 34px; padding: 0; list-style: none; font-size: 16px; color: var(--dim); }
+    .stepper li { display: flex; align-items: center; gap: 10px; } .stepper span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .3); font-size: 13px; }
+    .stepper[data-step="1"] li:nth-child(1), .stepper[data-step="2"] li:nth-child(2), .stepper[data-step="3"] li:nth-child(3) { color: #fff; font-weight: 500; }
+    .stepper[data-step="1"] li:nth-child(1) span, .stepper[data-step="2"] li:nth-child(2) span, .stepper[data-step="3"] li:nth-child(3) span { border-color: transparent; background: var(--blue); color: #fff; }
+    .q { margin: 0 0 14px; font-size: 19px; font-weight: 600; color: #fff; }
+    .langs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+    .lang { height: auto; min-height: 86px; padding: 18px; gap: 14px; border: 1px solid var(--line); border-radius: 6px; background: #181b1f; font-size: 15px; }
+    .lang b { display: block; font-size: 17px; font-weight: 600; color: #fff; } .lang small { display: block; font-size: 14px; color: var(--dim); line-height: 1.35; }
+    .lang.off { opacity: 1; } .lang.off:hover { box-shadow: none; border-color: rgba(204, 204, 220, .22); cursor: default; } .lang.dashed { border-style: dashed; }
+    .lang-ic { flex: none; width: 40px; height: 40px; border-radius: 6px; background: #22252b; font: 600 14px ui-monospace, monospace; color: #ff9830; } .lang-ic.big { width: 44px; height: 44px; }
+    .callout-k { display: flex; align-items: center; gap: 16px; margin: 4px 0 40px; padding: 20px 26px; border: 1px solid rgba(87, 148, 242, .35); border-radius: 8px; background: #141b29; }
+    .callout-k div { display: flex; flex-direction: column; } .callout-k b { color: #fff; font-weight: 600; } .callout-k span { color: var(--text); }
+    .callout-k a { margin-left: auto; color: var(--link); text-decoration: none; font-weight: 600; white-space: nowrap; } .callout-k a:hover { text-decoration: underline; }
+    .minor-h { margin: 0 0 10px; font-size: 16px; color: var(--text); }
+    .skeleton { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+    .sk-head, .sk-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 20px; padding: 16px 22px; }
+    .sk-head { color: var(--dim); background: #16181d; } .sk-row { border-top: 1px solid var(--line); }
+    .sk-row i { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #22252b 0%, #2c3035 50%, #22252b 100%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; } .sk-row i:first-child { width: 55%; } .sk-row i:not(:first-child) { width: 55%; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .jvm-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
+    .stepcard { position: relative; margin: 0 0 18px 64px; padding: 26px 28px; border: 1px solid var(--line); border-radius: 8px; background: #181b1f; }
+    .stepcard .stepnum { position: absolute; left: -64px; top: 24px; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .3); font-size: 15px; color: var(--text); }
+    .stepcard[data-card="1"] .stepnum { border-color: transparent; background: var(--blue); color: #fff; } .stepcard.done .stepnum { background: #3cc39a; color: #0b0c0e; }
+    .stepcard.done ~ .stepcard[data-card="2"] .stepnum { border-color: transparent; background: var(--blue); color: #fff; }
+    .stepcard h2 { margin: 0 0 16px; font-size: 19px; font-weight: 600; color: #fff; }
+    .lbl { display: block; margin-bottom: 8px; color: var(--dim); }
+    .field { width: 100%; height: 44px; padding: 0 14px; border: 1px solid rgba(204, 204, 220, .2); border-radius: 6px; background: #0e0f12; color: #fff; font: inherit; font-size: 16px; }
+    .field:focus { outline: 2px solid #5794f2; outline-offset: -1px; } .mono { font-family: ui-monospace, monospace; } .half { max-width: 460px; margin-bottom: 18px; }
+    .inline { display: flex; gap: 14px; } .btn.big { height: 44px; padding: 0 22px; font-size: 16px; border-radius: 6px; }
+    .help { margin: 12px 0 0; color: var(--dim); font-size: 15px; }
+    .seg.big { padding: 4px; border-radius: 8px; background: #16181d; margin-bottom: 16px; } .seg.big button { padding: 8px 18px; font-size: 15px; border-radius: 6px; color: var(--text); } .seg.big button.on { background: #2c3035; color: #fff; font-weight: 600; }
+    .codebox { position: relative; border-radius: 8px; background: #0b0c0e; border: 1px solid var(--line); }
+    .codebox pre { margin: 0; padding: 22px 24px; overflow-x: auto; font: 15px/1.75 ui-monospace, monospace; color: #e6e6ef; }
+    .copy { position: absolute; top: 12px; right: 12px; height: 34px; padding: 0 14px; border: 1px solid rgba(204, 204, 220, .25); border-radius: 6px; background: #16181d; color: #fff; cursor: pointer; } .copy:hover { background: #22252b; }
+    .listen { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border: 1px solid var(--line); border-radius: 8px; background: #121722; }
+    .listen div { display: flex; flex-direction: column; } .listen b { color: #fff; font-weight: 600; } .listen span { color: var(--text); } .listen code { border: 0; background: none; padding: 0; font-size: 15px; }
+    .spin { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(110, 159, 255, .25); border-top-color: #6e9fff; animation: spin 1s linear infinite; }
+    @keyframes spin { to { rotate: 360deg; } }
+    .listen.got { border-color: rgba(60, 195, 154, .5); background: rgba(60, 195, 154, .08); } .listen.got .spin { animation: none; border-color: #3cc39a; background: #3cc39a; }
+    .trouble { margin-top: 14px; } .trouble summary { color: var(--link); cursor: pointer; } .trouble ul { margin: 10px 0 0; color: var(--text); }
+    .sim { margin: 14px 0 0; text-align: right; } .textbtn { border: 0; background: none; color: var(--dim); font-size: 14px; cursor: pointer; } .textbtn:hover { color: #fff; }
+    .rail { display: flex; flex-direction: column; gap: 28px; position: sticky; top: 96px; }
+    .rail b { display: block; margin-bottom: 10px; color: #fff; font-weight: 600; font-size: 16px; }
+    .rail ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; color: var(--text); font-size: 16px; }
+    .rail-box { padding: 22px 24px; border: 1px solid var(--line); border-radius: 8px; } .rail-plain { padding: 0 24px; }
+    .page .h1 { font-size: 30px; font-weight: 600; color: #fff; }
+    .page .tbl { font-size: 15px; } .page .tbl th { color: var(--dim); font-weight: 500; } .page .tbl td { padding: 12px 10px; }
+    .page .chart { border-radius: 8px; } .page .tab { font-size: 15px; } .page .sec { font-size: 18px; font-weight: 600; color: #fff; margin: 18px 0 12px; }
+    @media (max-width: 1200px) { .jvm-grid { grid-template-columns: 1fr; } .rail { position: static; } .langs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 </body>
 </html>
