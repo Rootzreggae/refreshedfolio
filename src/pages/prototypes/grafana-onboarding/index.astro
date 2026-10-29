@@ -1,0 +1,286 @@
+---
+// Grafana Cloud onboarding, rebuilt in code from the original Figma file (2022).
+const A = "/prototypes/grafana-onboarding";
+const benefits = [
+  "Enjoy all the benefits of a fully-managed cloud environment- true horizontal scalability, instant upgrades, security patches, and backups",
+  "Monitor your entire stack using out-of-the-box integrations\n(Just install an agent, and we'll take care of the rest)",
+  "Same Grafana plugins, dashboards and visualizations you know and love, only hosted in Grafana Cloud so it's easier to manage",
+  "Visualize and alert on your Kubernetes cluster in minutes",
+  "Manage your on-call rotations through simpler workflows and interfaces",
+];
+
+// The five ways in. Each card brings its own short docs into the left panel when selected.
+const paths = [
+  { id: "explore", icon: "icon-explore", title: "I’m just exploring", sub: "Learn more about Grafana Cloud",
+    doc: { title: "Explore Grafana Cloud", body: "Explore Grafana Cloud with a guided tour and become acquainted with some of its features. Connect your data to the cloud to get the most out of it." } },
+  { id: "dashboard", icon: "icon-dash", title: "Create a dashboard", sub: "Visualize and/or monitor data",
+    doc: { title: "Dashboard", body: "Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored. Create, explore, and share beautiful dashboards with your team and foster a data driven culture.\n\nThe easiest way to get started is with Grafana Cloud, our fully composable observability stack.", link: "Learn more on creating your first dashboard" } },
+  { id: "mlt", icon: "icon-mlt", title: "Get hosted metrics, logs, traces", sub: "Send existing data to Grafana Cloud",
+    doc: { title: "Made for you, managed by us", body: "Grafana Cloud is a composable observability platform, integrating metrics, traces and logs with Grafana. Leverage the best open source observability software – including Prometheus, Loki, and Tempo – without the overhead of installing, maintaining, and scaling your observability stack.", link: "Learn more on metrics, logs and traces" } },
+  { id: "oncall", icon: "icon-oncall", title: "Set up an on-call rotation", sub: "Simpler workflows for your team",
+    doc: { title: "The easiest way to do\non-call management", body: "Grafana OnCall is an easy-to-use on-call management tool that will help reduce toil in on-call management through simpler workflows and interfaces that are tailored specifically for engineers.", link: "Learn more about on-call management" } },
+  { id: "kube", icon: "icon-kube", title: "Monitor Kubernetes clusters", sub: "Visibility into health and performance",
+    doc: { title: "Monitoring Kubernetes with Grafana", body: "Kubernetes Monitoring in Grafana Cloud is the full solution for all levels of Kubernetes usage within your organization.\n\nSimply install the Grafana Agent onto your Kubernetes cluster(s) and in minutes, the Kube-state metrics will be shipped to Prometheus and Grafana. From there, you’ll have out-of-the-box access to your Kubernetes infrastructure’s metrics, logs, and Kubernetes events as well as prebuilt dashboards and alerts.", link: "Learn more on Kubernetes with Grafana" } },
+];
+const steps = ["Setup", "Placeholder", "Placeholder"];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome to Grafana Cloud · Onboarding prototype</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preload" href={`${A}/inter.woff2`} as="font" type="font/woff2" crossorigin />
+  <style is:global>
+    @font-face { font-family: "Inter"; src: url("/prototypes/grafana-onboarding/inter.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+    :root {
+      --bg: #22252b;
+      --canvas: #181b1f;
+      --text: #ccccdc;
+      --text-dim: rgba(204, 204, 220, .65);
+      --text-faint: rgba(204, 204, 220, .4);
+      --primary: #3d71d9;
+      --primary-hover: #4e7fe0;
+      --link: #6e9fff;
+      --focus: #5794f2;
+      --accent: linear-gradient(90deg, #f55f3e, #ff8833);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--text); font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    [data-screen] { display: none; }
+    [data-screen].active { display: grid; animation: in .3s linear; }
+    @keyframes in { from { opacity: 0; } }
+    a { color: inherit; }
+  </style>
+</head>
+<body>
+  <!-- 1. Welcome -->
+  <main class="welcome" data-screen="welcome">
+    <aside class="panel" aria-hidden="true">
+      <img class="logo" src={`${A}/logo.svg`} alt="" width="220" height="23" />
+      <span class="shape shape-a"></span>
+      <span class="shape shape-b"></span>
+      <img class="illus" src={`${A}/illus.svg`} alt="" width="631" height="631" />
+      <span class="bar"></span>
+    </aside>
+
+    <section class="content">
+      <div class="inner">
+        <h1>Welcome to Grafana Cloud</h1>
+        <ul>
+          {benefits.map((b) => (
+            <li><img src={`${A}/bullet.svg`} alt="" width="24" height="24" /><span>{b}</span></li>
+          ))}
+        </ul>
+        <a class="button" href="#setup">Get started</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- 2. Setup: pick a way in. The left panel answers "what is this?" for whatever is selected -->
+  <main class="setup" data-screen="setup">
+    <aside class="side">
+      <img class="side-logo" src={`${A}/logo-stacked.svg`} alt="Grafana" width="46" height="61" />
+      <div class="doc" data-doc="intro">
+        <h2>What is Grafana Cloud</h2>
+        <p>Grafana Cloud is a highly available, performant, and scalable observability platform for your applications and infrastructure. It provides a centralized view over all of your observability data, whether the data lives in Grafana Cloud Metrics services or in your own bare-metal and cloud environments.</p>
+        <p class="doc-more">Learn more Grafana Cloud</p>
+        <ul class="doc-links">
+          {["Grafana Cloud fundamentals", "Quick starts", "Integrations"].map((l) => (
+            <li><a href="#setup">{l}<img src={`${A}/arrow.svg`} alt="" width="20" height="20" /></a></li>
+          ))}
+        </ul>
+      </div>
+      {paths.map((p) => (
+        <div class="doc small" data-doc={p.id} hidden>
+          <h2>{p.doc.title}</h2>
+          {p.doc.body.split("\n\n").map((para) => <p>{para}</p>)}
+          {p.doc.link && <a class="doc-link" href="#setup">{p.doc.link}</a>}
+        </div>
+      ))}
+      <img class="plugs" src={`${A}/plugs.svg`} alt="" width="478" height="478" aria-hidden="true" />
+    </aside>
+
+    <section class="main">
+      <ol class="stepper">
+        {steps.map((s, i) => (
+          <li class={i === 0 ? "current" : ""}><span class="num">{i + 1}</span><span class="label">{s}</span></li>
+        ))}
+      </ol>
+      <a class="skip" href="#skip">Skip<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
+
+      <p class="question" id="q">How would you want to begin?</p>
+      <div class="cards" role="radiogroup" aria-labelledby="q">
+        {paths.map((p) => (
+          <div class="card-slot">
+            <button class="card" role="radio" aria-checked="false" data-path={p.id}>
+              <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
+              <strong>{p.title}</strong>
+              <span>{p.sub}</span>
+            </button>
+            <p class="selected"><img src={`${A}/check.svg`} alt="" width="16" height="16" />Selected</p>
+          </div>
+        ))}
+      </div>
+
+      <a class="next" href="#setup" aria-disabled="true">Next<img src={`${A}/next-arrow.svg`} alt="" width="16" height="16" /></a>
+    </section>
+  </main>
+
+  <style>
+    /* ---------- 1. Welcome ---------- */
+    .welcome { grid-template-columns: 1fr 1fr; min-height: 100vh; }
+
+    /* Left: brand panel. Gradient, two soft rotated squares, the isometric illustration, orange base line */
+    .panel {
+      position: relative; overflow: hidden; min-height: 100vh;
+      background: linear-gradient(180deg, rgba(41, 64, 105, .83) 0%, #294069 14%, #2a518e 50%, #2861b8 75%, #2773e0 100%);
+    }
+    .logo { position: absolute; left: 38px; top: 38px; width: 220px; height: auto; z-index: 2; }
+    .shape {
+      position: absolute; width: 462px; height: 462px; border-radius: 40px; opacity: .3;
+      background: linear-gradient(90deg, #091e3a 0%, #2f80ed 50%, #2d9ee0 100%);
+    }
+    /* Figma rotates counter-clockwise around the layer's top-left corner */
+    .shape { transform-origin: 0 0; }
+    .shape-a { left: 38.6%; top: -2.6%; transform: rotate(-55deg); }
+    .shape-b { left: 66%; top: 104%; transform: rotate(125.3deg); }
+    /* scales with the panel: as wide as the panel allows, never taller than ~75% of it */
+    .illus { position: absolute; left: 50%; top: 46%; width: min(92%, 76vh); height: auto; transform: translate(-50%, -50%); z-index: 1; }
+    .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--accent); }
+
+    /* Right: what Grafana Cloud is, in five lines, then one action */
+    .content { display: flex; align-items: center; justify-content: center; padding: 64px 48px; }
+    .inner { width: 100%; max-width: 438px; }
+    .welcome h1 { margin: 0 0 24px -35px; white-space: nowrap; font-size: 39.4px; line-height: 52.5px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+    .welcome ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 36px; }
+    .welcome li { display: flex; gap: 16px; align-items: flex-start; font-size: 16px; line-height: 22px; white-space: pre-line; }
+    .welcome li img { flex: none; margin-top: 5px; }
+    .button {
+      display: flex; align-items: center; justify-content: center; height: 44px; margin-top: 24px; border-radius: 2px;
+      background: var(--primary); color: #fff; font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: none;
+      transition: background .15s ease;
+    }
+    .button:hover { background: var(--primary-hover); }
+    .button:active { background: #3563c2; }
+    .button:focus-visible, .card:focus-visible, .next:focus-visible, .skip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+    /* ---------- 2. Setup ---------- */
+    .setup { grid-template-columns: 440px 1fr; min-height: 100vh; background: var(--canvas); }
+
+    .side { position: relative; overflow: hidden; background: var(--bg); padding: 40px; }
+    .side-logo { display: block; }
+    .plugs { position: absolute; left: -32px; top: 574px; width: 478px; height: 478px; pointer-events: none; }
+    .doc {
+      position: relative; z-index: 1; margin-top: 143px; padding: 24px; border-radius: 4px;
+      background: rgba(61, 113, 217, .1); display: flex; flex-direction: column; gap: 18px;
+    }
+    .doc[hidden] { display: none; }
+    .doc h2 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; white-space: pre-line; }
+    .doc p { margin: 0; font-size: 16px; line-height: 22px; }
+    .doc.small p { font-size: 14px; line-height: 20px; }
+    .doc-links { list-style: none; margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 18px; }
+    .doc-links li { position: relative; }
+    .doc-links li::before { content: ""; position: absolute; left: -14px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
+    .doc-links a, .doc-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-size: 16px; line-height: 22px; text-decoration: none; }
+    .doc-link { color: var(--link); font-size: 14px; line-height: 20px; }
+    .doc-links a:hover, .doc-link:hover { text-decoration: underline; }
+    .doc-links a img { transition: transform .15s ease; }
+    .doc-links a:hover img { transform: translateX(3px); }
+
+    .main { position: relative; padding: 71px 55px 64px; }
+    .stepper { list-style: none; margin: 0; padding: 0; display: flex; gap: 81px; font-size: 16px; line-height: 22px; }
+    .stepper li { display: flex; align-items: center; gap: 19px; color: var(--text-faint); }
+    .stepper .num { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .25); background: rgba(36, 41, 46, .04); }
+    .stepper .current { color: var(--text); }
+    .stepper .current .num { border: 2px solid var(--text); }
+    .skip { position: absolute; right: 36px; top: 36px; display: inline-flex; align-items: center; color: var(--primary); font-weight: 700; font-size: 16px; line-height: 20px; text-decoration: none; }
+    .skip img { margin-left: 4px; transition: transform .15s ease; }
+    .skip:hover img { transform: translateX(3px); }
+
+    .question { margin: 143px 0 48px; color: var(--text-dim); font-size: 16px; line-height: 22px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 250px); gap: 48px 24px; }
+    .card-slot { position: relative; }
+    .card {
+      width: 250px; height: 150px; padding: 16px; border: 0; border-radius: 2px; background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; font: inherit; cursor: pointer;
+      box-shadow: 0 0 0 0 transparent; transition: box-shadow .15s ease, background .15s ease;
+    }
+    .card-icon { height: 26px; width: auto; margin-bottom: 14px; }
+    .card strong { font-size: 14px; line-height: 24px; font-weight: 700; }
+    .card span { margin-top: 8px; font-size: 12px; line-height: 16px; }
+    .card:hover { box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
+    .card[aria-checked="true"] { background: var(--canvas); box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
+    .selected { visibility: hidden; position: absolute; left: 0; right: 0; top: 150px; justify-content: center; display: flex; align-items: center; gap: 12px; margin: 16px 0 0; color: var(--link); font-size: 12px; line-height: 16px; }
+    .card[aria-checked="true"] + .selected { visibility: visible; }
+
+    .next {
+      display: inline-flex; align-items: center; gap: 4px; margin: 56px 0 0 -20px; padding: 6px 16px; border-radius: 2px;
+      color: var(--text-faint); font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: underline; pointer-events: none;
+    }
+    .next img { opacity: .4; }
+    .next[aria-disabled="false"] { margin-left: 0; background: #5a86de; color: #fff; text-decoration: none; pointer-events: auto; }
+    .next[aria-disabled="false"] img { opacity: 1; filter: brightness(10); }
+    .next[aria-disabled="false"]:hover { background: var(--primary-hover); }
+
+    @media (max-width: 900px) {
+      .welcome { grid-template-columns: 1fr; }
+      .panel { min-height: 0; aspect-ratio: 720 / 560; }
+      .illus { width: min(62%, 460px); top: 57%; }
+      .content { padding: 40px 16px 56px; }
+      .welcome h1 { margin-left: 0; white-space: normal; font-size: 30px; line-height: 40px; }
+      .welcome ul { gap: 24px; }
+
+      .setup { grid-template-columns: 1fr; }
+      .side { order: 2; padding: 24px 16px 40px; }
+      .side-logo, .plugs { display: none; }
+      .doc { margin-top: 0; }
+      .main { padding: 24px 16px 32px; }
+      .stepper { gap: 16px; font-size: 14px; }
+      .stepper li:not(.current) .label { display: none; }
+      .skip { top: 26px; right: 16px; }
+      .question { margin: 40px 0 20px; }
+      .cards { grid-template-columns: 1fr; gap: 12px; }
+      .card-slot { align-items: stretch; }
+      .card { width: 100%; height: auto; }
+      .selected { display: none; }
+    }
+    @media (min-width: 901px) and (max-width: 1260px) {
+      .cards { grid-template-columns: repeat(2, 250px); }
+    }
+  </style>
+
+  <script>
+    // Hash router: #welcome (default), #setup. Unbuilt steps fall back to the welcome screen.
+    const screens = [...document.querySelectorAll<HTMLElement>("[data-screen]")];
+    function show() {
+      const id = location.hash.slice(1);
+      const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
+      screens.forEach((s) => s.classList.toggle("active", s === target));
+      scrollTo(0, 0);
+    }
+    addEventListener("hashchange", show);
+    show();
+
+    // Setup: picking a card selects it, swaps the left panel to that path's docs, and enables Next.
+    const cards = [...document.querySelectorAll<HTMLButtonElement>(".card")];
+    const docs = [...document.querySelectorAll<HTMLElement>("[data-doc]")];
+    const next = document.querySelector<HTMLAnchorElement>(".next")!;
+    function select(id: string | null) {
+      cards.forEach((c) => c.setAttribute("aria-checked", String(c.dataset.path === id)));
+      docs.forEach((d) => (d.hidden = d.dataset.doc !== (id ?? "intro")));
+      next.setAttribute("aria-disabled", String(!id));
+      next.href = id ? `#${id}` : "#setup";
+    }
+    cards.forEach((c) => c.addEventListener("click", (e) => {
+      e.stopPropagation();
+      select(c.getAttribute("aria-checked") === "true" ? null : c.dataset.path!);
+    }));
+    // Like the original: clicking outside the cards clears the choice
+    document.querySelector(".setup .main")!.addEventListener("click", (e) => {
+      if (!(e.target as HTMLElement).closest(".card, .next, .skip")) select(null);
+    });
+  </script>
+</body>
+</html>
