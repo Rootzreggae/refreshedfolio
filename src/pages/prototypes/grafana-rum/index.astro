@@ -79,6 +79,16 @@ const jsErrors = [
   ["Error", "Non-Error exception captured with keys: refID, message, status, traceID", 2, 20, "bump"], ["Error", "NetworkError when attempting to fetch resource.", 2, 23, "wave"],
 ] as const;
 const spkDown = (i: number) => smooth(Array.from({ length: 28 }, (_, k) => 9 - 8 / (1 + Math.exp(-(k / 27 - 0.5) * 10))), 200, 32, 10);
+const errSpk = jsErrors.map(([, , , , k], i) => (k === "ramp" ? spkDown(i) : spk(200 + (i % 3), k as (typeof kinds)[number])));
+const errCol = jsErrors.map(([, , , , k]) => (k === "noise" ? "#e0226e" : k === "ramp" ? "#ff9830" : "#3cc39a"));
+// Flyout content, after the original Flyout frames
+const fyLines = [["FCP", "#5794f2"], ["TTFB", "#e0b400"], ["LCP", "#f2495c"], ["CLS", "#ff9830"], ["FID", "#73bf69"], ["INP", "#b877d9"]].map(([n, c], i) => ({ n, c, d: smooth(series(70 + i, 14, 2 + i * 1.2, 4).map((v) => Math.max(0.3, Math.min(9.7, v))), 600, 200, 10) }));
+const waterfall = [["Redirect", "4.49ms", "1%", "#ff9830", 2], ["App Cache", "3.32ms", "1%", "#5794f2", 2], ["DNS", "152.15ms", "38%", "#b877d9", 37], ["TCP", "235.83ms", "60%", "#56a64b", 54], ["Request", "0.20ms", "<1%", "#e02f44", 5]] as const;
+const fyData = {
+  errors: jsErrors.map(([t, m, c, u]) => ({ t, m, c, u })),
+  pages: perf.map((r, i) => ({ id: r[0], ttfb: r[1], fcp: r[2], lcp: r[3], inp: r[5], load: r[6], cls: [0.02, 0.08, 0.31, 0.12, 0.04, 0.27][i] })),
+  pageIds: perf.map((r) => r[0]),
+};
 const views = [["/", "2347ms", 826, "18ms"], ["product_detail", "743ms", 740, "4ms"], ["/products/1/detail", "200ms", 630, "120ms"], ["product_detail", "1114ms", 530, "4ms"], ["/products/1/detail", "123ms", 412, "4ms"], ["product_detail", "355ms", 90, "4ms"]];
 const p75 = [
   { title: "Page Load, p75", ticks: ["25 s", "20 s", "15 s", "10 s", "5 s", "0 ms"], color: "#f2b736", legend: [["TTFB", "#73bf69"], ["FCP", "#f2b736"], ["LCP", "#b877d9"]], d: series(51, 90, 6, 4).map((v, i) => v + (i > 45 && i < 80 ? 10 + Math.sin(i / 6) * 4 : 0)), max: 26 },
@@ -310,7 +320,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
             <header><h3 data-mtitle>Page Performance</h3><span class="tp-tools"><label class="flt"><input placeholder="Filter" aria-label="Filter pages" data-pfilter /></label><span class="tt">Tт</span><span class="seg2" role="tablist">{msets.map((m, i) => <button role="tab" data-mset-btn={m.id} aria-selected={i === 0 ? "true" : "false"} class:list={{ on: i === 0 }}>{m.tab}</button>)}</span></span></header>
             {msets.map((m, mi) => (
               <table class="ptbl" data-mset={m.id} data-title={m.title} hidden={mi !== 0}><thead><tr><th>Page ID</th>{m.cols.map((c) => <th>{c}</th>)}{m.last && <th class="r">{m.last}</th>}</tr></thead><tbody>
-                {m.rows.map((r, ri) => <tr data-prow={r[0]}><td><span class="plus">⊕</span><a class="lnk">{r[0]}</a></td>{m.cols.map((_, ci) => { const c = tone[(ri + ci + mi) % 3], d = spk(mi * 50 + ri * 7 + ci, kinds[(ri + ci + mi) % 4]); return <td><span class="pv">{r[ci + 1]}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(d, 200, 32)} fill={c} opacity=".18" /><path d={d} stroke={c} fill="none" /></svg></td>; })}{m.last && <td class:list={["r", { warn: r[r.length - 1] === "120ms" }]}>{r[r.length - 1]}</td>}</tr>)}
+                {m.rows.map((r, ri) => <tr data-prow={r[0]}><td><span class="plus">⊕</span><button class="lnk" data-pg={ri}>{r[0]}</button></td>{m.cols.map((_, ci) => { const c = tone[(ri + ci + mi) % 3], d = spk(mi * 50 + ri * 7 + ci, kinds[(ri + ci + mi) % 4]); return <td><span class="pv">{r[ci + 1]}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(d, 200, 32)} fill={c} opacity=".18" /><path d={d} stroke={c} fill="none" /></svg></td>; })}{m.last && <td class:list={["r", { warn: r[r.length - 1] === "120ms" }]}>{r[r.length - 1]}</td>}</tr>)}
               </tbody></table>
             ))}
             <footer class="pager">Showing 1 to 5 of 30 entries <span><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>›</button></span></footer>
@@ -340,13 +350,12 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
           <section class="tpanel">
             <header><h3>Javascript Errors</h3><label class="flt wide"><input placeholder="Search" aria-label="Search errors" data-efilter /></label></header>
             <table class="ptbl etbl"><thead><tr><th>Type</th><th>Message</th><th>Count</th><th>Users Impacted</th><th>Action</th></tr></thead><tbody>
-              {jsErrors.map(([t, m, c, u, k], i) => { const col = k === "noise" ? "#e0226e" : k === "ramp" ? "#ff9830" : "#3cc39a", d = k === "ramp" ? spkDown(i) : spk(200 + (i % 3), k as (typeof kinds)[number]); return <>
+              {jsErrors.map(([t, m, c, u], i) => (
                 <tr data-erow={`${t} ${m}`}><td>{t}</td><td class="msg"><button class="lnk" data-err={i}>{m}</button></td>
-                  <td><span class="pv n">{c}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(d, 200, 32)} fill={col} opacity=".18" /><path d={d} stroke={col} fill="none" /></svg></td>
-                  <td><span class="pv n">{u}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp s"><path d={area(d, 200, 32)} fill={col} opacity=".18" /><path d={d} stroke={col} fill="none" /></svg></td>
+                  <td><span class="pv n">{c}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(errSpk[i], 200, 32)} fill={errCol[i]} opacity=".18" /><path d={errSpk[i]} stroke={errCol[i]} fill="none" /></svg></td>
+                  <td><span class="pv n">{u}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp s"><path d={area(errSpk[i], 200, 32)} fill={errCol[i]} opacity=".18" /><path d={errSpk[i]} stroke={errCol[i]} fill="none" /></svg></td>
                   <td><button class="watch" data-watch aria-pressed="false"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path class="slash" d="M2.5 13.5 13.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg><span>Watch</span></button></td></tr>
-                <tr class="stackrow" hidden><td colspan="5"><pre>{`${t}: ${m}\n    at fetchCart (webpack://shop-web/src/api/cart.ts:42:11)\n    at CartProvider (webpack://shop-web/src/state/cart.tsx:18:5)\n    at renderWithHooks (react-dom.development.js:16305)\n\nLast seen 2 min ago · Chrome 129, Safari 18 · trace 4bf92f3577b34da6`}</pre></td></tr>
-              </>; })}
+              ))}
             </tbody></table>
             <footer class="pager">Showing 1 of 10 entries <span><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>›</button></span></footer>
           </section>
@@ -361,6 +370,64 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
         <section data-pane="settings" hidden>
           <dl class="summary"><div><dt>App name</dt><dd data-app-title>acme-monitoring</dd></div><div><dt>Allowed domains</dt><dd>*.acme-monitoring.com</dd></div><div><dt>Session sampling</dt><dd>100%</dd></div></dl>
         </section>
+        <aside class="flyout" data-flyout aria-label="Details" inert>
+          <header class="fy-head">
+            <button class="fy-ic" data-fy-close aria-label="Close panel"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 4 4 4-4 4M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="fy-nav"><button class="fy-ic" data-fy-step="-1" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.5V2.5M3 7.5l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fy-ic" data-fy-step="1" aria-label="Next"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M3 8.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
+            <h2 data-fy-title tabindex="-1"></h2>
+            <button class="btn primary drill" data-fy-drill>Drilldown <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7 9M11.5 9.5v4h-9v-9h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </header>
+
+          <div class="fy-body" data-fy="err">
+            <div class="fy-stats">
+              <div><b><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L12.5 4.5v10h-8.5Z M9.5 1.5v3h3 M6.5 8.5h4 M6.5 11h4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>PAGE_URL</b><span class="url" data-f="url"></span></div>
+              <div><b class="e"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h8M4 14.5h8M4.5 1.5c0 4 7 4 7 6.5S4.5 10.5 4.5 14.5M11.5 1.5c0 4-7 4-7 6.5s7 2.5 7 6.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>COUNT</b><em class="e" data-f="count"></em></div>
+              <div><b><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="6" cy="5" r="2.6" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 14c0-2.8 2-4.5 4.5-4.5s4.5 1.7 4.5 4.5M10.5 2.6a2.6 2.6 0 0 1 0 4.9M12 9.7c1.6.5 2.5 2 2.5 4.3" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>USERS IMPACTED</b><em data-f="users"></em></div>
+            </div>
+            <details class="fy-sec" open><summary>Stacktrace <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary><pre class="fy-trace" data-f="trace"></pre></details>
+            <details class="fy-sec" open><summary>Impacted pages <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+              <div class="fy-imp">
+                <table class="fy-pages"><thead><tr><th>Pages</th><th>Count</th><th class="r">User impacted</th></tr></thead><tbody><tr><td><a class="lnk" data-f="page"></a></td><td data-f="pcount"></td><td class="r" data-f="pusers"></td></tr></tbody></table>
+                <div><h4>Browser</h4><ul class="fy-bars" data-f="browsers"></ul></div>
+                <div><h4>Operating system</h4><ul class="fy-bars" data-f="os"></ul></div>
+              </div>
+            </details>
+            <details class="fy-sec" open><summary>Impacted Users <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary>
+              <table class="ptbl fy-users"><thead><tr><th>Session ID</th><th>View ID</th><th>Root</th><th>Browser</th><th>Operating System</th><th class="r">Location</th><th class="r">Window Width</th></tr></thead><tbody data-f="urows"></tbody></table>
+              <button class="more" data-f="more">View more <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+            </details>
+            <div class="fy-two">
+              <details class="fy-sec" open><summary>User actions impacted by this error <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary><table class="fy-pages"><thead><tr><th>User action</th><th class="r">Percentage</th></tr></thead><tbody><tr><td><a class="lnk">Click on ‘Add to Cart’ button on page /product/1/detail</a></td><td class="r">100%</td></tr></tbody></table></details>
+              <details class="fy-sec" open><summary>Geolocations <svg class="chev" width="12" height="12" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></summary><table class="fy-pages"><thead><tr><th>Country name</th><th class="r">Percentage</th></tr></thead><tbody><tr><td>USA</td><td class="r">100%</td></tr></tbody></table></details>
+            </div>
+          </div>
+
+          <div class="fy-body" data-fy="page" hidden>
+            <div class="fy-chips" data-f="chips"></div>
+            <div class="wf">
+              <div class="wf-bar">{waterfall.map(([, , , c, w]) => <i style={`background:${c};flex:${w}`}></i>)}</div>
+              <ul>{waterfall.map(([n, t, pc, c]) => <li><span class="wf-n"><i style={`background:${c}`}></i>{n}</span><span class="wf-v"><b>{t}</b><b>{pc}</b></span></li>)}</ul>
+            </div>
+            <section class="tpanel">
+              <header><h3>Javascript Errors</h3><label class="flt wide"><input placeholder="Search" aria-label="Search this page's errors" /></label></header>
+              <table class="ptbl etbl"><thead><tr><th>Type</th><th>Message</th><th>Count</th><th class="r">Users Impacted</th></tr></thead><tbody>
+                {jsErrors.slice(0, 4).map(([t, m, c, u], i) => (
+                  <tr><td>{t}</td><td class="msg"><button class="lnk" data-err={i}>{m}</button></td>
+                    <td><span class="pv n">{c}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(errSpk[i], 200, 32)} fill={errCol[i]} opacity=".18" /><path d={errSpk[i]} stroke={errCol[i]} fill="none" /></svg></td>
+                    <td><span class="pv n">{u}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp s"><path d={area(errSpk[i], 200, 32)} fill={errCol[i]} opacity=".18" /><path d={errSpk[i]} stroke={errCol[i]} fill="none" /></svg></td></tr>
+                ))}
+              </tbody></table>
+            </section>
+            <figure class="chart fy-chart"><header><figcaption>Performance Analytics</figcaption><button class="btn">Explore</button></header>
+              <div class="plot3"><ul class="yax2">{["10250", "10000", "7500", "5000", "2500", "0"].map((t) => <li>{t}</li>)}</ul>
+                <svg viewBox="0 0 600 200" preserveAspectRatio="none"><g class="grid">{[1, 2, 3, 4].map((i) => <line x1="0" x2="600" y1={i * 40} y2={i * 40} />)}</g>{fyLines.map((l) => <path d={l.d} stroke={l.c} fill="none" class="ln" />)}</svg>
+                <ul class="yax2 rt">{["0.25", "0.20", "0.15", "0.10", "0.05", "0.00"].map((t) => <li>{t}</li>)}</ul></div>
+              <ul class="xax2 fy-x">{["13:25", "13:30", "13:35", "13:40", "13:45", "13:50", "13:55"].map((t) => <li>{t}</li>)}</ul>
+              <ul class="legend">{fyLines.map((l) => <li style={`--c:${l.c}`}>{l.n}</li>)}</ul>
+            </figure>
+          </div>
+        </aside>
+        <script type="application/json" id="fy-data" set:html={JSON.stringify(fyData)} />
       </main>
     </div>
   </div>
@@ -444,9 +511,63 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     const tabs = [...document.querySelectorAll<HTMLElement>("[data-tab]")];
     function openTab(id: string) { tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id))); document.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== id)); }
     tabs.forEach((t) => t.addEventListener("click", () => openTab(t.dataset.tab!)));
-    document.querySelectorAll<HTMLElement>("[data-err]").forEach((b) => b.addEventListener("click", () => { const s = b.closest("tr")!.nextElementSibling as HTMLElement; s.hidden = !s.hidden; }));
+    // Flyout: reveals a record's details beside the list, without leaving the page
+    const fyD = JSON.parse($("#fy-data").textContent!) as { errors: { t: string; m: string; c: number; u: number }[]; pages: Record<string, string | number>[]; pageIds: string[] };
+    const fly = $("[data-flyout]");
+    const f = (k: string) => fly.querySelector<HTMLElement>(`[data-f="${k}"]`)!;
+    const esc = (t: string) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]!);
+    const bars = (rows: [string, number, string][]) => rows.map(([n, w, v]) => `<li><span>${n}</span><b>${v}</b><i style="--w:${w}%"></i></li>`).join("");
+    const rate = (v: number, good: number, ok: number, unit: string, val: string) => { const r = v <= good ? ["Good", "g"] : v <= ok ? ["Needs improvement", "o"] : ["Poor", "p"]; return `<span class="${r[1]}">${val}${unit} (${r[0]})</span>`; };
+    const sessions2 = [["yEoB18maG9", "/", "Chrome", "Windows 10", "Germany", "1580"], ["C7ZT6fe1BR", "product_detail", "Chrome", "Windows 10", "China", "720"], ["TGDiZEpBcA", "/products/1/detail", "Chrome", "Windows 10", "Portugal", "1440"], ["JbkaGpC4tf", "product_detail", "Safari mobile", "Mac OS 10.15.7", "USA", "420"], ["y8x7oUJcQ0", "/products/1/detail", "Chrome", "Linux x86_64", "UK", "1920"]];
+    let fyKind: "err" | "page" = "err", fyIdx = 0, fyFrom: HTMLElement | null = null;
+    function fillErr(i: number) {
+      const e = fyD.errors[i], pg = fyD.pageIds[i % fyD.pageIds.length];
+      $("[data-fy-title]").textContent = e.m;
+      f("url").textContent = `https://acme-shop.example${pg.startsWith("/") ? pg : "/" + pg}`;
+      f("count").textContent = String(e.c); f("users").textContent = String(e.u);
+      f("trace").innerHTML = `<span class="t1">${esc(e.t)}: ${esc(e.m)}</span>\n  <span class="t2">at ?</span> <span class="t3">(</span>https://acme-shop.example/assets/cart-7f3a9c.js?build=1.1.5&amp;release=eu-west&amp;route=%2Fproducts%2F1%2Fdetail&amp;session=JbkaGpC4tf&amp;view=product_detail&amp;trace=4bf92f3577b34da6&amp;ts=1698845456160&amp;payload=%7B%22cart%22%3A%7B%22items%22%3A%5B%7B%22sku%22%3A%22KB-0412%22%2C%22qty%22%3A1%7D%5D%7D%7D:1:4182<span class="t3">)</span>`;
+      f("page").textContent = pg; f("pcount").textContent = String(e.c); f("pusers").textContent = String(e.u);
+      f("browsers").innerHTML = bars([["Safari mobile", 12, "12%"], ["Chrome", 82, "82%"], ["Firefox", 68, "68%"], ["Edge", 41, "41%"]]);
+      const os = [3, 18, 5].map((n) => Math.max(e.u > 2 ? 1 : 0, Math.round((n / 26) * e.u)));
+      f("os").innerHTML = bars([["Mac OSX", (os[0] / e.u) * 100, String(os[0])], ["Windows", (os[1] / e.u) * 100, String(os[1])], ["Linux", (os[2] / e.u) * 100, String(os[2])]]);
+      f("urows").innerHTML = sessions2.slice(0, Math.min(5, e.u)).map(([s, v, b, o, l, w]) => `<tr><td><a class="lnk">${s}</a></td><td><a class="lnk">${v}</a></td><td><a class="lnk">${v}</a></td><td>${b}</td><td>${o}</td><td class="r">${l}</td><td class="r">${w}</td></tr>`).join("");
+      f("more").hidden = e.u <= 5;
+    }
+    function fillPage(i: number) {
+      const p = fyD.pages[i] as { id: string; ttfb: string; fcp: string; lcp: string; inp: string; load: string; cls: number };
+      $("[data-fy-title]").textContent = p.id;
+      const chip = (l: string, v: string) => `<span class="chip"><span>${l}</span> ${v}</span>`;
+      f("chips").innerHTML = [chip("Load Time", `<b>${p.load}</b>`), chip("Network Time (TTFB)", `<b>${p.ttfb}</b>`), chip("Processing Time", "<b>4.6 s</b>"), chip("Transfer Size", "<b>45 KB</b>"), chip("Version", "<b>1.1.5</b>"), chip("Environment", "<b>EU WEST</b>"),
+        chip("First Contentful Paint (FCP):", `<b>${p.fcp}</b>`), chip("Largest Contentful Paint:", rate(parseFloat(p.lcp), 2.5, 4, " s", String(parseFloat(p.lcp)))), chip("Cumulative Layout Shift:", rate(p.cls, 0.1, 0.25, "", p.cls.toFixed(2))), chip("INP", rate(parseFloat(p.inp), 200, 500, " ms", String(parseFloat(p.inp))))].join("");
+    }
+    // ↑ ↓ walk the rows the list currently shows, so they respect the search
+    const fyRows = () => fyKind === "err"
+      ? [...document.querySelectorAll<HTMLElement>("[data-erow]")].filter((r) => !r.hidden).map((r) => +r.querySelector<HTMLElement>("[data-err]")!.dataset.err!)
+      : [...document.querySelectorAll<HTMLElement>("[data-mset]:not([hidden]) [data-prow]")].filter((r) => !r.hidden).map((r) => +r.querySelector<HTMLElement>("[data-pg]")!.dataset.pg!);
+    function openFly(kind: "err" | "page", i: number, from?: HTMLElement) {
+      fyKind = kind; fyIdx = i; if (from && !fly.contains(from)) fyFrom = from;
+      fly.querySelectorAll<HTMLElement>("[data-fy]").forEach((b) => (b.hidden = b.dataset.fy !== kind));
+      (kind === "err" ? fillErr : fillPage)(i);
+      const rows = fyRows(), at = rows.indexOf(i);
+      fly.querySelector<HTMLButtonElement>('[data-fy-step="-1"]')!.disabled = at <= 0;
+      fly.querySelector<HTMLButtonElement>('[data-fy-step="1"]')!.disabled = at < 0 || at >= rows.length - 1;
+      document.querySelectorAll("tr.fy-sel").forEach((r) => r.classList.remove("fy-sel"));
+      document.querySelector(kind === "err" ? `[data-erow] [data-err="${i}"]` : `[data-mset]:not([hidden]) [data-pg="${i}"]`)?.closest("tr")?.classList.add("fy-sel");
+      fly.inert = false; fly.classList.add("on"); fly.querySelector(".fy-body:not([hidden])")!.scrollTop = 0; fly.scrollTop = 0;
+      $("[data-fy-title]").focus({ preventScroll: true });
+    }
+    function closeFly() { fly.classList.remove("on"); fly.inert = true; document.querySelectorAll("tr.fy-sel").forEach((r) => r.classList.remove("fy-sel")); fyFrom?.focus(); }
+    document.addEventListener("click", (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>("[data-err], [data-pg]"); if (!t) return;
+      if (t.dataset.err) openFly("err", +t.dataset.err, t); else openFly("page", +t.dataset.pg!, t);
+    });
+    $("[data-fy-close]").addEventListener("click", closeFly);
+    fly.querySelectorAll<HTMLElement>("[data-fy-step]").forEach((b) => b.addEventListener("click", () => { const rows = fyRows(), at = rows.indexOf(fyIdx), n = rows[at + +b.dataset.fyStep!]; if (n !== undefined) openFly(fyKind, n); }));
+    $("[data-fy-drill]").addEventListener("click", () => toast(fyKind === "err" ? "Drilldown opens the full error view in Explore" : "Drilldown opens the full page analysis"));
+    addEventListener("keydown", (e) => { if (e.key === "Escape" && fly.classList.contains("on")) closeFly(); });
+    addEventListener("hashchange", () => fly.classList.contains("on") && closeFly());
     document.querySelectorAll<HTMLElement>("[data-watch]").forEach((b) => b.addEventListener("click", () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); b.querySelector("span")!.textContent = on ? "Watching" : "Watch"; }));
-    $("[data-efilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-erow]").forEach((r) => { r.hidden = !r.dataset.erow!.toLowerCase().includes(q); if (r.hidden) (r.nextElementSibling as HTMLElement).hidden = true; }); });
+    $("[data-efilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-erow]").forEach((r) => { r.hidden = !r.dataset.erow!.toLowerCase().includes(q); }); });
     $("[data-compare]").addEventListener("change", (e) => ($<HTMLSelectElement>("[data-cmp-sel]").disabled = !(e.target as HTMLInputElement).checked));
     document.querySelectorAll<HTMLElement>("[data-mset-btn]").forEach((b) => b.addEventListener("click", () => {
       document.querySelectorAll<HTMLElement>("[data-mset-btn]").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-selected", String(x === b)); });
@@ -679,12 +800,46 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .three .chart { padding: 14px 18px; } .three figcaption.plain { margin-bottom: 14px; color: #fff; font-size: 15px; }
     .flt.wide input { width: min(480px, 28vw); }
     .etbl th:nth-child(3), .etbl th:nth-child(4) { width: 1%; } .etbl td:nth-child(3) .psp { width: 170px; } .etbl td:nth-child(4) .psp { width: 110px; }
-    .etbl .pv.n { min-width: 34px; } .etbl td.msg { width: 70%; } .etbl .lnk { padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
+    .etbl .pv.n { min-width: 34px; } .etbl td.msg { width: 70%; } button.lnk { padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
     .etbl td:last-child, .etbl th:last-child { width: 1%; border-left: 0; }
     .watch { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; }
     .watch[aria-pressed="true"] { color: #fff; } .watch[aria-pressed="true"] .slash { display: none; } .watch[aria-pressed="false"] svg { opacity: .7; }
-    .stackrow td { padding: 0; border-left: 0; } .stackrow pre { margin: 0; padding: 14px 16px; border-left: 3px solid #f2495c; background: #111217; font: 12px/1.7 ui-monospace, monospace; color: #ff7383; white-space: pre-wrap; } .etbl tr[hidden] { display: none; }
+    .etbl tr[hidden] { display: none; }
     @media (max-width: 1400px) { .statrow { grid-template-columns: repeat(4, minmax(0, 1fr)); } .st:nth-child(5) { border-left: 0; } .three { grid-template-columns: 1fr; } }
+    /* ---------- Flyout: details beside the list, no overlay ---------- */
+    .flyout { position: fixed; top: 56px; right: 0; bottom: 0; z-index: 25; display: flex; flex-direction: column; width: min(66vw, calc(100vw - 440px)); background: #181b1f; border-left: 1px solid var(--line); box-shadow: -18px 0 40px rgba(0, 0, 0, .45); overflow-y: auto; overscroll-behavior: contain; transform: translateX(102%); visibility: hidden; transition: transform .28s cubic-bezier(.2, .7, .2, 1), visibility 0s .28s; }
+    .flyout.on { transform: none; visibility: visible; transition: transform .28s cubic-bezier(.2, .7, .2, 1); }
+    .fy-head { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 4px; min-height: 64px; padding: 10px 20px; background: #181b1f; border-bottom: 1px solid var(--line); }
+    .fy-ic { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 2px; background: none; color: var(--text); cursor: pointer; } .fy-ic:hover:not(:disabled) { background: #22252b; color: #fff; } .fy-ic:disabled { opacity: .35; cursor: default; }
+    .fy-nav { display: flex; gap: 2px; margin: 0 12px 0 8px; padding: 0 10px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); }
+    .fy-head h2 { flex: 1; min-width: 0; margin: 0; font-size: 17px; font-weight: 400; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; outline: none; }
+    .drill { display: inline-flex; align-items: center; gap: 8px; }
+    .fy-body { display: flex; flex-direction: column; gap: 8px; padding: 12px 20px 32px; } .fy-body[hidden] { display: none; }
+    .fy-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .fy-stats > div { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 1px solid var(--line); background: var(--panel); }
+    .fy-stats b { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text); letter-spacing: .02em; } .fy-stats b.e, .fy-stats em.e { color: #f2495c; }
+    .fy-stats em { padding-left: 24px; font-style: normal; font-size: 30px; line-height: 1; font-weight: 600; color: #fff; } .fy-stats .url { padding-left: 24px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fy-sec { padding: 16px 20px 18px; border: 1px solid var(--line); background: var(--panel); }
+    .fy-sec summary { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; list-style: none; font-size: 16px; font-weight: 600; color: #fff; cursor: pointer; } .fy-sec summary::-webkit-details-marker { display: none; }
+    .fy-sec:not([open]) summary { margin-bottom: 0; } .fy-sec:not([open]) .chev { rotate: -90deg; } .chev { color: var(--dim); transition: rotate .15s; }
+    .fy-trace { margin: 0; padding: 22px 26px; background: #111217; font: 14px/1.75 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--text); white-space: pre-wrap; word-break: break-all; }
+    .fy-trace :global(.t1) { color: #ff5286; } .fy-trace :global(.t2), .fy-trace :global(.t3) { color: #f2b736; }
+    .fy-imp { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; } .fy-imp h4 { margin: 0 0 8px; font-weight: 400; color: var(--text); font-size: 14px; }
+    .fy-pages { width: 100%; border-collapse: collapse; align-self: start; } .fy-pages th { padding: 0 0 10px; text-align: left; font-weight: 400; color: var(--text); border-bottom: 1px solid var(--line); } .fy-pages td { padding: 12px 0 10px; border-bottom: 3px solid #3d71d9; color: #fff; } .fy-pages .r { text-align: right; }
+    .fy-bars { margin: 0; padding: 0; list-style: none; } .fy-bars :global(li) { display: grid; grid-template-columns: 1fr auto; padding: 6px 0 0; } .fy-bars :global(span) { color: var(--text); } .fy-bars :global(b) { font-weight: 400; color: var(--text); }
+    .fy-bars :global(i) { grid-column: 1 / -1; height: 4px; margin-top: 8px; border-radius: 2px; background: linear-gradient(90deg, #3d71d9 var(--w), #111217 0); }
+    .fy-users :global(td) { padding: 10px 8px; border-bottom: 1px solid var(--line); border-left: 1px solid var(--line); white-space: nowrap; color: var(--text); } .fy-users :global(td:first-child) { border-left: 0; } .fy-users :global(td.r) { text-align: right; } .fy-users :global(.lnk) { color: var(--link); text-decoration: none; }
+    .more { display: flex; align-items: center; gap: 6px; margin: 12px auto 0; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; } .more[hidden] { display: none; }
+    .fy-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .fy-two .fy-sec { min-height: 220px; }
+    .fy-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .fy-chips :global(.chip) { padding: 6px 10px; border-radius: 2px; background: #22252b; color: var(--dim); } .fy-chips :global(b) { font-weight: 600; color: #5794f2; } .fy-chips :global(.g) { color: #73bf69; font-weight: 600; } .fy-chips :global(.o) { color: #ff9830; font-weight: 600; } .fy-chips :global(.p) { color: #f2495c; font-weight: 600; }
+    .wf { margin-top: 8px; } .wf-bar { display: flex; height: 12px; } .wf-bar i { min-width: 6px; }
+    .wf ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border: 1px solid var(--line); border-top: 0; }
+    .wf li { display: flex; flex-direction: column; gap: 22px; padding: 14px 14px 16px; border-left: 1px solid var(--line); } .wf li:first-child { border-left: 0; }
+    .wf-n { display: flex; align-items: center; gap: 8px; color: var(--text); } .wf-n i { width: 12px; height: 6px; border-radius: 1px; } .wf-v { display: flex; justify-content: space-between; } .wf-v b { font-weight: 400; color: var(--text); }
+    .fy-chart { padding: 14px 18px; } .plot3 { display: grid; grid-template-columns: 44px minmax(0, 1fr) 36px; gap: 6px; height: 200px; } .plot3 svg { width: 100%; height: 100%; } .yax2.rt { text-align: right; } .fy-x { margin-left: 50px; margin-right: 42px; }
+    tr.fy-sel td { background: rgba(87, 148, 242, .1); }
+    @media (max-width: 1100px) { .flyout { width: 100vw; } .fy-imp, .fy-two, .fy-stats { grid-template-columns: 1fr; } .wf ul { grid-template-columns: repeat(2, 1fr); } }
+    @media (prefers-reduced-motion: reduce) { .flyout, .flyout.on { transition: none; } }
   </style>
 </body>
 </html>
