@@ -1,0 +1,233 @@
+---
+// Kubernetes Monitoring: where "Monitor Kubernetes" lands. Rebuilt from the 2022 Grafana Cloud screen. Typing a namespace
+// rewrites both commands, and "Check connection" closes the loop the empty state opens.
+import "./grafana.css";
+const copy = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
+const info = `<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M8 7v4M8 5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+const dashboards = ["Cluster overview", "Nodes", "Namespaces", "Workloads", "Pods", "Kubelet", "Persistent volumes", "Events"];
+---
+<div class="gp k8s" data-k8s>
+  <header class="head">
+    <svg class="logo" width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+      <path d="M22 2 39 10.5 43 29 31 43H13L1 29 5 10.5Z" fill="#326ce5"/>
+      <g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><circle cx="22" cy="23" r="9"/><path d="M22 10v26M9.6 17 34.4 29M9.6 29 34.4 17M22 23l-7 9M22 23l7 9"/></g>
+      <circle cx="22" cy="23" r="3" fill="#fff"/>
+    </svg>
+    <h1>Kubernetes Monitoring</h1>
+  </header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="nav">Cluster navigation</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="dash">Dashboards</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="conf">Configuration</button>
+  </div>
+
+  <section class="panel body" data-pane="nav">
+    <div class="pickers">
+      <select aria-label="Data source"><option>grafanacloud-nilsongaspar-prom</option></select>
+      <select aria-label="Cluster" data-cluster disabled><option>Cluster</option></select>
+      <select aria-label="Namespaces" data-ns-pick disabled><option>Namespaces</option></select>
+    </div>
+
+    <div class="empty" data-empty>
+      <p class="lead">The pre-built Kubernetes dashboards and rules have been installed but there is no data connected to the selected Grafana Cloud Prometheus data source. Add the Grafana Agent to your cluster by following the instructions below.</p>
+      <p class="small">If you have multiple datasources, make sure you have the correct one selected. <button class="textlink" data-goto="conf">Visit the configuration tab to set your preferences.</button></p>
+
+      <h2>1. Prerequisites</h2>
+      <div class="step">
+        <p class="note"><Fragment set:html={info} />If you are updating from a previous version, please see <a class="inline" href="#dest-kube">Updating the Grafana agent.</a></p>
+        <p>Before you begin, make sure you have the following available on your local machine:</p>
+        <ul class="rings">
+          <li>The <code>kubectl</code> command-line tool. To learn how install <code>kubectl</code>, please see <a class="inline" href="#dest-kube">kubectl</a> from the Kubernetes docs.</li>
+          <li>(Optional) The <code>helm</code> command-line tool for managing Helm charts. To learn how to install <code>helm</code>, please see <a class="inline" href="#dest-kube">Installing Helm</a> from the Helm docs.</li>
+          <li>The <code>curl</code> and <code>envsubst</code> command-line tools. To learn how to install these on your OS, you can consult <a class="inline" href="#dest-kube">command-not-found.</a></li>
+        </ul>
+      </div>
+
+      <h2>2. Metrics &amp; Events: Deploy Agent ConfigMap &amp; StatefulSet</h2>
+      <div class="step">
+        <label class="ns">Namespace <input data-ns value="default" spellcheck="false" aria-describedby="ns-help" /></label>
+        <p class="small dim" id="ns-help">Both commands below follow what you type here.</p>
+
+        <h3>Create Agent ConfigMap</h3>
+        <p class="note"><Fragment set:html={info} />The default scrape interval is set to 60s. Scrape intervals lower than 60s may result in increased costs (DPM &gt; 1). To learn more, please see <a class="inline" href="#dest-kube">Active Series and DPM</a></p>
+        <p>Paste the following script into your shell and run it to create the metrics Agent ConfigMap</p>
+        <div class="code scroll"><pre data-configmap></pre><button class="copy" data-copy-from="[data-configmap]" aria-label="Copy ConfigMap command" set:html={copy} /></div>
+        <p>This ConfigMap configures the Grafana Agent StatefulSet to scrape the <code>cadvisor</code>, <code>kubelet</code>, and <code>kube-state-metrics</code> endpoints in your cluster. It also configures the Agent to collect Kubernetes events from your cluster’s control plane and ship these to your Cloud Loki instance. To learn more about configuring Grafana Agent, please see <a class="inline" href="#dest-kube">Configuration Reference</a> from Grafana Agent docs.</p>
+
+        <h3>Create Agent StatefulSet</h3>
+        <p>Run the following command from your shell to install a <a class="inline" href="#dest-kube">Grafana Agent</a> StatefulSet into the <code data-ns-label>default</code> Namespace of your Kubernetes cluster:</p>
+        <div class="code"><pre data-statefulset></pre><button class="copy" data-copy-from="[data-statefulset]" aria-label="Copy StatefulSet command" set:html={copy} /></div>
+      </div>
+
+      <h2>3. Check that data is flowing</h2>
+      <div class="step">
+        <p>Once the agent is running, the first metrics arrive within a minute or two.</p>
+        <button class="primary" data-check>Check connection</button>
+        <p class="status" data-status role="status"></p>
+      </div>
+    </div>
+
+    <div class="connected" data-connected hidden>
+      <p class="lead">Cluster <b>prod-eu-1</b> is sending data. 3 nodes, 14 namespaces, 112 pods.</p>
+      <div class="tiles">
+        {[["Nodes", "3", "all ready"], ["Pods", "112", "2 pending"], ["CPU usage", "41%", "of requests"], ["Memory usage", "63%", "of requests"]].map(([t, v, s]) => (
+          <div class="tile"><span>{t}</span><strong>{v}</strong><small>{s}</small></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="panel body" data-pane="dash" hidden>
+    <p class="lead small-lead">Installed with your stack. They fill in as soon as the agent sends data.</p>
+    <ul class="dashes">
+      {dashboards.map((d) => <li><span>Kubernetes / {d}</span><em data-dash-state>No data yet</em></li>)}
+    </ul>
+  </section>
+
+  <section class="panel body" data-pane="conf" hidden>
+    <div class="conf">
+      <label>Prometheus data source<select><option>grafanacloud-nilsongaspar-prom</option></select></label>
+      <label>Loki data source (events)<select><option>grafanacloud-nilsongaspar-logs</option></select></label>
+      <label>Default namespace<input data-ns-mirror value="default" spellcheck="false" /></label>
+    </div>
+  </section>
+  <p class="toast" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-k8s]")!;
+  const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const nsInput = $<HTMLInputElement>("[data-ns]");
+  const mirror = $<HTMLInputElement>("[data-ns-mirror]");
+
+  function commands() {
+    const ns = nsInput.value.trim() || "default";
+    $("[data-configmap]").textContent = `cat <<'EOF' | NAMESPACE=${ns} /bin/sh -c 'kubectl apply -n $NAMESPACE -f -'
+
+kind: ConfigMap
+metadata:
+  name: grafana-agent
+apiVersion: v1
+data:
+  agent.yaml: |
+    metrics:
+      wal_directory: /var/lib/agent/wal
+      global:
+        scrape_interval: 60s
+        external_labels:
+          cluster: cloud
+      configs:
+      - name: integrations
+        remote_write:
+        - url: https://prometheus-us-central1.grafana.net/api/prom/push
+          basic_auth:
+            username: 448076
+            password: <API key>
+        scrape_configs:
+        - job_name: integrations/kubernetes/cadvisor
+        - job_name: integrations/kubernetes/kubelet
+        - job_name: integrations/kubernetes/kube-state-metrics
+EOF`;
+    $("[data-statefulset]").textContent = `MANIFEST_URL=https://raw.githubusercontent.com/grafana/agent/v0.24.0/production/kubernetes/agent-bare.yaml NAMESPACE=${ns} /bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/grafana/agent/v0.24.0/production/kubernetes/install-bare.sh)" | kubectl apply -f -`;
+    $("[data-ns-label]").textContent = ns;
+  }
+  nsInput.addEventListener("input", () => { mirror.value = nsInput.value; commands(); });
+  mirror.addEventListener("input", () => { nsInput.value = mirror.value; commands(); });
+
+  // Tabs
+  const tabs = [...root.querySelectorAll<HTMLElement>("[data-tab]")];
+  function openTab(id: string) {
+    tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id)));
+    root.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== id));
+  }
+  tabs.forEach((t) => t.addEventListener("click", () => openTab(t.dataset.tab!)));
+  root.querySelectorAll<HTMLElement>("[data-goto]").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.goto!)));
+
+  // "Check connection": a short wait, then the cluster shows up and the pickers unlock
+  $("[data-check]").addEventListener("click", (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const status = $("[data-status]");
+    btn.disabled = true;
+    btn.textContent = "Checking…";
+    status.textContent = "Looking for metrics from your cluster";
+    setTimeout(() => {
+      $<HTMLSelectElement>("[data-cluster]").innerHTML = "<option>prod-eu-1</option>";
+      $<HTMLSelectElement>("[data-ns-pick]").innerHTML = "<option>All namespaces</option>";
+      root.querySelectorAll<HTMLSelectElement>("[data-cluster], [data-ns-pick]").forEach((s) => (s.disabled = false));
+      root.querySelectorAll<HTMLElement>("[data-dash-state]").forEach((d) => { d.textContent = "Receiving data"; d.classList.add("ok"); });
+      $("[data-empty]").hidden = true;
+      $("[data-connected]").hidden = false;
+      toast("Connected: metrics are arriving");
+    }, 1800);
+  });
+
+  const toastEl = $(".toast");
+  let toastTimer = 0;
+  function toast(text: string) {
+    toastEl.textContent = text;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toastEl.classList.remove("on"), 1800);
+  }
+  root.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>(".copy");
+    if (!btn) return;
+    navigator.clipboard?.writeText(root.querySelector(btn.dataset.copyFrom!)?.textContent ?? "").catch(() => {});
+    toast("Copied to clipboard");
+  });
+
+  commands();
+</script>
+
+<style>
+  .k8s .head { padding: 32px 0 0 362px; }
+  .logo { flex: none; }
+  .k8s .tabs { padding-left: 362px; border-bottom: 0; }
+  .body { margin: 0 0 120px 348px; max-width: 1262px; padding: 36px 36px 48px; background: #181b1f; border-color: transparent; }
+  .pickers { display: flex; gap: 22px; margin-bottom: 44px; }
+  .pickers select:first-child { width: 210px; }
+
+  .empty, .connected { padding-left: 22px; max-width: 1050px; }
+  .lead { margin: 0 0 6px; font-size: 20px; line-height: 23px; font-weight: 500; color: #d8d9da; }
+  .small-lead { font-size: 16px; margin-bottom: 20px; }
+  .small { margin: 0; font-size: 12.5px; line-height: 18px; }
+  .dim { color: var(--dim); }
+  .textlink { padding: 0; font: inherit; color: inherit; background: none; border: 0; text-decoration: underline; cursor: pointer; }
+  h2 { margin: 44px 0 18px 9px; font-size: 18px; line-height: 26px; font-weight: 500; color: #d8d9da; }
+  h3 { margin: 28px 0 10px; font-size: 18px; line-height: 26px; font-weight: 400; color: #d8d9da; }
+  .step { margin-left: 28px; max-width: 612px; }
+  .step p { margin: 0 0 16px; }
+  .note :global(svg) { vertical-align: -2px; margin-right: 6px; }
+  .rings { margin: 0; padding-left: 18px; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .rings li { position: relative; }
+  .rings li::before { content: ""; position: absolute; left: -17px; top: 6px; width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid #ccccdc; }
+  .ns { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 6px; font-weight: 500; }
+  .ns input { width: 180px; font-family: "Roboto Mono", ui-monospace, monospace; font-size: 13px; }
+  .status { min-height: 21px; margin-top: 10px !important; color: var(--dim); }
+
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+  .tile { display: flex; flex-direction: column; gap: 4px; padding: 16px; background: #111217; border: 1px solid var(--line); border-radius: 2px; }
+  .tile span { color: var(--dim); }
+  .tile strong { font-size: 28px; line-height: 36px; font-weight: 500; color: #6ccf8e; }
+  .tile small { color: var(--dim); font-size: 12px; }
+
+  .dashes { list-style: none; margin: 0; padding: 0; max-width: 760px; }
+  .dashes li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .dashes em { font-style: normal; font-size: 12px; color: var(--dim); }
+  .dashes em:global(.ok) { color: #6ccf8e; }
+  .conf { display: flex; flex-direction: column; gap: 20px; max-width: 420px; }
+  .conf label { display: flex; flex-direction: column; gap: 8px; font-weight: 500; }
+  .conf select, .conf input { width: 100%; }
+
+  @media (max-width: 1500px) {
+    .k8s .head, .k8s .tabs { padding-left: 64px; }
+    .body { margin-left: 48px; margin-right: 48px; }
+  }
+  @media (max-width: 900px) {
+    .k8s .head, .k8s .tabs { padding-left: 16px; }
+    .body { margin: 0 0 96px; padding: 24px 16px; }
+    .pickers { flex-direction: column; gap: 12px; }
+    .empty, .connected, .step { padding-left: 0; margin-left: 0; }
+    .tiles { grid-template-columns: 1fr 1fr; }
+  }
+</style>
