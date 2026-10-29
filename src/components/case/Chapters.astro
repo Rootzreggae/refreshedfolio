@@ -20,6 +20,8 @@ interface Props { src: string; url: string; chapters: Chapter[]; heroBg: string 
 const { src, url, chapters, heroBg } = Astro.props;
 const accent = (s: string) => s.split(/(\*[^*]+\*)/).map((p) => (p.startsWith("*") ? { t: p.slice(1, -1), a: true } : { t: p, a: false }));
 const first = (c: Chapter) => c.keys.find((k) => k.hash)!;
+// section names for the travelling pill: "About the question" → "Question"
+const sections = ["Intro", ...chapters.map((c) => c.label.replace(/^About (the )?/, "").replace(/^./, (m) => m.toUpperCase()))];
 // the hero is rendered twice: inside the pinned scene, and at the top of the stacked version
 const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
 ---
@@ -50,7 +52,7 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     <div class="shade bottom" aria-hidden="true"></div>
 
     <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
-    <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(["Intro", ...chapters.map((c) => c.label.replace(/^About (the )?/, "").replace(/^./, (m) => m.toUpperCase())))])}>
+    <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(sections)}>
       <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
     </button>
   </div>
