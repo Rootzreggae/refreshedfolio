@@ -361,6 +361,12 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
           </section>
         </section>
 
+        <section data-pane="drill" hidden>
+          <a class="lnk dd-back" href="#app-errors">← Javascript Errors</a>
+          <h2 class="dd-title" data-dd-title></h2>
+          <div data-dd-body></div>
+        </section>
+
         <section data-pane="sessions" hidden>
           <table class="tbl"><thead><tr><th>Session</th><th>Browser</th><th>Location</th><th>Pages</th><th>Errors</th><th>Duration</th></tr></thead><tbody>
             {sessions.map((r) => <tr>{r.map((c, i) => <td class:list={{ poor: i === 4 && c }}>{c || "—"}</td>)}</tr>)}
@@ -445,14 +451,18 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     function show() {
       let id = location.hash.slice(1) || "landing", tab = "";
       if (id === "app-errors") { id = "app"; tab = "errors"; }
+      const dd = id.match(/^app-error-(\d+)$/);
+      if (dd) { id = "app"; tab = "drill"; }
       const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       const appName = document.querySelector("[data-app-title]")?.textContent ?? "acme-monitoring";
       const parts = (target.dataset.crumb ?? "Home").replace("APP", appName).split("/");
       crumbs.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : `<a href="${i === 0 ? "#landing" : i === 2 ? "#apps" : "#landing"}">${p}</a>`)).join("<i>/</i>");
       document.body.classList.toggle("focus", id === "setup");
-      document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" ? "Error awareness" : target.dataset.sideOn)));
+      document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" || tab === "drill" ? "Error awareness" : target.dataset.sideOn)));
+      target.classList.toggle("drill", tab === "drill");
       if (tab) openTab(tab);
+      if (dd) drillTo(+dd[1]);
       scrollTo(0, 0);
     }
     addEventListener("hashchange", show);
@@ -563,7 +573,19 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     });
     $("[data-fy-close]").addEventListener("click", closeFly);
     fly.querySelectorAll<HTMLElement>("[data-fy-step]").forEach((b) => b.addEventListener("click", () => { const rows = fyRows(), at = rows.indexOf(fyIdx), n = rows[at + +b.dataset.fyStep!]; if (n !== undefined) openFly(fyKind, n); }));
-    $("[data-fy-drill]").addEventListener("click", () => toast(fyKind === "err" ? "Drilldown opens the full error view in Explore" : "Drilldown opens the full page analysis"));
+    // Drilldown: the error's full page, opened in a new tab as the ↗ promises
+    function drillTo(i: number) {
+      if (!fyD.errors[i]) return;
+      fillErr(i);
+      const body = fly.querySelector<HTMLElement>('[data-fy="err"]')!.cloneNode(true) as HTMLElement;
+      body.hidden = false; body.classList.add("dd-body");
+      $("[data-dd-body]").replaceChildren(body);
+      $("[data-dd-title]").textContent = fyD.errors[i].m;
+    }
+    $("[data-fy-drill]").addEventListener("click", () => {
+      if (fyKind === "err") window.open(`${location.pathname}#app-error-${fyIdx}`, "_blank", "noopener");
+      else toast("Drilldown opens the full page analysis");
+    });
     addEventListener("keydown", (e) => { if (e.key === "Escape" && fly.classList.contains("on")) closeFly(); });
     addEventListener("hashchange", () => fly.classList.contains("on") && closeFly());
     document.querySelectorAll<HTMLElement>("[data-watch]").forEach((b) => b.addEventListener("click", () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); b.querySelector("span")!.textContent = on ? "Watching" : "Watch"; }));
@@ -840,6 +862,10 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     tr.fy-sel td { background: rgba(87, 148, 242, .1); }
     @media (max-width: 1100px) { .flyout { width: 100vw; } .fy-imp, .fy-two, .fy-stats { grid-template-columns: 1fr; } .wf ul { grid-template-columns: repeat(2, 1fr); } }
     @media (prefers-reduced-motion: reduce) { .flyout, .flyout.on { transition: none; } }
+    /* Drilldown page: the flyout's content at full width */
+    [data-screen="app"].drill .tabs, [data-screen="app"].drill .app-h { display: none; }
+    .dd-back { display: inline-block; margin: 18px 0 6px; } .dd-title { margin: 0 0 14px; font-size: 26px; font-weight: 500; color: #fff; }
+    .dd-body { padding: 0; }
   </style>
 </body>
 </html>
