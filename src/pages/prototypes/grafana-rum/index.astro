@@ -66,11 +66,6 @@ const errCol = jsErrors.map(([, , , , k]) => (k === "noise" ? "#e0226e" : k === 
 // Flyout content, after the original Flyout frames
 const fyLines = [["FCP", "#5794f2"], ["TTFB", "#e0b400"], ["LCP", "#f2495c"], ["CLS", "#ff9830"], ["FID", "#73bf69"], ["INP", "#b877d9"]].map(([n, c], i) => ({ n, c, d: smooth(series(70 + i, 14, 2 + i * 1.2, 4).map((v) => Math.max(0.3, Math.min(9.7, v))), 600, 200, 10) }));
 const waterfall = [["Redirect", "4.49ms", "1%", "#ff9830", 2], ["App Cache", "3.32ms", "1%", "#5794f2", 2], ["DNS", "152.15ms", "38%", "#b877d9", 37], ["TCP", "235.83ms", "60%", "#56a64b", 54], ["Request", "0.20ms", "<1%", "#e02f44", 5]] as const;
-const fyData = {
-  errors: jsErrors.map(([t, m, c, u]) => ({ t, m, c, u })),
-  pages: perf.map((r, i) => ({ id: r[0], ttfb: r[1], fcp: r[2], lcp: r[3], inp: r[5], load: r[6], cls: [0.02, 0.08, 0.31, 0.12, 0.04, 0.27][i] })),
-  pageIds: perf.map((r) => r[0]),
-};
 // Page drilldown: the resources a page loaded, as in the original frame
 const resources = [
   ["https://code.google.com/jquery.js", "JS", "85.1 KB", "85.1 KB", "18ms", "Yes"], ["https://code.google.com/jquery.js", "JS", "85.1 KB", "85.1 KB", "18ms", "Yes"],
@@ -92,6 +87,36 @@ const sessRows = [
   ["2023-10-19 09:41:30", "Tfvq8U6aCB", "product_detail", 2, "Chrome", "118.0.0.0", "Linux x86_64"], ["2023-10-19 09:41:30", "Tfvq8U6aCB", "/products/1/detail", 1, "Chrome", "118.0.0.0", "Linux x86_64"],
   ["2023-10-19 09:34:07", "RC5h143Mxh", "product_detail", 1, "Mobile Safari", "17.1", "iOS 16.6.1"],
 ] as const;
+// Session drilldown: timeline events (seconds from start) and the Error Awareness hover card
+const tlTicks = ["50ms", ...Array.from({ length: 21 }, (_, i) => `${(1 + i * 0.5).toFixed(1)}s`)];
+const tlMax = 11.5;
+const tlMarks = [
+  { at: 0.05, k: "start", label: "session_start" }, { at: 0.75, k: "start", label: "page_load" }, { at: 1.95, k: "ok", label: "Duration" },
+  { at: 3.15, k: "err", label: "Error" }, { at: 4.35, k: "tick", label: "" }, { at: 4.9, k: "cluster", label: "6 errors and warnings" }, { at: 10.35, k: "tick", label: "" },
+] as const;
+const awareness = [
+  ["err", "Type error. Cannot read properties of undefined", 0], ["warn", "Script error.", 3], ["err", "Script error.", 3],
+  ["err", "Type error. Cannot read properties of undefined", 7], ["warn", "Error. Failed to fetch", 0], ["warn", "Error. Failed to fetch", 11],
+] as const;
+const awArea = smooth([0.4, 1.2, 2.6, 2.2, 2.1, 2.0, 2.1, 2.4, 4.8, 7.2, 8.2, 8.0, 5.0, 0.3], 460, 110, 10);
+const sessEvents = [
+  ["start", "15:37:31", "/", "Event", "session_start"], ["load", "15:37:32", "/", "Measurement", "page_load"],
+  ["err", "15:38:44", "/products/1/detail", "Error", "TypeError: Cannot read properties of undefined"], ["warn", "15:38:44", "/products/1/detail", "Warning", "Script error."],
+  ["err", "15:38:45", "/products/1/detail", "Error", "Error: Failed to fetch"], ["load", "15:38:51", "/product_detail", "Measurement", "page_load"],
+] as const;
+// Expanded event: navigation timing, as in the original frame (shares of each bar)
+const navSum = [["Total Navigation Time", "412ms", "", "#ff7f2a", 0], ["Backend Time", "247ms", "60%", "#1fb5a8", 60], ["Frontend Time", "165ms", "40%", "#e0226e", 40]] as const;
+const navBack = [["Redirect Time", "0ms", "0%", "#c64fc0", 0], ["Service Worker", "0ms", "0%", "#ff8a7a", 0], ["DNS Lookup", "0ms", "0%", "#1f60c4", 0], ["TCP Handshake", "0ms", "0%", "#f2cc0c", 0], ["TLS Negotiation", "37ms", "15%", "#e5a8e2", 15], ["Request", "210ms", "85%", "#7c2876", 85]] as const;
+const navFront = [["DOM Processing Time", "99ms", "60%", "#1f78c1", 60], ["onLoad Time", "66ms", "40%", "#5fd3e8", 40]] as const;
+const navChips = [["Cache Hit Status", "Full Load"], ["Protocol", "http/1.1"], ["Body (compressed)", "47,060 B"], ["Body (uncompressed)", "131,208 B"], ["Visibility State", "Visible"]];
+const XC = '<svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="m5.8 5.8 4.4 4.4m0-4.4-4.4 4.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+const WT = '<svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8 15 14H1Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 6.3v3.6M8 11.6v.3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+const fyData = {
+  errors: jsErrors.map(([t, m, c, u]) => ({ t, m, c, u })),
+  pages: perf.map((r, i) => ({ id: r[0], ttfb: r[1], fcp: r[2], lcp: r[3], inp: r[5], load: r[6], cls: [0.02, 0.08, 0.31, 0.12, 0.04, 0.27][i] })),
+  pageIds: perf.map((r) => r[0]),
+  sessions: sessRows,
+};
 const views = [["/", "2347ms", 826, "18ms"], ["product_detail", "743ms", 740, "4ms"], ["/products/1/detail", "200ms", 630, "120ms"], ["product_detail", "1114ms", 530, "4ms"], ["/products/1/detail", "123ms", 412, "4ms"], ["product_detail", "355ms", 90, "4ms"]];
 const p75 = [
   { title: "Page Load, p75", ticks: ["25 s", "20 s", "15 s", "10 s", "5 s", "0 ms"], color: "#f2b736", legend: [["TTFB", "#73bf69"], ["FCP", "#f2b736"], ["LCP", "#b877d9"]], d: series(51, 90, 6, 4).map((v, i) => v + (i > 45 && i < 80 ? 10 + Math.sin(i / 6) * 4 : 0)), max: 26 },
@@ -385,6 +410,64 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
           </section>
         </section>
 
+        <section data-pane="session" hidden>
+          <a class="lnk dd-back" href="#app-sessions">← Session explore</a>
+          <p class="ss-eyebrow">Session Details:</p>
+          <h2 class="ss-title"><span data-ss="id"></span><small data-ss="date"></small></h2>
+          <div class="ss-cards">
+            {[["Browser name", "browser"], ["Browser version", "version"], ["Operating System", "os"], ["App name", "app"], ["App version", "appv"], ["Total JS errors", "errors"]].map(([l, k]) => <div><span>{l}</span><b data-ss={k}></b></div>)}
+          </div>
+
+          <section class="tl">
+            <header><h3>TIMELINE</h3><label class="flt wide"><input placeholder="Search URL, status or metric" aria-label="Search timeline events" data-tlfilter /></label></header>
+            <div class="tl-box">
+              <p class="tl-meta"><span>Session start time - <b data-ss="start"></b></span><span>Application: <b data-ss="app2"></b></span><span>Server time: <b>0.02s</b></span><span>Network time: <b>0.0s</b></span></p>
+              <ol class="tl-ruler">{tlTicks.map((t) => <li>{t}</li>)}</ol>
+              <div class="tl-track">
+                {tlMarks.map((m) => m.k === "tick" ? <i class="tl-tick" style={`left:${(m.at / tlMax) * 100}%`}></i>
+                  : m.k === "cluster" ? <button class="tl-cluster" style={`left:${(m.at / tlMax) * 100}%`} aria-label={m.label} aria-haspopup="dialog" data-aw-open><i class="d warn"></i><i class="d err"></i><i class="d warn"></i></button>
+                  : <span class:list={["d", m.k]} style={`left:${(m.at / tlMax) * 100}%`} title={m.label}></span>)}
+                <div class="aw" role="dialog" aria-label="Error Awareness" data-aw hidden>
+                  <header><span><Fragment set:html={WT} />Error Awareness</span><button class="fy-ic" aria-label="Close" data-aw-close>×</button></header>
+                  <div class="aw-body">
+                    <ul class="aw-list">{awareness.map(([k, m], i) => <li><button class:list={["aw-item", `k-${k}`, { on: i === 0 }]} data-aw-i={i}>{k === "err" ? <Fragment set:html={XC} /> : <Fragment set:html={WT} />}<span><small data-ss="app3">Kowalski-baby</small>{m}</span></button></li>)}</ul>
+                    <div class="aw-detail">
+                      <h4 data-aw-title></h4><p class="aw-date">10/19/2023, 3:38:44 PM</p><p data-aw-msg></p>
+                      <figure class="aw-chart"><svg viewBox="0 0 460 110" preserveAspectRatio="none"><g class="grid">{[1, 2, 3].map((i) => <line x1="0" x2="460" y1={i * 27} y2={i * 27} />)}</g><path d={area(awArea, 460, 110)} fill="#ff5286" /><path d="M370,110 L372,60 L376,30 L380,60 L382,110 Z" fill="#f2b736" /></svg>
+                        <ul class="xax2 aw-x">{["13:25", "13:30", "13:35", "13:40", "13:45", "13:50", "13:55"].map((t) => <li>{t}</li>)}</ul>
+                        <ul class="legend"><li style="--c:#5794f2">Page load</li><li style="--c:#ff5286">Error</li></ul></figure>
+                      <button class="btn primary examine" data-aw-examine><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M4.5 7h5M7 4.5v5M10.6 10.6 14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Examine</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ul class="tl-legend"><li><span class="d start"></span>session_start <b>0.019s</b></li><li><span class="d ok"></span>Duration <b>0.019s</b></li><li><span class="d warn"></span>Warning</li><li><span class="d err"></span>Error</li></ul>
+            </div>
+            <table class="ptbl tl-tbl"><thead><tr><th></th><th>Timestamp</th><th>Page URL</th><th>Kind</th><th class="r">Value</th></tr></thead><tbody>
+              {sessEvents.map(([k, t, pg, kind, v], i) => <>
+                <tr class:list={["tl-row", `k-${k}`]} data-tlrow={`${pg} ${kind} ${v}`}><td><button class="fy-ic tl-exp" aria-expanded="false" aria-label="Show event details" data-tl-exp={i}>›</button></td>
+                  <td><span class="tl-ic">{k === "err" ? <Fragment set:html={XC} /> : k === "warn" ? <Fragment set:html={WT} /> : <span class={`d ${k === "start" ? "start" : "ok"}`}></span>}</span><span data-ss-ts={t}></span></td>
+                  <td>https://acme-shop.example{pg}</td><td><span class:list={["kind", kind.toLowerCase()]}>{kind}</span></td><td class="r">{v}</td></tr>
+                <tr class="tl-more" hidden><td colspan="5"><div class="nav">
+                  {[["Summary", navSum], ["Backend Time", navBack], ["Frontend Time", navFront]].map(([title, rows], bi) => <>
+                    <h4>{title as string}</h4>
+                    <div class="wf nav-wf"><div class="wf-bar">{(rows as readonly (readonly [string, string, string, string, number])[]).filter((r) => r[4] > 0).map(([, , , c, w]) => <i style={`background:${c};flex:${w}`}></i>)}</div>
+                      <ul style={`grid-template-columns:repeat(${(rows as readonly unknown[]).length},minmax(0,1fr))`}>{(rows as readonly (readonly [string, string, string, string, number])[]).map(([n, tm, pc, c]) => <li><span class="wf-n"><i style={`background:${c}`}></i>{n}</span><span class="wf-v"><b>{tm}</b><b>{pc}</b></span></li>)}</ul></div>
+                    {bi === 0 && <div class="fy-chips nav-chips">{navChips.map(([l, v]) => <span class="chip"><span>{l}</span> <b>{v}</b></span>)}</div>}
+                  </>)}
+                </div></td></tr>
+              </>)}
+            </tbody></table>
+          </section>
+
+          <div class="ss-two">
+            <section class="tpanel ss-info"><header><h3><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5.5" r="3" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2.5 14.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>USER INFO</h3></header>
+              <dl>{[["Session ID", "id2"], ["App", "app4"], ["Environment", "env"], ["Browser", "browser2"], ["Operating system", "os2"], ["Location", "loc"]].map(([l, k]) => <><dt>{l}:</dt><dd><a class="lnk" data-ss={k}></a></dd></>)}</dl></section>
+            <section class="tpanel"><header><h3><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 15s5-4.6 5-8.5a5 5 0 0 0-10 0C3 10.4 8 15 8 15Z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="6.5" r="1.8" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>LOCATION</h3></header>
+              <table class="fy-pages ss-loc"><thead><tr><th>Location</th><th class="r">Number of sessions</th></tr></thead><tbody><tr><td data-ss="loc2"></td><td class="r">10</td></tr></tbody></table></section>
+          </div>
+        </section>
+
         <section data-pane="sessions" hidden>
           <figure class="chart sess-chart"><header><figcaption>Sessions</figcaption><button class="btn">Explore</button></header>
             <div class="plot2"><ul class="yax2">{[10, 8, 6, 4, 2, 0].map((t) => <li>{t}</li>)}</ul>
@@ -395,7 +478,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
           <section class="tpanel">
             <header><h3>Session explore</h3><span class="tp-tools"><label class="flt"><input placeholder="Search" aria-label="Search sessions" data-sfilter /></label><span class="tt">Tт</span><button class="fy-ic" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5V5h-2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button><button class="btn">Explore</button></span></header>
             <table class="ptbl stbl"><thead><tr><th>Session start</th><th>Session ID</th><th>Page ID</th><th></th><th>Errors</th><th class="r">Browser name</th><th class="r">Browser version</th><th class="r">Platform</th></tr></thead><tbody>
-              {sessRows.map(([t, id, pg, e, b, v, pl]) => <tr data-srow={`${id} ${pg} ${b} ${pl}`}><td>{t}</td><td><a class="lnk">{id}</a></td><td><a class="lnk">{pg}</a></td><td class="pl">⊕</td><td>{e}</td><td class="r">{b}</td><td class="r">{v}</td><td class="r">{pl}</td></tr>)}
+              {sessRows.map(([t, id, pg, e, b, v, pl], si) => <tr data-srow={`${id} ${pg} ${b} ${pl}`}><td>{t}</td><td><a class="lnk" href={`#app-session-${si}`}>{id}</a></td><td><a class="lnk">{pg}</a></td><td class="pl">⊕</td><td>{e}</td><td class="r">{b}</td><td class="r">{v}</td><td class="r">{pl}</td></tr>)}
             </tbody></table>
             <footer class="pager">Showing 1 to 13 of 30 entries <span><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>›</button></span></footer>
           </section>
@@ -479,7 +562,9 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     function show() {
       let id = location.hash.slice(1) || "landing", tab = "";
       if (id === "app-errors") { id = "app"; tab = "errors"; }
-      const dd = id.match(/^app-error-(\d+)$/), pd = id.match(/^app-page-(\d+)$/);
+      if (id === "app-sessions") { id = "app"; tab = "sessions"; }
+      const dd = id.match(/^app-error-(\d+)$/), pd = id.match(/^app-page-(\d+)$/), sd = id.match(/^app-session-(\d+)$/);
+      if (sd) { id = "app"; tab = "session"; }
       if (dd) { id = "app"; tab = "drill"; }
       if (pd) { id = "app"; tab = "pdrill"; }
       const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
@@ -490,10 +575,11 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       document.body.classList.toggle("focus", id === "setup");
       document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" || tab === "drill" ? "Error awareness" : target.dataset.sideOn)));
       target.classList.toggle("drill", tab === "drill");
-      target.classList.toggle("pdrill", tab === "pdrill");
+      target.classList.toggle("pdrill", tab === "pdrill" || tab === "session");
       if (tab) openTab(tab); else if (id === "app") openTab("overview");
       if (dd) drillTo(+dd[1]);
       if (pd) pageDrill(+pd[1]);
+      if (sd) sessionDrill(+sd[1]);
       scrollTo(0, 0);
     }
     addEventListener("hashchange", show);
@@ -571,7 +657,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       f("browsers").innerHTML = bars([["Safari mobile", 12, "12%"], ["Chrome", 82, "82%"], ["Firefox", 68, "68%"], ["Edge", 41, "41%"]]);
       const os = [3, 18, 5].map((n) => Math.max(e.u > 2 ? 1 : 0, Math.round((n / 26) * e.u)));
       f("os").innerHTML = bars([["Mac OSX", (os[0] / e.u) * 100, String(os[0])], ["Windows", (os[1] / e.u) * 100, String(os[1])], ["Linux", (os[2] / e.u) * 100, String(os[2])]]);
-      f("urows").innerHTML = sessions2.slice(0, Math.min(5, e.u)).map(([s, v, b, o, l, w]) => `<tr><td><a class="lnk">${s}</a></td><td><a class="lnk">${v}</a></td><td><a class="lnk">${v}</a></td><td>${b}</td><td>${o}</td><td class="r">${l}</td><td class="r">${w}</td></tr>`).join("");
+      f("urows").innerHTML = sessions2.slice(0, Math.min(5, e.u)).map(([s, v, b, o, l, w], si) => `<tr><td><a class="lnk" href="#app-session-${si}">${s}</a></td><td><a class="lnk">${v}</a></td><td><a class="lnk">${v}</a></td><td>${b}</td><td>${o}</td><td class="r">${l}</td><td class="r">${w}</td></tr>`).join("");
       f("more").hidden = e.u <= 5;
     }
     function fillPage(i: number) {
@@ -620,6 +706,36 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       $("[data-pd-stats]").replaceChildren($(".statrow").cloneNode(true));
       $("[data-pd-wf]").replaceChildren(fly.querySelector(".wf")!.cloneNode(true));
     }
+    // Session drilldown: details, the event timeline and the Error Awareness hover card
+    const locs = ["Augsburg, Germany", "Shenzhen, China", "Porto, Portugal", "Austin, USA", "Leeds, UK"];
+    function sessionDrill(i: number) {
+      const r = (fyD as unknown as { sessions: (string | number)[][] }).sessions[i]; if (!r) return;
+      const [start, id, , errs, browser, ver, os] = r.map(String), app = name(), loc = locs[i % locs.length];
+      const set: Record<string, string> = { id, id2: id, date: `on ${new Date(start.replace(" ", "T")).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`, browser, browser2: browser, version: ver, os, os2: os, app, app2: app, app4: app, appv: "r331-v1.3.105", errors: errs, start: start.slice(11), env: "Prod", loc, loc2: loc };
+      document.querySelectorAll<HTMLElement>("[data-ss]").forEach((e) => { const v = set[e.dataset.ss!]; if (v !== undefined) e.textContent = v; else if (e.dataset.ss === "app3") e.textContent = app; });
+      const base = new Date(start.replace(" ", "T")).getTime(), first = new Date(`${start.slice(0, 10)}T15:37:31`).getTime();
+      document.querySelectorAll<HTMLElement>("[data-ss-ts]").forEach((e) => { const d = new Date(base + (new Date(`${start.slice(0, 10)}T${e.dataset.ssTs}`).getTime() - first)); e.textContent = `${start.slice(0, 10)} ${d.toTimeString().slice(0, 8)}`; });
+      awClose(); awPick(0);
+    }
+    const aw = $("[data-aw]"), awItems = [...document.querySelectorAll<HTMLElement>("[data-aw-i]")];
+    const awErrIdx = [7, 3, 3, 7, 0, 11]; // the matching row in Javascript Errors, for Examine
+    let awAt = 0;
+    function awPick(i: number) {
+      awAt = i; awItems.forEach((b, k) => b.classList.toggle("on", k === i));
+      const m = awItems[i].querySelector("span")!.lastChild!.textContent!.trim();
+      $("[data-aw-title]").textContent = m.replace(/\.$/, ""); $("[data-aw-msg]").textContent = m.endsWith(".") ? m : `${m}.`;
+    }
+    const awOpen = () => { aw.hidden = false; };
+    function awClose() { aw.hidden = true; }
+    const cluster = $("[data-aw-open]");
+    cluster.addEventListener("mouseenter", awOpen); cluster.addEventListener("focus", awOpen); cluster.addEventListener("click", awOpen);
+    $("[data-aw-close]").addEventListener("click", () => { awClose(); cluster.focus(); });
+    awItems.forEach((b, i) => { b.addEventListener("mouseenter", () => awPick(i)); b.addEventListener("click", () => awPick(i)); });
+    $("[data-aw-examine]").addEventListener("click", () => { location.hash = `#app-error-${awErrIdx[awAt]}`; });
+    document.addEventListener("click", (e) => { if (!aw.hidden && !aw.contains(e.target as Node) && !cluster.contains(e.target as Node)) awClose(); });
+    addEventListener("keydown", (e) => { if (e.key === "Escape" && !aw.hidden) { awClose(); cluster.focus(); } });
+    document.querySelectorAll<HTMLElement>("[data-tl-exp]").forEach((b) => b.addEventListener("click", () => { const more = b.closest("tr")!.nextElementSibling as HTMLElement, open = more.hidden; more.hidden = !open; b.setAttribute("aria-expanded", String(open)); }));
+    $("[data-tlfilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-tlrow]").forEach((r) => { r.hidden = !r.dataset.tlrow!.toLowerCase().includes(q); if (r.hidden) (r.nextElementSibling as HTMLElement).hidden = true; }); });
     $("[data-fy-drill]").addEventListener("click", () => {
       location.hash = fyKind === "err" ? `#app-error-${fyIdx}` : `#app-page-${fyIdx}`;
     });
@@ -912,6 +1028,39 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     .fi.js { background: #f7df1e; color: #111; align-items: end; justify-items: end; padding: 0 2px 1px 0; } .fi.css { background: #264de4; color: #fff; clip-path: polygon(8% 0, 92% 0, 84% 88%, 50% 100%, 16% 88%); } .fi.html { background: #e44d26; color: #fff; clip-path: polygon(8% 0, 92% 0, 84% 88%, 50% 100%, 16% 88%); }
     .sess-chart { margin-bottom: 8px; padding: 14px 18px; } .sess-chart .plot2 { height: 230px; }
     .stbl td { padding: 12px 8px; } .stbl tr[hidden] { display: none; }
+    /* ---------- Session drilldown ---------- */
+    .ss-eyebrow { margin: 18px 0 4px; color: var(--text); } .ss-title { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; font-size: 26px; font-weight: 500; color: var(--text); } .ss-title small { font-size: 15px; font-weight: 400; color: var(--text); }
+    .ss-cards { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; } .ss-cards div { display: flex; flex-direction: column; gap: 6px; padding: 10px 16px 12px; border: 1px solid var(--line); background: #22252b; }
+    .ss-cards span { color: var(--text); font-size: 14px; } .ss-cards b { font-size: 20px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tl { margin-bottom: 8px; padding: 0 0 8px; border: 1px solid var(--line); background: var(--panel); } .tl > header { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; } .tl h3 { margin: 0; font-size: 17px; font-weight: 600; color: #5794f2; letter-spacing: .02em; }
+    .tl-box { margin: 0 16px; border: 1px solid var(--line); background: #111217; }
+    .tl-meta { display: flex; gap: 56px; margin: 0; padding: 14px 20px; color: var(--dim); } .tl-meta b { font-weight: 500; color: var(--text); }
+    .tl-ruler { display: grid; grid-template-columns: repeat(22, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); } .tl-ruler li { padding: 12px 0; text-align: center; color: var(--text); border-left: 1px solid var(--line); } .tl-ruler li:first-child { border-left: 0; }
+    .tl-track { position: relative; height: 84px; margin: 0 24px; } .tl-track::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid #2c3035; }
+    .d { position: absolute; top: 50%; width: 12px; height: 12px; translate: -50% -50%; rotate: 45deg; border-radius: 1px; } .d.start { background: #ccccdc; } .d.ok { background: #56a64b; } .d.err { background: #f2495c; } .d.warn { background: #ff9830; }
+    .tl-tick { position: absolute; top: calc(50% - 10px); width: 1px; height: 20px; background: #464c54; }
+    .tl-cluster { position: absolute; top: 50%; width: 40px; height: 30px; translate: -50% -50%; border: 0; border-radius: 2px; background: none; cursor: pointer; } .tl-cluster:hover, .tl-cluster[aria-expanded="true"] { background: rgba(255, 152, 48, .12); }
+    .tl-cluster .d:nth-child(1) { left: 30%; } .tl-cluster .d:nth-child(2) { left: 50%; } .tl-cluster .d:nth-child(3) { left: 70%; }
+    .tl-legend { display: flex; gap: 52px; margin: 0; padding: 14px 24px 16px; list-style: none; border-top: 1px solid var(--line); color: var(--dim); } .tl-legend li { position: relative; padding-left: 22px; } .tl-legend .d { left: 6px; width: 10px; height: 10px; } .tl-legend b { font-weight: 400; color: var(--text); }
+    .aw { position: absolute; z-index: 5; top: calc(50% + 4px); left: clamp(0px, calc(42.6% - 60px), calc(100% - min(1080px, 100%))); width: min(1080px, 100%); border: 1px solid var(--line); background: #22252b; box-shadow: 0 10px 40px rgba(0, 0, 0, .55); } .aw[hidden] { display: none; }
+    .aw > header { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 8px 18px; border-bottom: 1px solid var(--line); } .aw > header span { display: flex; align-items: center; gap: 10px; color: var(--text); }
+    .aw-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-height: 520px; } .aw-list { margin: 0; padding: 0; list-style: none; overflow-y: auto; border-right: 1px solid var(--line); }
+    .aw-item { display: flex; align-items: center; gap: 18px; width: 100%; padding: 14px 18px; border: 0; border-left: 4px solid #f2495c; border-bottom: 1px solid var(--line); background: #1c1f24; color: #fff; font: inherit; text-align: left; cursor: pointer; } .aw-item.k-warn { border-left-color: #ff9830; }
+    .aw-item.on, .aw-item:hover { background: #2c3035; } .aw-item svg { flex: none; color: var(--text); } .aw-item small { display: block; color: var(--dim); font-size: 14px; }
+    .aw-detail { display: flex; flex-direction: column; padding: 18px 26px 22px; } .aw-detail h4 { margin: 0 0 14px; font-size: 18px; font-weight: 400; color: var(--text); } .aw-date { margin: 0 0 22px; color: var(--dim); } .aw-detail > p:not(.aw-date) { margin: 0 0 22px; color: #fff; }
+    .aw-chart { margin: 0 0 18px; padding: 14px 18px 10px; border: 1px solid var(--line); background: #1c1f24; } .aw-chart svg { width: 100%; height: 110px; } .aw-x { margin-left: 0; }
+    .examine { display: inline-flex; align-items: center; gap: 8px; align-self: center; }
+    .tl-tbl { margin-top: 10px; } .tl-tbl td { padding: 10px 8px; } .tl-row td:first-child { width: 40px; border-left: 0; } .tl-row td:nth-child(2) { position: relative; } .tl-row.k-err td:nth-child(2) { box-shadow: inset 3px 0 #f2495c; } .tl-row.k-warn td:nth-child(2) { box-shadow: inset 3px 0 #ff9830; }
+    .tl-ic { display: inline-flex; vertical-align: middle; width: 22px; margin: 0 12px 0 10px; } .tl-row.k-err .tl-ic { color: #f2495c; } .tl-row.k-warn .tl-ic { color: #ff9830; } .tl-ic .d { position: relative; top: auto; translate: none; display: block; width: 10px; height: 10px; margin: 0 6px; }
+    .tl-exp { font-size: 20px; transition: rotate .15s; } .tl-exp[aria-expanded="true"] { rotate: 90deg; } .tl-more dl { display: grid; grid-template-columns: max-content 1fr; gap: 6px 24px; margin: 4px 0; } .tl-more dt { color: var(--dim); } .tl-more dd { margin: 0; color: var(--text); } .tl-tbl tr[hidden] { display: none; }
+    .ss-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.6fr); gap: 8px; } .ss-two .tpanel { padding: 4px 8px 14px; } .ss-two h3 { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: .02em; }
+    .ss-info dl { display: grid; grid-template-columns: max-content 1fr; gap: 18px 40px; margin: 10px 10px 0; padding-top: 16px; border-top: 1px solid var(--line); } .ss-info dt { color: var(--text); } .ss-info dd { margin: 0; }
+    .ss-loc { margin: 10px 10px 0; width: calc(100% - 20px); } .ss-loc td { border-bottom: 0; color: var(--text); }
+    @media (max-width: 1300px) { .ss-cards { grid-template-columns: repeat(3, 1fr); } .aw { left: 16px; width: calc(100% - 32px); } .tl-ruler li:nth-child(even) { visibility: hidden; } }
+    .kind { display: inline-block; padding: 2px 6px; border: 1px solid #ff9830; border-radius: 2px; color: #ff9830; font-size: 13px; } .kind.error { border-color: #f2495c; color: #f2495c; } .kind.measurement { border-color: #5794f2; color: #5794f2; }
+    .tl-more > td { padding: 6px 36px 28px !important; background: #181b1f; } .nav h4 { margin: 22px 0 14px; font-size: 14px; font-weight: 500; color: var(--text); }
+    .nav-wf { margin: 0; } .nav-wf .wf-bar { height: 12px; } .nav-chips { margin-top: 18px; padding-bottom: 20px; }
+    .fy-chips .chip { padding: 6px 10px; border-radius: 2px; background: #22252b; color: var(--dim); } .fy-chips .chip b { font-weight: 600; color: #5794f2; }
   </style>
 </body>
 </html>
