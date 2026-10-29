@@ -15,15 +15,16 @@ function area(vals: number[], w: number, h: number, max: number) {
   return { line: `M${pts.join("L")}`, fill: `M0,${h}L${pts.join("L")}L${w},${h}Z` };
 }
 const W = 400, H = 130;
-const dur = series(7, 60, 22, 9, 0.25), dur99 = dur.map((v) => v * 1.5), durAvg = dur.map((v) => v * 0.6);
+const dur = series(7, 60, 22, 9, 0.25), dur99 = dur.map((v) => v * 1.35), durAvg = dur.map((v) => v * 0.6);
+const durMax = Math.ceil(Math.max(...dur99) / 10) * 10 + 10;
 const err = series(11, 60, 2.1, 0.8), rate = series(23, 60, 26, 6, 0.08);
 const durPrev = series(31, 60, 18, 7, 0.1), errPrev = series(37, 60, 1.6, 0.6), ratePrev = series(41, 60, 22, 5);
 const charts = [
-  { id: "duration", title: "Duration, p95", unit: "ms", max: 63, ticks: ["63 ms", "31 ms", "16 ms", "8 ms", "4 ms", "0 ms"], lines: [
-    { name: "p95", color: "#ff9830", fill: true, d: area(dur, W, H, 63) },
-    { name: "p99", color: "#fade2a", d: area(dur99.map((v) => Math.min(v, 62)), W, H, 63) },
-    { name: "average", color: "#b877d9", d: area(durAvg, W, H, 63) },
-  ], prev: area(durPrev, W, H, 63) },
+  { id: "duration", title: "Duration, p95", unit: "ms", max: durMax, ticks: [5, 4, 3, 2, 1, 0].map((i) => `${Math.round((durMax * i) / 5)} ms`), lines: [
+    { name: "p95", color: "#ff9830", fill: true, d: area(dur, W, H, durMax) },
+    { name: "p99", color: "#fade2a", d: area(dur99, W, H, durMax) },
+    { name: "average", color: "#b877d9", d: area(durAvg, W, H, durMax) },
+  ], prev: area(durPrev, W, H, durMax) },
   { id: "errors", title: "Errors", unit: "%", max: 5, ticks: ["5%", "4%", "3%", "2%", "1%", "0%"], lines: [
     { name: "errors", color: "#ff5286", fill: true, d: area(err, W, H, 5) },
   ], prev: area(errPrev, W, H, 5) },
@@ -605,7 +606,8 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     .prev-l { display: none; } .prev-l::before { background: repeating-linear-gradient(90deg, #ccccdc 0 4px, transparent 4px 7px) !important; }
     .compare .prev { opacity: 1; } .compare .prev-l { display: list-item; }
     .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-bottom: 16px; }
-    .bars { display: flex; align-items: flex-end; gap: 3px; height: 170px; padding-left: 40px; } .bars i { flex: 1; background: #5fb4c8; border-radius: 1px 1px 0 0; opacity: .9; }
+    .bars { display: flex; align-items: flex-end; gap: 3px; height: 170px; padding-left: 40px; flex: 1; }
+    .two .chart { display: flex; flex-direction: column; } .two .chart .bars { height: auto; min-height: 170px; } .bars i { flex: 1; background: #5fb4c8; border-radius: 1px 1px 0 0; opacity: .9; }
     .minor { margin: 6px 0; font-size: 12px; color: var(--dim); } .small td, .small th { padding: 5px 8px; }
     .split { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; }
     .query { padding: 12px; border: 1px solid var(--line); border-radius: 2px; background: var(--page); }
@@ -677,7 +679,7 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     .sk-row i { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #22252b 0%, #2c3035 50%, #22252b 100%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; } .sk-row i:first-child { width: 55%; } .sk-row i:not(:first-child) { width: 55%; }
     @keyframes shimmer { to { background-position: -200% 0; } }
 
-    .jvm-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
+    .jvm-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 48px; align-items: start; }
     .stepcard { position: relative; margin: 0 0 18px 64px; padding: 26px 28px; border: 1px solid var(--line); border-radius: 8px; background: #181b1f; }
     .stepcard .stepnum { position: absolute; left: -64px; top: 24px; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .3); font-size: 15px; color: var(--text); }
     .stepcard[data-card="1"] .stepnum { border-color: transparent; background: var(--blue); color: #fff; } .stepcard.done .stepnum { background: #3cc39a; color: #0b0c0e; }
@@ -739,7 +741,7 @@ const megamenu = ["Home", "Starred", "Dashboards", "Explore", "Alerts & Incident
     .links-box a, .links-plain a { color: var(--text); text-decoration: none; font-size: 16px; } .links-box a:hover, .links-plain a:hover { color: #fff; }
     @media (max-width: 1200px) { .home-grid { grid-template-columns: 1fr; } .gs-cards { grid-template-columns: 1fr 1fr; } }
     /* ---------- Grafana visual language (from the original file): 2px corners, flat panels, lighter headings ---------- */
-    .page { margin: 0 auto; max-width: 1560px; }
+    .page { margin: 0; max-width: none; padding-left: 40px; padding-right: 40px; }
     .home2 { margin: 0 auto; max-width: 1560px; }
     .title { font-size: 30px; font-weight: 400; letter-spacing: 0; } .title b { font-weight: 600; }
     .q, .stepcard h2, .getstarted h2, .gs-body b, .gs-card b, .demo-box b, .lang b, .links-box b, .rail b, .callout-k b { font-weight: 500; }
