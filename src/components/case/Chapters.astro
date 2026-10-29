@@ -223,16 +223,8 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .half { max-width: 46%; translate: calc((1 - var(--in, 0)) * -40vw) calc(var(--out, 0) * -8vh); }
   .half.right { text-align: right; translate: calc((1 - var(--in, 0)) * 40vw) calc(var(--out, 0) * -8vh); }
   .half em { font-style: normal; color: #ffb27a; }
-  /* Narration: spoken-caption cards, frosted so they read over any part of the prototype */
-  .body {
-    position: absolute; bottom: 100px; margin: 0; max-width: 26ch; padding: 18px 22px 20px; border-radius: 18px;
-    background: rgba(10, 16, 28, .62); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 8px 30px rgba(0, 0, 0, .25);
-    font-family: "NB International", sans-serif; font-size: clamp(18px, 1.35vw, 24px); line-height: 1.35; letter-spacing: -.005em; color: #fff;
-    opacity: calc(var(--in, 0) * 1); translate: 0 calc((1 - var(--in, 0)) * 28px);
-  }
-  .body::before { content: ""; display: block; width: 26px; height: 3px; margin-bottom: 12px; border-radius: 2px; background: #ffb27a; }
-  .br { transition-delay: .08s; }
+  /* Narration: plain text over the scene, a touch heavier and brighter so it holds up without a backing */
+  .body { position: absolute; bottom: 100px; margin: 0; max-width: 30ch; font-size: 17px; line-height: 1.5; font-weight: 500; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 2px 16px rgba(0, 0, 0, .45); translate: 0 calc((1 - var(--in, 0)) * 20px); }
   .bl { left: clamp(24px, 4vw, 64px); } .br { right: clamp(24px, 4vw, 64px); text-align: right; }
 
   /* The prototype is the scene: full screen, no frame */
