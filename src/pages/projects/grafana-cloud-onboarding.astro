@@ -7,7 +7,7 @@ import Chapters, { type Chapter } from "../../components/case/Chapters.astro";
 // The story in three chapters. Camera keys: at = 0..1 through the chapter, zoom around the focus point (fx, fy)
 const I = "/images/grafana";
 const chapters: Chapter[] = [
-  { id: "ch-question", label: "About the question", bg: "#1d3a5f", ghost: "?",
+  { id: "ch-question", label: "About the question", bg: "#000000", ghost: "?",
     left: "Nobody knew what", right: "*Loki, Mimir or Tempo* were.",
     keys: [{ at: 0, hash: "#welcome", zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.35, zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.72, zoom: 1, fx: 0.5, fy: 0.5 }],
     sheet: [
@@ -18,7 +18,7 @@ const chapters: Chapter[] = [
       { kicker: "The craft", title: "I drew the illustration from scratch.", img: "/images/grafana/welcome-illustration-affinity.webp", alt: "The illustration open in Affinity Designer",
         text: "The Grafana core, the cloud above it, and one object for each part of the platform, so the answer is visible before it’s read." },
     ] },
-  { id: "ch-goals", label: "About setup", bg: "#3a2d5e", ghost: "Goals",
+  { id: "ch-goals", label: "About setup", bg: "#000000", ghost: "Goals",
     left: "Ask what they came to do,", right: "*then bring the docs to them.*",
     keys: [{ at: 0, hash: "#setup", zoom: 1.4, fx: 0.68, fy: 0.52 }, { at: 0.38, zoom: 1.4, fx: 0.68, fy: 0.52, hover: '.active .card[data-path="kube"]' }, { at: 0.7, zoom: 1.65, fx: 0.16, fy: 0.5 }],
     sheet: [
@@ -29,7 +29,7 @@ const chapters: Chapter[] = [
       { kicker: "The detail", title: "Every path says what it takes.", img: `${I}/onb-cost.webp`, alt: "Cards showing time and access needed",
         text: "Time and access up front, so nobody starts something they can’t finish." },
     ] },
-  { id: "ch-real", label: "About the landing", bg: "#1e4848", ghost: "Real",
+  { id: "ch-real", label: "About the landing", bg: "#000000", ghost: "Real",
     left: "Every path ends", right: "*somewhere real.*",
     keys: [{ at: 0, hash: "#dest-kube", zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.35, zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.76, zoom: 2.6, fx: 0.02, fy: 0.52 }],
     sheet: [
@@ -137,7 +137,7 @@ const facts: [string, string][] = [
   <body>
     <nav class="nav"><a href="/projects/grafana" class="back">← Grafana projects</a></nav>
 
-    <Chapters src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" heroBg="#1d3a5f" chapters={chapters} play="/prototypes/grafana-onboarding/">
+    <Chapters src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" heroBg="#000000" chapters={chapters} play="/prototypes/grafana-onboarding/">
       <div slot="hero" class="hero-in">
         <p class="eyebrow">Grafana Labs · 2022</p>
         <h1 class="hero-title"><span>Grafana Cloud</span> <span>onboarding</span></h1>
@@ -226,7 +226,7 @@ const facts: [string, string][] = [
     <style>
       @font-face { font-family: "NB International"; src: url("/font/NB International Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #1d3a5f; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
+      body { background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
       h1, h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
       a { color: inherit; }
 
@@ -245,7 +245,7 @@ const facts: [string, string][] = [
       .actions { grid-column: 1; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; animation: up .9s .35s cubic-bezier(.2, .7, .2, 1) both; }
       .facts { grid-column: 2; margin-top: 30px; align-self: center; color: rgba(255, 255, 255, .72); font-size: 15px; }
       .play { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; transition: translate .2s ease, scale .2s ease, background .2s ease, border-color .2s ease; }
-      .play { border: 0; background: #fff; color: #1d3a5f; }
+      .play { border: 0; background: #fff; color: #000; }
       .play:hover { translate: 0 -2px; scale: 1.03; }
       .play:hover svg { rotate: -8deg; transition: rotate .2s ease; }
       .play:focus-visible, summary:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }

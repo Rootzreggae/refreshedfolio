@@ -47,7 +47,6 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     <div class="stage" data-stage-cam aria-hidden="true">
       <div class="cam" data-cam><iframe src={src} title="" tabindex="-1" data-cam-frame></iframe></div>
     </div>
-    <div class="shade" aria-hidden="true"></div>
 
     {chapters.map((c, i) => c.sheet && (
       <article class="sheet" data-sheet={i} style={`--rows:${c.sheet.length}`}>
@@ -195,21 +194,28 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     root.style.backgroundColor = colour;
     root.style.setProperty("--tint", colour);
 
-    // Stage: rises out of the hero until it fills the screen, then holds
-    const rise = seg.kind === "hero" ? range(t, 0.05, 0.75) : 1;
+    // Rhythm: each chapter opens on black with only its headline; once the headline lifts away the prototype
+    // fades up out of the black, and it fades back to black before the next chapter. Type and UI never share the screen.
+    const ends = !segs[n + 1] || segs[n + 1].kind !== "sheet";
+    let shown: number, rise = 1;
+    if (seg.kind === "hero") { rise = range(t, 0.05, 0.7); shown = 1 - range(t, 0.84, 1); }
+    else if (seg.kind === "scene") shown = range(t, 0.4, 0.6) * (ends ? 1 - range(t, 0.9, 1) : 1);
+    else shown = 1 - range(t, 0.84, 1);
+    stage.style.opacity = String(shown);
     stage.style.translate = `0 ${mix(innerHeight * 0.62, 0, rise)}px`;
-    stage.style.scale = String(mix(0.9, 1, rise));
+    stage.style.scale = String(mix(0.9, 1, rise) * mix(0.96, 1, shown));
     stage.style.borderRadius = `${mix(28, 0, rise)}px`;
 
-    // Camera: follows the chapter's keys; holds the last moment while its sheet is up
+    // Camera: follows the chapter's keys once the prototype is up; holds the last moment while its sheet is up
+    const camT = seg.kind === "scene" ? clamp((t - 0.4) / 0.6) : 1;
     if (seg.kind === "hero") { aim(1, 0.5, 0.5, w, h); show(data[0].keys.find((x) => x.hash)?.hash); }
-    else { const f = frameAt(data[seg.c].keys, seg.kind === "scene" ? t : 1); aim(f.zoom, f.fx, f.fy, w, h); show(f.hash, f.hover); }
+    else { const f = frameAt(data[seg.c].keys, camT); aim(f.zoom, f.fx, f.fy, w, h); show(f.hash, f.hover); }
 
     // Text layers: hero leaves; a chapter's headline halves slide in from the edges, then lift away
     layers.forEach((el, li) => {
       const mine = li === 0 ? seg.kind === "hero" : seg.kind === "scene" && seg.c === li - 1;
-      const inT = li === 0 ? 1 : mine ? range(t, 0, 0.22) : 0;
-      const outT = mine ? range(t, li === 0 ? 0.08 : 0.8, li === 0 ? 0.5 : 0.98) : 1;
+      const inT = li === 0 ? 1 : mine ? range(t, 0, 0.18) : 0;
+      const outT = mine ? range(t, li === 0 ? 0.08 : 0.3, li === 0 ? 0.5 : 0.44) : 1;
       el.style.visibility = mine ? "visible" : "hidden";
       el.style.opacity = String(Math.min(inT, 1 - outT));
       el.style.setProperty("--in", String(inT));
@@ -217,7 +223,7 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     });
     ghosts.forEach((g, gi) => {
       const mine = seg.kind === "scene" && seg.c === gi;
-      g.style.opacity = String(mine ? 0.07 * Math.min(range(t, 0, 0.3), 1 - range(t, 0.8, 1)) : 0);
+      g.style.opacity = String(mine ? 0.06 * Math.min(range(t, 0, 0.2), 1 - range(t, 0.3, 0.45)) : 0);
       g.style.translate = `${mix(12, -12, mine ? t : 0)}vw 0`;
     });
 
@@ -269,12 +275,12 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .ghost { grid-area: 1 / 1; font-family: "NB International", sans-serif; font-size: 28vw; line-height: 1; white-space: nowrap; color: #fff; opacity: 0; }
 
   .hero { position: absolute; inset: 0; z-index: 3; }
-  .ch { position: absolute; inset: 0; z-index: 3; pointer-events: none; visibility: hidden; text-shadow: 0 1px 2px rgba(0, 0, 0, .45), 0 4px 28px rgba(0, 0, 0, .45); }
+  .ch { position: absolute; inset: 0; z-index: 3; pointer-events: none; visibility: hidden; }
   .corner { position: absolute; top: 26px; margin: 0; font-size: 13px; letter-spacing: .04em; color: rgba(255, 255, 255, .72); }
   .corner.l { left: clamp(24px, 4vw, 64px); } .corner.r { right: clamp(24px, 4vw, 64px); }
 
   /* The split headline: halves travel in from opposite edges */
-  .split { position: absolute; left: 0; right: 0; top: 64px; margin: 0; padding: 0 clamp(24px, 4vw, 64px); display: flex; justify-content: space-between; align-items: flex-start; gap: 4vw; font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(34px, 4.6vw, 86px); line-height: 1.02; letter-spacing: -.02em; }
+  .split { position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; margin: 0; padding: 0 clamp(24px, 4vw, 64px); display: flex; justify-content: space-between; align-items: flex-start; gap: 4vw; font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(40px, 5.6vw, 110px); line-height: 1.02; letter-spacing: -.02em; }
   .half { max-width: 46%; translate: calc((1 - var(--in, 0)) * -40vw) calc(var(--out, 0) * -8vh); }
   .half.right { text-align: right; translate: calc((1 - var(--in, 0)) * 40vw) calc(var(--out, 0) * -8vh); }
   .half em { font-style: normal; color: #ffb27a; }
@@ -283,8 +289,6 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #181b1f; }
   .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
   .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
-  /* A light shade in the chapter colour behind the headline only */
-  .shade { position: absolute; left: 0; right: 0; top: 0; height: 30vh; z-index: 2; pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--tint, #1d3a5f) 82%, transparent), color-mix(in srgb, var(--tint, #1d3a5f) 50%, transparent) 50%, transparent); }
 
   /* The sheet: paper tossed over the scene */
   .sheet {
