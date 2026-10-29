@@ -70,6 +70,9 @@ const { src, url, steps, width = 1440, height = 900 } = Astro.props;
 
   async function play() {
     if (index >= steps.length) index = 0;
+    // the demo plays where the reader can see it
+    const r = stage.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > innerHeight) stage.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "center" });
     const id = ++run;
     playing = true;
     stage.classList.add("playing");
