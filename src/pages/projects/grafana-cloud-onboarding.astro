@@ -1,3 +1,69 @@
+---
+// Case study: Grafana Cloud onboarding. Try-before-read: the live prototype leads, a guided demo plays it with captions,
+// the story pins the prototype beside it, and the process is folded away for those who want depth.
+import PrototypeStage, { type Step } from "../../components/case/PrototypeStage.astro";
+import Dock from "../../components/case/Dock.astro";
+
+// The guided demo: what the cursor does and what the caption says (voice clips can be added per step later)
+const steps: Step[] = [
+  { hash: "#welcome", caption: "Every new user arrives with the same question: what is Grafana Cloud? This screen answers it before asking for anything.", wait: 5200 },
+  { click: ".active .button", caption: "Every new user arrives with the same question: what is Grafana Cloud? This screen answers it before asking for anything.", wait: 600 },
+  { caption: "Then one question about them: what did you come here to do? Goals, not product names.", wait: 4600 },
+  { hover: '.active .card[data-path="kube"]', caption: "Point at a path and its docs come to you. No new tab, no digging through documentation.", wait: 4800 },
+  { hover: '.active .card[data-path="mlt"]', caption: "Each path says what it takes, so nobody starts something they can’t finish.", wait: 4200 },
+  { click: '.active .card[data-path="kube"]', caption: "A short confirmation, then straight into the product.", wait: 700 },
+  { caption: "A short confirmation, then straight into the product.", wait: 2200 },
+  { hover: ".active .menu .current", caption: "They land on the real page with the next step ready. The pulsing menu item brings them back to onboarding any time.", wait: 6000 },
+  { caption: "That’s the flow. Your turn: click anything.", wait: 2600 },
+];
+
+// One idea per screen; each shows its screen in the prototype as it scrolls in
+const beats: { show: string; hover?: string; title: string; body: string[]; images?: [string, string][] }[] = [
+  { show: "#welcome", title: "People signed up for Loki, Mimir and Tempo without knowing what they were.",
+    body: ["In 2022 Grafana Cloud kept adding products, and research kept showing the same thing: new users didn’t know what Loki, Mimir or Tempo were for.", "The people who needed the documentation most were the ones who never opened it."] },
+  { show: "#welcome", title: "Answer the question before asking anything.",
+    body: ["The welcome screen does one job: explain what Grafana Cloud is, in five lines and one picture.", "I drew the illustration from scratch, one object for each part of the platform, so the answer is visible before it’s read."] },
+  { show: "#setup", title: "Ask what they came to do, not which product they want.",
+    body: ["The setup step offers goals: send metrics, monitor Kubernetes, build a dashboard, set up on-call.", "A new user knows what they want to do long before they know what Tempo is."] },
+  { show: "#setup", hover: '.active .card[data-path="kube"]', title: "The docs come to them.",
+    body: ["Point at a path and the panel on the left explains it, with a link for anyone who wants more.", "I brought the docs into the flow instead of linking out, because the users who needed them most never opened them."] },
+  { show: "#done-kube", title: "Every path ends somewhere real.",
+    body: ["A short confirmation, then the actual product page with the next step ready.", "The menu entry pulses, so people know where onboarding lives when they want it again."] },
+  { show: "#welcome", title: "The first screen starts answering too.",
+    body: ["Before anyone signs in, the login already says what Grafana Cloud is and what’s inside."],
+    images: [["https://i.postimg.cc/pLY6QzDg/old-login.png", "Before"], ["https://i.postimg.cc/jjM3mT3c/proposed-login.png", "After"]] },
+];
+
+const shipped = [
+  ["Login", "A login screen that introduces the product"],
+  ["Welcome", "A welcome screen built around “What is Grafana Cloud?”"],
+  ["Setup", "Doc snippets inside each setup step"],
+  ["Tutorials", "Interactive tutorials and tooltips"],
+];
+const principles = [
+  ["Integrate documentation", "Concise, relevant doc snippets inside each onboarding step."],
+  ["Visual communication", "Clear pictures of complex products, so abstract ideas become tangible."],
+  ["Progressive disclosure", "Complexity arrives gradually: deeper docs when the user is ready, not forced."],
+  ["Interactive learning", "Hands-on tutorials and contextual tooltips instead of passive reading."],
+];
+const iterations = [
+  ["https://i.postimg.cc/ZK67ZpDC/cloud-1.png", "Initial exploration focusing on product ecosystem visualization"],
+  ["https://i.postimg.cc/NG3JWpD3/cloud-2.png", "Iteration emphasizing clear navigation paths and product discovery"],
+  ["https://i.postimg.cc/1Rn7CLG0/cloud-3.png", "Final version with balanced information hierarchy and visual clarity"],
+];
+const videos = [
+  ["https://www.youtube-nocookie.com/embed/qj0o3uY8bHE", "Welcome screen walkthrough"],
+  ["https://www.youtube-nocookie.com/embed/QXZHoQk0ubA", "Integrated learning walkthrough"],
+  ["https://www.youtube-nocookie.com/embed/ThLqQUa4IKc", "Tutorials walkthrough"],
+];
+const facts: [string, string][] = [
+  ["Role", "Product Designer"],
+  ["Company", "Grafana Labs"],
+  ["Year", "2022"],
+  ["Shipped", "Login, welcome, setup, tutorials"],
+  ["Prototype", "Rebuilt in 2026 from the original Figma, with a coding agent"],
+];
+---
 <!doctype html>
 <html lang="en">
   <head>
@@ -61,889 +127,197 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        background: #16304c;
-        color: #ffffff;
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-        line-height: 1.6;
-        overflow-x: hidden;
-      }
-
-      /* Navigation */
-      .nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding: 24px 48px;
-        background: linear-gradient(to bottom, #16304c 0%, transparent 100%);
-        z-index: 100;
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .nav-link {
-        color: #888;
-        text-decoration: none;
-        font-size: 13px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        transition: color 0.3s;
-      }
-
-      .nav-link:hover {
-        color: #fff;
-      }
-
-      /* Container */
-      .container {
-        max-width: 1600px;
-        margin: 0 auto;
-        padding: 120px 48px 80px;
-      }
-
-      /* Hero Spread */
-      .hero-spread {
-        min-height: 100vh;
-        display: grid;
-        grid-template-columns: 1fr 1.5fr;
-        gap: 0;
-        margin-bottom: 120px;
-        position: relative;
-      }
-
-      .hero-left {
-        padding: 80px 60px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: #16304c;
-        position: relative;
-      }
-
-      .hero-number {
-        position: absolute;
-        top: 40px;
-        left: 60px;
-        font-size: 180px;
-        font-weight: 900;
-        color: rgba(255, 255, 255, 0.03);
-        line-height: 1;
-      }
-
-      .hero-title {
-        font-size: clamp(36px, 5vw, 72px);
-        font-weight: 700;
-        line-height: 0.95;
-        letter-spacing: -0.03em;
-        margin-bottom: 40px;
-        position: relative;
-        z-index: 2;
-      }
-
-      .hero-subtitle {
-        font-size: 20px;
-        font-weight: 300;
-        color: #aaa;
-        line-height: 1.5;
-        margin-bottom: 60px;
-        max-width: 500px;
-      }
-
-      .hero-meta-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-        padding-top: 32px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .meta-stat {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .meta-number {
-        font-size: 48px;
-        font-weight: 200;
-        color: #fff;
-        line-height: 1;
-      }
-
-      .meta-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        color: #666;
-      }
-
-      .hero-right {
-        position: relative;
-        overflow: hidden;
-        background: #102237;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .hero-image {
-        width: 90%;
-        height: auto;
-        border-radius: 8px;
-      }
-
-      /* Section Headers */
-      .section {
-        margin: 120px 0;
-      }
-
-      .section-header {
-        margin-bottom: 48px;
-        position: relative;
-      }
-
-      .section-number {
-        font-size: 14px;
-        color: #ff5f00;
-        font-weight: 500;
-        letter-spacing: 1px;
-        margin-bottom: 24px;
-      }
-
-      .section-title {
-        font-size: 48px;
-        font-weight: 300;
-        line-height: 1.2;
-        margin-bottom: 24px;
-      }
-
-      .section-description {
-        font-size: 20px;
-        line-height: 1.8;
-        color: #bbb;
-        max-width: 800px;
-      }
-
-      /* Problem Section */
-      .problem-spread {
-        display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        gap: 80px;
-        align-items: center;
-        margin: 80px 0;
-      }
-
-      .problem-content p {
-        font-size: 20px;
-        line-height: 1.8;
-        color: #bbb;
-        margin-bottom: 32px;
-      }
-
-      .problem-visual {
-        background: #102237;
-        border-radius: 8px;
-        overflow: hidden;
-        padding: 32px;
-      }
-
-      .problem-visual img {
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-      }
-
-      .problem-caption {
-        margin-top: 16px;
-        font-size: 14px;
-        color: #888;
-        font-style: italic;
-        text-align: center;
-      }
-
-      /* Stats Bar */
-      .stats-bar {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2px;
-        background: rgba(255, 255, 255, 0.1);
-        padding: 2px;
-        margin: 80px 0;
-      }
-
-      .stat-item {
-        background: #16304c;
-        padding: 48px 32px;
-        text-align: center;
-        transition: background 0.3s;
-      }
-
-      .stat-item:hover {
-        background: #182e49;
-      }
-
-      .stat-value {
-        font-size: 48px;
-        font-weight: 200;
-        color: #ff5f00;
-        margin-bottom: 12px;
-      }
-
-      .stat-desc {
-        font-size: 14px;
-        color: #888;
-        line-height: 1.4;
-      }
-
-      /* Before/After Comparison */
-      .comparison-section {
-        margin: 120px 0;
-      }
-
-      .comparison-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 48px;
-        margin: 80px 0;
-      }
-
-      .comparison-item {
-        position: relative;
-      }
-
-      .comparison-label {
-        position: absolute;
-        top: 24px;
-        left: 24px;
-        background: rgba(48, 48, 46, 0.95);
-        backdrop-filter: blur(10px);
-        padding: 12px 24px;
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        z-index: 10;
-      }
-
-      .comparison-label.before {
-        color: #888;
-      }
-
-      .comparison-label.after {
-        color: #ff5f00;
-      }
-
-      .comparison-image {
-        width: 100%;
-        height: auto;
-        border-radius: 8px;
-        background: #102237;
-      }
-
-      /* Solution Showcase */
-      .solution-showcase {
-        margin: 120px 0;
-      }
-
-      .showcase-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 48px;
-        margin-top: 80px;
-      }
-
-      .showcase-item {
-        background: #182e49;
-        border-radius: 8px;
-        overflow: hidden;
-      }
-
-      .showcase-item img {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-
-      .showcase-caption {
-        padding: 32px 48px;
-        font-size: 16px;
-        color: #aaa;
-        line-height: 1.6;
-      }
-
-      /* Video Section */
-      .video-container {
-        position: relative;
-        padding-bottom: 56.25%;
-        height: 0;
-        overflow: hidden;
-        border-radius: 8px;
-        background: #102237;
-        margin: 48px 0;
-      }
-
-      .video-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: 0;
-      }
-
-      /* Process Cards */
-      .process-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 48px;
-        margin: 80px 0;
-      }
-
-      .process-card {
-        background: #182e49;
-        padding: 48px;
-        border-radius: 4px;
-        border-left: 3px solid #ff5f00;
-      }
-
-      .process-number {
-        font-size: 48px;
-        font-weight: 100;
-        color: #ff5f00;
-        margin-bottom: 24px;
-      }
-
-      .process-title {
-        font-size: 24px;
-        color: #fff;
-        margin-bottom: 16px;
-        font-weight: 400;
-      }
-
-      .process-text {
-        font-size: 16px;
-        line-height: 1.8;
-        color: #aaa;
-      }
-
-      /* Results Section */
-      .results-section {
-        background: #182e49;
-        padding: 80px;
-        border-radius: 8px;
-        margin: 120px 0;
-      }
-
-      .results-header {
-        text-align: center;
-        margin-bottom: 80px;
-      }
-
-      .results-title {
-        font-size: 48px;
-        font-weight: 300;
-        color: #fff;
-        margin-bottom: 24px;
-      }
-
-      .results-subtitle {
-        font-size: 20px;
-        color: #aaa;
-      }
-
-      .results-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 48px;
-      }
-
-      .result-item {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        padding: 24px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .result-label {
-        font-size: 18px;
-        color: #aaa;
-        max-width: 70%;
-      }
-
-      .result-value {
-        font-size: 32px;
-        font-weight: 300;
-        color: #ff5f00;
-      }
-
-      /* Full Width Image */
-      .full-width-section {
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        padding: 120px 48px;
-        background: #102237;
-        margin-top: 120px;
-        margin-bottom: 120px;
-      }
-
-      .full-width-content {
-        max-width: 1600px;
-        margin: 0 auto;
-      }
-
-      /* Quote */
-      .quote-block {
-        padding: 80px;
-        text-align: center;
-        margin: 120px 0;
-      }
-
-      .quote-text {
-        font-size: 32px;
-        font-weight: 300;
-        font-style: italic;
-        line-height: 1.4;
-        color: #fff;
-        max-width: 900px;
-        margin: 0 auto;
-      }
-
-      /* Responsive */
-      @media (max-width: 1200px) {
-        .hero-spread {
-          grid-template-columns: 1fr;
-        }
-
-        .problem-spread {
-          grid-template-columns: 1fr;
-          gap: 48px;
-        }
-
-        .comparison-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .process-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .stats-bar {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .container {
-          padding: 80px 24px 48px;
-        }
-
-        .hero-title {
-          font-size: 36px;
-        }
-
-        .section-title {
-          font-size: 32px;
-        }
-
-        .stats-bar {
-          grid-template-columns: 1fr;
-        }
-
-        .results-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      /* Smooth scroll */
-      html {
-        scroll-behavior: smooth;
-      }
-
-      /* Selection */
-      ::selection {
-        background: #ff5f00;
-        color: #000;
-      }
-    </style>
+    <link rel="preload" href="/font/NB International Regular.otf" as="font" type="font/otf" crossorigin />
   </head>
   <body>
     <nav class="nav">
-      <a href="/projects/grafana" class="nav-link">← Back to Grafana Projects</a
-      >
-      <div>
-        <span class="nav-link">Grafana Labs / 2022</span>
-      </div>
+      <a href="/projects/grafana" class="back">← Grafana projects</a>
     </nav>
 
-    <div class="container">
-      <!-- Hero Spread -->
-      <section class="hero-spread">
-        <div class="hero-left">
-          <div class="hero-number">04</div>
-          <h1 class="hero-title">
-            Grafana Cloud<br />
-            Onboarding
-          </h1>
-          <p class="hero-subtitle">
-            Transforming a complex product landscape into an intuitive
-            onboarding experience that answers one question for every new
-            user: what is Grafana Cloud?
-          </p>
-
-          <div class="hero-meta-grid">
-            <div class="meta-stat">
-              <div class="meta-number">3</div>
-              <div class="meta-label">Products new users didn't know: Loki, Mimir, Tempo</div>
-            </div>
-            <div class="meta-stat">
-              <div class="meta-number">4</div>
-              <div class="meta-label">Touchpoints redesigned: login, welcome, setup, tutorials</div>
-            </div>
-            <div class="meta-stat">
-              <div class="meta-number">1</div>
-              <div class="meta-label">Question to answer: "What is Grafana Cloud?"</div>
-            </div>
-            <div class="meta-stat">
-              <div class="meta-number">2022</div>
-              <div class="meta-label">Shipped in Grafana Cloud</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-right">
-          <img
-            src="https://i.postimg.cc/HLG97XCM/onboard-cover.png"
-            alt="Grafana Cloud Onboarding"
-            class="hero-image"
-          />
-        </div>
-      </section>
-
-      <!-- Problem Section -->
-      <section class="section">
-        <div class="section-header">
-          <span class="section-number">01 · THE CHALLENGE</span>
-          <h2 class="section-title">Lost in Complexity</h2>
-        </div>
-
-        <div class="problem-spread">
-          <div class="problem-content">
-            <p>
-              In June 2022, Grafana Cloud's rapidly evolving product landscape
-              posed a significant communication conundrum: as our suite of
-              complex offerings grew, users were increasingly struggling to
-              understand the value and purpose of each product.
-            </p>
-            <p>
-              User feedback and research kept showing the same thing: many new
-              users didn't know what key products such as Loki, Mimir, and Tempo
-              were for. Non-technical users often failed to engage with
-              documentation, hindering their ability to effectively utilize
-              these resources.
-            </p>
-          </div>
-
-          <div class="problem-visual">
-            <img
-              src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png"
-              alt="User Feedback"
-            />
-            <p class="problem-caption"
-              >User feedback highlighting confusion with product offerings</p
-            >
-          </div>
-        </div>
-      </section>
-
-      <!-- Stats Bar -->
-      <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-value">3</div>
-          <div class="stat-desc">Key products causing confusion</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">1</div>
-          <div class="stat-desc"
-            >Critical question: "What is Grafana Cloud?"</div
-          >
+    <!-- The story: text on the left, the live prototype pinned on the right and following along -->
+    <div class="story" id="story">
+      <div class="stagecol">
+        <div class="pin">
+          <PrototypeStage src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" steps={steps} />
         </div>
       </div>
-
-      <!-- Approach Section -->
-      <section class="section">
-        <div class="section-header">
-          <span class="section-number">02 · THE APPROACH</span>
-          <h2 class="section-title">Merging Education with Experience</h2>
-          <p class="section-description">
-            To make the onboarding more intuitive and informative, particularly
-            for non-technical users, we needed to visually and contextually
-            represent Grafana Cloud's functionalities in an engaging way. The
-            critical outcome from our team workshops was the idea to visually
-            answer: "What is Grafana Cloud?"
-          </p>
-        </div>
-
-        <div class="process-grid">
-          <div class="process-card">
-            <div class="process-number">01</div>
-            <h3 class="process-title">Integrate Documentation</h3>
-            <p class="process-text">
-              Merge essential documentation snippets with interactive onboarding
-              steps, providing users with concise and relevant information at
-              each stage.
-            </p>
+      <div class="text">
+        <header class="hero" id="hero">
+          <p class="eyebrow">Grafana Labs · 2022</p>
+          <h1>Grafana Cloud onboarding</h1>
+          <p class="lede">New users signed up without knowing what they’d signed up for. I redesigned their first ten minutes around one question: what is Grafana Cloud?</p>
+          <p class="facts">Product Designer · Grafana Labs · 2022 · Shipped</p>
+          <div class="actions">
+            <button class="watch" data-watch><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Watch the demo · 35s</button>
+            <a class="try" href="/prototypes/grafana-onboarding/" target="_blank" rel="noopener">Try it yourself ↗</a>
           </div>
-          <div class="process-card">
-            <div class="process-number">02</div>
-            <h3 class="process-title">Visual Communication</h3>
-            <p class="process-text">
-              Create clear visual representations of complex products, making
-              abstract concepts tangible for non-technical users.
-            </p>
-          </div>
-          <div class="process-card">
-            <div class="process-number">03</div>
-            <h3 class="process-title">Progressive Disclosure</h3>
-            <p class="process-text">
-              Introduce complexity gradually, allowing users to dive deeper into
-              documentation when ready, not when forced.
-            </p>
-          </div>
-          <div class="process-card">
-            <div class="process-number">04</div>
-            <h3 class="process-title">Interactive Learning</h3>
-            <p class="process-text">
-              Replace passive documentation reading with hands-on tutorials and
-              contextual tooltips that guide users through actual tasks.
-            </p>
-          </div>
-        </div>
-      </section>
+          <p class="note">Rebuilt in 2026 from my 2022 designs.</p>
+        </header>
 
-      <!-- Login Screen Redesign -->
-      <section class="comparison-section">
-        <div class="section-header">
-          <span class="section-number">03 · REBUILDING THE LOGIN</span>
-          <h2 class="section-title">First Impressions Matter</h2>
-          <p class="section-description">
-            I redesigned the login screen to provide a clear and concise
-            introduction to Grafana Cloud and its key components, so the first
-            screen already starts answering what the product is.
-          </p>
-        </div>
-
-        <div class="comparison-grid">
-          <div class="comparison-item">
-            <span class="comparison-label before">Before</span>
-            <img
-              src="https://i.postimg.cc/pLY6QzDg/old-login.png"
-              alt="Old Login"
-              class="comparison-image"
-            />
-          </div>
-          <div class="comparison-item">
-            <span class="comparison-label after">After</span>
-            <img
-              src="https://i.postimg.cc/jjM3mT3c/proposed-login.png"
-              alt="New Login"
-              class="comparison-image"
-            />
-          </div>
-        </div>
-
-        <div style="margin-top: 48px;">
-          <img
-            src="https://i.postimg.cc/DwKNbBbr/proposed-login1.png"
-            alt="Login Variation"
-            style="width: 100%; height: auto; border-radius: 8px;"
-          />
-        </div>
-      </section>
-
-      <!-- Welcome Screen Section -->
-      <section class="section">
-        <div class="section-header">
-          <span class="section-number">04 · WELCOME EXPERIENCE</span>
-          <h2 class="section-title">Setting the Right Tone</h2>
-          <p class="section-description">
-            I explored various options for the welcome screen, ultimately
-            developing a version that clearly introduced Grafana Cloud and its
-            key features. I also drew the illustration from scratch.
-          </p>
-        </div>
-
-        <div class="solution-showcase">
-          <div class="showcase-grid">
-            <div class="showcase-item">
-              <img
-                src="https://i.postimg.cc/ZK67ZpDC/cloud-1.png"
-                alt="Welcome Screen 1"
-              />
-              <div class="showcase-caption"
-                >Initial exploration focusing on product ecosystem visualization</div
-              >
-            </div>
-            <div class="showcase-item">
-              <img
-                src="https://i.postimg.cc/NG3JWpD3/cloud-2.png"
-                alt="Welcome Screen 2"
-              />
-              <div class="showcase-caption"
-                >Iteration emphasizing clear navigation paths and product
-                discovery</div
-              >
-            </div>
-            <div class="showcase-item">
-              <img
-                src="https://i.postimg.cc/1Rn7CLG0/cloud-3.png"
-                alt="Welcome Screen 3"
-              />
-              <div class="showcase-caption"
-                >Final version with balanced information hierarchy and visual
-                clarity</div
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="solution-showcase">
-          <div class="showcase-item">
-            <img
-              src="/images/grafana/welcome-illustration-affinity.webp"
-              alt="The welcome screen illustration open in Affinity Designer, with its layers"
-              loading="lazy"
-            />
-            <div class="showcase-caption"
-              >The welcome illustration, drawn from scratch in Affinity
-              Designer: the Grafana core with the cloud above it and one object
-              for each part of the platform around it.</div
-            >
-          </div>
-        </div>
-
-        <div class="video-container">
-          <iframe
-            src="https://www.youtube.com/embed/qj0o3uY8bHE?si=BCIipXb4UCJG482F"
-            title="Welcome Screen Demo"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          >
-          </iframe>
-        </div>
-      </section>
-
-      <!-- Documentation Integration -->
-      <section class="section">
-        <div class="section-header">
-          <span class="section-number">05 · INTEGRATED LEARNING</span>
-          <h2 class="section-title">Documentation Meets Onboarding</h2>
-          <p class="section-description">
-            I merged essential information from our documentation into the
-            onboarding process. Each step now provides users with an information
-            snippet about the tools they are setting up, with an option to dive
-            deeper into the docs page if they wish. I chose to bring the docs
-            into the flow instead of linking out, because the users who needed
-            them most were the ones who never opened them.
-          </p>
-        </div>
-
-        <div class="video-container">
-          <iframe
-            src="https://www.youtube.com/embed/QXZHoQk0ubA?si=si_E7fwgG70TNZZQ"
-            title="Documentation Integration"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          >
-          </iframe>
-        </div>
-
-        <div class="video-container">
-          <iframe
-            src="https://www.youtube.com/embed/ThLqQUa4IKc?si=-u_f4Uu_ROzRT6Jy"
-            title="Interactive Tutorials"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allowfullscreen
-          >
-          </iframe>
-        </div>
-      </section>
-
-      <!-- Quote -->
-      <div class="quote-block">
-        <p class="quote-text">
-          "Interactive tutorials and tooltips guide users through their initial
-          setup and usage of Grafana Cloud products. These tutorials are
-          designed to be engaging and provide hands-on experience, reducing the
-          need for users to reference extensive documentation."
-        </p>
+        {beats.map((b) => (
+          <section class="beat" data-show={b.show} data-hover={b.hover ?? ""}>
+            <h2>{b.title}</h2>
+            {b.body.map((p) => <p>{p}</p>)}
+            {b.images && (
+              <div class="pair">
+                {b.images.map(([src, label]) => <figure><img src={src} alt={`${label} login screen`} loading="lazy" /><figcaption>{label}</figcaption></figure>)}
+              </div>
+            )}
+          </section>
+        ))}
       </div>
 
-      <!-- Results Section -->
-      <div class="results-section">
-        <div class="results-header">
-          <h2 class="results-title">What Shipped</h2>
-          <p class="results-subtitle">
-            By rethinking the onboarding experience, we lowered the barrier of
-            entry for new users, especially those who are non-technical.
-          </p>
-        </div>
-
-        <div class="results-grid">
-          <div class="result-item">
-            <span class="result-label">A login screen that introduces the product</span>
-            <span class="result-value">Login</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">A welcome screen built around "What is Grafana Cloud?"</span>
-            <span class="result-value">Welcome</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Doc snippets inside each setup step</span>
-            <span class="result-value">Setup</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Interactive tutorials and tooltips</span>
-            <span class="result-value">Tutorials</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Conclusion -->
-      <section class="section">
-        <div class="section-header">
-          <span class="section-number">06 · REFLECTION</span>
-          <h2 class="section-title">What I'd Change</h2>
-        </div>
-
-        <div style="max-width: 800px;">
-          <p class="section-description">
-            We shipped it and the feedback from users was good. But I didn't agree on a baseline metric with the PM
-            before we started, so today I can describe the impact better than I
-            can prove it.
-          </p>
-          <p class="section-description" style="margin-top: 32px;">
-            Now I set the metric and the baseline first, and I write my own
-            notes while the work is fresh. It's the first thing I'd change, and
-            it's the habit I took from this project into every one after it.
-          </p>
-        </div>
-      </section>
     </div>
+
+    <section class="block" id="shipped">
+      <h2>What shipped</h2>
+      <p class="sub">By rethinking the first ten minutes, we lowered the barrier of entry for new users, especially non-technical ones.</p>
+      <ul class="shipped">
+        {shipped.map(([k, v]) => <li><span>{k}</span>{v}</li>)}
+      </ul>
+    </section>
+
+    <section class="block" id="process">
+      <details>
+        <summary><span>How I got there</span><small>Research, iterations, the illustration</small></summary>
+        <div class="process">
+          <h3>The approach</h3>
+          <p>The critical outcome from our team workshops was the idea to visually answer: “What is Grafana Cloud?”</p>
+          <ol class="principles">
+            {principles.map(([t, d]) => <li><strong>{t}</strong><span>{d}</span></li>)}
+          </ol>
+
+          <h3>What users told us</h3>
+          <figure><img src="https://i.postimg.cc/jS15ZYq0/feedback-onboard.png" alt="User feedback highlighting confusion with product offerings" loading="lazy" /><figcaption>User feedback highlighting confusion with product offerings</figcaption></figure>
+
+          <h3>Welcome screen iterations</h3>
+          <div class="trio">
+            {iterations.map(([src, cap]) => <figure><img src={src} alt={cap} loading="lazy" /><figcaption>{cap}</figcaption></figure>)}
+          </div>
+
+          <h3>The illustration</h3>
+          <figure><img src="/images/grafana/welcome-illustration-affinity.webp" alt="The welcome screen illustration open in Affinity Designer, with its layers" loading="lazy" /><figcaption>Drawn from scratch in Affinity Designer: the Grafana core with the cloud above it and one object for each part of the platform around it.</figcaption></figure>
+
+          <h3>Walkthroughs</h3>
+          <div class="videos">
+            {videos.map(([src, title]) => <iframe src={src} title={title} loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>)}
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="block" id="change">
+      <h2>What I’d change</h2>
+      <p>We shipped it and the feedback from users was good. But I didn’t agree on a baseline metric with the PM before we started, so today I can describe the impact better than I can prove it.</p>
+      <p>Now I set the metric and the baseline first, and I write my own notes while the work is fresh. It’s the first thing I’d change, and it’s the habit I took from this project into every one after it.</p>
+    </section>
+
+    <footer class="foot"><a href="/projects/grafana" class="back">← Grafana projects</a></footer>
+
+    <Dock after="#hero" sections={[["#story", "The story"], ["#shipped", "What shipped"], ["#process", "How I got there"], ["#change", "What I’d change"]]} facts={facts} />
+
+    <script>
+      // Hero button starts the demo (and brings the prototype into view on small screens)
+      document.querySelector("[data-watch]")!.addEventListener("click", () => {
+        document.querySelector(".stagecol")!.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        document.dispatchEvent(new Event("demo:play"));
+      });
+      // Each beat shows its screen in the prototype as it reaches the middle of the viewport
+      const io = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          const el = e.target as HTMLElement;
+          el.classList.add("seen");
+          document.dispatchEvent(new CustomEvent("stage:show", { detail: { hash: el.dataset.show, hover: el.dataset.hover || undefined } }));
+        }
+      }, { rootMargin: "-45% 0px -45% 0px" });
+      document.querySelectorAll(".beat").forEach((b) => io.observe(b));
+    </script>
+
+    <style>
+      @font-face { font-family: "NB International"; src: url("/font/NB International Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { background: #0f1d2e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
+      h1, h2, .beat h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
+      a { color: inherit; }
+
+      .nav { padding: 24px 48px; }
+      .back { color: rgba(255, 255, 255, .7); text-decoration: none; font-size: 15px; }
+      .back:hover { color: #fff; }
+
+      .story { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; max-width: 1600px; margin: 0 auto; padding: 0 48px; }
+      .stagecol { order: 2; }
+      .pin { position: sticky; top: max(24px, calc(50vh - 30vw * .5)); }
+
+      .hero { min-height: calc(100vh - 80px); display: flex; flex-direction: column; justify-content: center; padding-bottom: 80px; }
+      .eyebrow { color: #ff8833; font-size: 15px; letter-spacing: .04em; margin-bottom: 18px; }
+      .hero h1 { font-size: clamp(40px, 4.6vw, 68px); line-height: 1.05; margin-bottom: 26px; }
+      .lede { font-size: clamp(19px, 1.5vw, 23px); line-height: 1.5; color: rgba(255, 255, 255, .86); max-width: 34ch; }
+      .facts { margin-top: 22px; color: rgba(255, 255, 255, .55); font-size: 15px; }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+      .watch, .try { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; }
+      .watch { border: 0; background: #fff; color: #0f1d2e; }
+      .watch:hover { background: #e8edf3; }
+      .try { border: 1px solid rgba(255, 255, 255, .25); color: #fff; }
+      .try:hover { border-color: rgba(255, 255, 255, .6); }
+      .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ff8833; outline-offset: 3px; }
+      .note { margin-top: 18px; color: rgba(255, 255, 255, .45); font-size: 14px; }
+
+      /* One idea per screen; each fades up as it arrives */
+      .beat { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; padding: 10vh 0; opacity: .25; translate: 0 24px; transition: opacity .6s ease, translate .6s ease; }
+      .beat.seen { opacity: 1; translate: 0 0; }
+      .beat h2 { font-size: clamp(30px, 3vw, 46px); line-height: 1.12; margin-bottom: 22px; max-width: 18ch; }
+      .beat p { max-width: 38ch; color: rgba(255, 255, 255, .78); margin-bottom: 14px; }
+      .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+      .pair img { width: 100%; border-radius: 8px; display: block; }
+      .pair figcaption { margin-top: 6px; color: rgba(255, 255, 255, .5); font-size: 14px; }
+
+      .block { max-width: 1040px; margin: 0 auto; padding: 96px 48px 0; }
+      .block h2 { font-size: clamp(30px, 3vw, 44px); line-height: 1.15; margin-bottom: 18px; }
+      .block > p { max-width: 62ch; color: rgba(255, 255, 255, .8); margin-bottom: 14px; }
+      .sub { color: rgba(255, 255, 255, .7); margin-bottom: 28px; }
+      .shipped { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .shipped li { display: flex; flex-direction: column; gap: 10px; padding: 22px; border-radius: 14px; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); font-size: 16px; line-height: 1.45; }
+      .shipped span { color: #ff8833; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+
+      details { border-top: 1px solid rgba(255, 255, 255, .12); border-bottom: 1px solid rgba(255, 255, 255, .12); }
+      summary { display: flex; align-items: baseline; gap: 16px; padding: 28px 0; cursor: pointer; list-style: none; }
+      summary::-webkit-details-marker { display: none; }
+      summary span { font-family: "NB International", sans-serif; font-size: clamp(26px, 2.6vw, 38px); }
+      summary small { color: rgba(255, 255, 255, .5); font-size: 16px; }
+      summary::after { content: "+"; margin-left: auto; font-size: 32px; line-height: 1; color: rgba(255, 255, 255, .6); transition: rotate .25s ease; }
+      details[open] summary::after { rotate: 45deg; }
+      .process { padding-bottom: 48px; }
+      .process h3 { margin: 40px 0 14px; font-size: 20px; font-weight: 500; }
+      .process > p { color: rgba(255, 255, 255, .78); max-width: 62ch; }
+      .process figure img { width: 100%; border-radius: 10px; display: block; }
+      .process figcaption { margin-top: 8px; color: rgba(255, 255, 255, .5); font-size: 14px; }
+      .principles { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; counter-reset: p; }
+      .principles li { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 12px; background: rgba(255, 255, 255, .05); counter-increment: p; }
+      .principles li::before { content: "0" counter(p); color: #ff8833; font-size: 13px; }
+      .principles span { color: rgba(255, 255, 255, .72); font-size: 16px; }
+      .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      .videos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .videos iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 10px; }
+
+      .foot { max-width: 1040px; margin: 0 auto; padding: 72px 48px 140px; }
+
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .beat { transition: none; opacity: 1; translate: none; } }
+      @media (max-width: 1000px) {
+        .nav { padding: 18px 16px; }
+        /* The prototype stays at the top of the screen while the story scrolls under it */
+        .story { display: block; padding: 0 16px; }
+        .stagecol { position: sticky; top: 0; z-index: 5; padding: 8px 0 10px; background: #0f1d2e; box-shadow: 0 18px 18px -2px #0f1d2e; }
+        summary { flex-wrap: wrap; row-gap: 4px; }
+        summary small { order: 3; flex-basis: 100%; }
+        .pin { position: static; }
+        .hero { min-height: 0; padding: 32px 0 24px; }
+        .beat { min-height: 70vh; padding: 6vh 0; }
+        .block { padding: 72px 16px 0; }
+        .shipped, .principles, .trio, .videos { grid-template-columns: 1fr; }
+        .foot { padding: 56px 16px 120px; }
+      }
+    </style>
   </body>
 </html>
