@@ -119,46 +119,85 @@ const steps = ["Create app", "Connect it", "Finish"];
 
       <!-- 2. Setup: three steps in one place -->
       <main class="screen page" data-screen="setup" data-crumb="Home/Frontend/New application" data-side-on="Applications">
-        <a class="back-link" href="#landing">← Frontend Observability</a>
-        <h1 class="title">Set up a frontend app</h1>
-        <ol class="stepper" data-stepper>{steps.map((st, i) => <li data-st={i}><span>{i + 1}</span>{st}</li>)}</ol>
+        <div class="wcard">
+        <aside class="wrail">
+          <p class="wlogo"><img src="/prototypes/grafana-rum/faro.svg" alt="" width="22" height="29" />Frontend Observability</p>
+          <ol class="vsteps">
+            <li data-st="0"><span>1</span>Create app</li>
+            <li data-st="1"><span>2</span>Configure app
+              <ul><li data-sub="1">Connect source</li><li data-sub="2">Set endpoints</li><li class="or" data-sub="import">Or import config</li></ul>
+            </li>
+            <li data-st="2"><span>3</span>Finish</li>
+          </ol>
+        </aside>
+        <div class="wmain">
+        <p class="trouble-top">Having trouble? Get <a class="lnk" href="#setup">Help</a></p>
 
         <section class="wiz" data-wiz="0">
-          <label class="lbl" for="appname">App name</label>
-          <input id="appname" class="field" value="acme-monitoring" data-appname />
-          <p class="help">A unique name to tell this app apart from the others in your stack.</p>
-          <label class="lbl" for="dom">Allowed domains</label>
-          <div class="inline"><input id="dom" class="field" placeholder="*.acme.com" data-dom /><button class="btn big" data-add-dom>Add</button></div>
-          <p class="chips" data-chips><span>*.acme-monitoring.com<button aria-label="Remove">×</button></span></p>
-          <p class="help">Only these origins can send data (CORS). <a class="lnk" href="#setup">Advanced CORS settings</a></p>
-          <div class="wiz-foot"><a class="btn big" href="#landing">Cancel</a><button class="btn primary big" data-next="1">Create app</button></div>
+          <h2 class="wtitle">Setup App</h2>
+          <div class="windent">
+            <label class="lbl2" for="appname">App Name</label>
+            <p class="help2">A unique name to identify and differentiate this frontend observability application from your others.</p>
+            <input id="appname" class="field" value="acme-monitoring" data-appname />
+            <label class="lbl2" for="dom">Domain</label>
+            <p class="help2">Allowed CORS origins for app access. See docs for details.</p>
+            <div class="inline"><input id="dom" class="field" placeholder="*.acme.com" data-dom /><button class="btn big addbtn" data-add-dom>Add</button></div>
+            <p class="chips" data-chips><span>*.acme-monitoring.com<button aria-label="Remove">×</button></span></p>
+            <details class="cors"><summary>Advanced CORS settings</summary><p class="help2">Allow credentials, exposed headers and max age, if your app needs them.</p></details>
+          </div>
+          <div class="wiz-foot"><a class="btn big" href="#landing">Cancel</a><button class="btn primary big" data-next="1" data-create>Next</button></div>
         </section>
 
         <section class="wiz" data-wiz="1" hidden>
-          <p class="ok-line">✓ <b data-appname-out>acme-monitoring</b> created. Now connect it.</p>
-          <div class="choices">
-            {[["sdk", "Automatic setup", "Add the SDK: React, Angular, Vue or plain JavaScript"], ["manual", "Manual configuration", "Point an existing OpenTelemetry web setup at Grafana"], ["import", "Import a configuration", "Upload a config file you already have"]].map(([id, t, d], i) => (
-              <button class:list={["choice", { on: i === 0 }]} data-mode={id}><b>{t}</b><span>{d}</span></button>
-            ))}
+          <h2 class="wtitle">Configure Your Application</h2>
+          <div class="windent">
+            <div class="okbox"><span aria-hidden="true">✓</span><div><b>App created successfully!</b><small>Now let’s set up frontend observability for <span data-appname-out>acme-monitoring</span>.</small></div></div>
+            <p class="lbl2">Connect Your Application</p>
+            <p class="help2">Choose how you want to connect your frontend application</p>
+            <div class="srcs">
+              <div class="src on" data-src="sdk"><b><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>Automatic Setup</b><span>Easy SDK integration (React, Angular, Vue, JS)</span><button class="btn primary sel" data-pick="sdk">Selected</button></div>
+              <div class="src" data-src="manual"><b><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="10" height="12" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Manual Config</b><span>Manual observability setup (web)</span><button class="btn sel" data-pick="manual">Select</button></div>
+            </div>
+            <p class="lbl2 imp">Import Existing Configuration</p>
+            <p class="help2">Already have a configuration file? Upload it here.</p>
+            <label class="drop"><input type="file" hidden data-import />Drag your configuration file here or click to select it from your device.</label>
           </div>
-          <label class="lbl">Framework</label>
-          <div class="seg big">{frameworks.map((f, i) => <button class:list={{ on: i === 0 }} data-fw={f}>{f}</button>)}</div>
-          <label class="lbl">Install with</label>
-          <div class="seg big">{["npm", "yarn", "CDN"].map((m, i) => <button class:list={{ on: i === 0 }} data-pm={m}>{m}</button>)}</div>
-          <div class="codebox"><button class="copy" data-copy>Copy</button><pre data-code></pre></div>
-          <div class="wiz-foot"><button class="btn big" data-next="0">Back</button><button class="btn primary big" data-next="2">I’ve added it</button></div>
+          <div class="wiz-foot"><button class="btn big" data-next="0">Back</button><button class="btn primary big" data-next="2">Next</button></div>
         </section>
 
         <section class="wiz" data-wiz="2" hidden>
-          <div class="listen" data-listen><span class="spin" aria-hidden="true"></span><div><b>Waiting for the first page load from <code data-appname-out2>acme-monitoring</code></b><span>Open your app in a browser. This updates on its own.</span></div></div>
-          <dl class="summary">
-            <div><dt>App name</dt><dd data-sum-name>acme-monitoring</dd></div>
-            <div><dt>Framework</dt><dd data-sum-fw>React</dd></div>
-            <div><dt>Allowed domains</dt><dd data-sum-dom>*.acme-monitoring.com</dd></div>
-            <div><dt>Endpoint</dt><dd><code>https://faro-collector-prod-eu-west-2.grafana.net/collect</code></dd></div>
-          </dl>
-          <div class="wiz-foot"><button class="btn big" data-next="1">Back</button><button class="btn primary big" data-finish>View the app</button></div>
+          <h2 class="wtitle">Configure Your Application</h2>
+          <div class="windent">
+            <p class="lbl2">Select your application framework</p>
+            <div class="fws">{frameworks.map((f, i) => <button class:list={["fw", { on: i === 0 }]} data-fw={f}>{f}</button>)}</div>
+            <p class="lbl2">Installation method:</p>
+            <div class="codepanel">
+              <div class="pms">{["npm", "yarn", "CDN"].map((m, i) => <button class:list={{ on: i === 0 }} data-pm={m}>{m.toUpperCase()}</button>)}</div>
+              <div class="codebox flat"><button class="copy icon" data-copy aria-label="Copy"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button><pre data-code></pre></div>
+              <div class="inline"><input class="field" placeholder="*Allowed domains" data-dom2 /><button class="btn big addbtn" data-add-dom2>Add</button></div>
+            </div>
+          </div>
+          <div class="wiz-foot"><button class="btn big" data-next="1">Back</button><button class="btn primary big" data-next="3">Next</button></div>
         </section>
+
+        <section class="wiz" data-wiz="3" hidden>
+          <h2 class="wtitle">Setup Complete!</h2>
+          <div class="bigcheck" aria-hidden="true">✓</div>
+          <div class="sumpanel">
+            <b>Configuration Summary</b>
+            <dl>
+              <dt>App Name:</dt><dd data-sum-name>acme-monitoring</dd>
+              <dt>Application Framework:</dt><dd data-sum-fw>React</dd>
+              <dt>Allowed Domains:</dt><dd data-sum-dom>*.acme-monitoring.com</dd>
+              <dt>Endpoint URL:</dt><dd>https://faro-collector-prod-eu-west-2.grafana.net/collect</dd>
+            </dl>
+          </div>
+          <p class="lbl2 ns">Next steps</p>
+          <button class="nextcard" data-finish><b>View Dashboard</b><span>Monitor your application’s performance in real-time</span></button>
+          <div class="wiz-foot"><button class="btn big" data-next="2">Back</button><button class="btn primary big" data-finish2>Finish</button></div>
+        </section>
+        </div>
+        </div>
       </main>
 
       <!-- 3. Applications -->
@@ -252,6 +291,7 @@ const steps = ["Create app", "Connect it", "Finish"];
       const appName = document.querySelector("[data-app-title]")?.textContent ?? "acme-monitoring";
       const parts = (target.dataset.crumb ?? "Home").replace("APP", appName).split("/");
       crumbs.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : `<a href="${i === 0 ? "#landing" : i === 2 ? "#apps" : "#landing"}">${p}</a>`)).join("<i>/</i>");
+      document.body.classList.toggle("focus", id === "setup");
       document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" ? "Error awareness" : target.dataset.sideOn)));
       if (tab) openTab(tab);
       scrollTo(0, 0);
@@ -262,9 +302,11 @@ const steps = ["Create app", "Connect it", "Finish"];
     const name = () => $<HTMLInputElement>("[data-appname]").value.trim() || "acme-monitoring";
     let fw = "React", pm = "npm";
     function wiz(n: number) {
+      const step = n === 0 ? 0 : n === 3 ? 2 : 1;
       document.querySelectorAll<HTMLElement>("[data-wiz]").forEach((w) => (w.hidden = w.dataset.wiz !== String(n)));
-      document.querySelectorAll<HTMLElement>("[data-st]").forEach((s) => { const i = +s.dataset.st!; s.classList.toggle("on", i === n); s.classList.toggle("done", i < n); });
-      document.querySelectorAll("[data-appname-out], [data-appname-out2], [data-sum-name]").forEach((e) => (e.textContent = name()));
+      document.querySelectorAll<HTMLElement>("[data-st]").forEach((s) => { const i = +s.dataset.st!; s.classList.toggle("on", i === step); s.classList.toggle("done", i < step); });
+      document.querySelectorAll<HTMLElement>("[data-sub]").forEach((s) => s.classList.toggle("on", s.dataset.sub === String(n) || (n === 3 && s.dataset.sub !== "import")));
+      document.querySelectorAll("[data-appname-out], [data-sum-name]").forEach((e) => (e.textContent = name()));
       $("[data-sum-fw]").textContent = fw;
       $("[data-sum-dom]").textContent = [...document.querySelectorAll("[data-chips] span")].map((c) => c.firstChild!.textContent).join(", ") || "—";
       code();
@@ -276,7 +318,7 @@ const steps = ["Create app", "Connect it", "Finish"];
     }
     document.querySelectorAll<HTMLElement>("[data-next]").forEach((b) => b.addEventListener("click", () => {
       const n = +b.dataset.next!;
-      if (n === 1 && b.textContent === "Create app") toast(`${name()} created`);
+      if (b.hasAttribute("data-create")) toast(`${name()} created`);
       wiz(n);
     }));
     $("[data-add-dom]").addEventListener("click", () => {
@@ -284,18 +326,26 @@ const steps = ["Create app", "Connect it", "Finish"];
       const chip = document.createElement("span"); chip.innerHTML = `${v}<button aria-label="Remove">×</button>`;
       $("[data-chips]").appendChild(chip); $<HTMLInputElement>("[data-dom]").value = "";
     });
+    $("[data-add-dom2]").addEventListener("click", () => {
+      const v = $<HTMLInputElement>("[data-dom2]").value.trim(); if (!v) return;
+      const chip = document.createElement("span"); chip.innerHTML = `${v}<button aria-label="Remove">×</button>`;
+      $("[data-chips]").appendChild(chip); $<HTMLInputElement>("[data-dom2]").value = ""; toast(`${v} allowed`);
+    });
+    document.querySelectorAll<HTMLElement>("[data-pick]").forEach((b) => b.addEventListener("click", () => {
+      document.querySelectorAll<HTMLElement>("[data-src]").forEach((c) => { const on = c.dataset.src === b.dataset.pick; c.classList.toggle("on", on); const btn = c.querySelector("button")!; btn.textContent = on ? "Selected" : "Select"; btn.classList.toggle("primary", on); });
+    }));
+    $("[data-import]").addEventListener("change", () => toast("Configuration imported"));
     $("[data-chips]").addEventListener("click", (e) => { const b = (e.target as HTMLElement).closest("button"); if (b) b.parentElement!.remove(); });
     const seg = (sel: string, fn: (b: HTMLElement) => void) => document.querySelectorAll<HTMLElement>(sel).forEach((b) => b.addEventListener("click", () => { b.parentElement!.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); fn(b); }));
     seg("[data-fw]", (b) => { fw = b.dataset.fw!; code(); });
     seg("[data-pm]", (b) => { pm = b.dataset.pm!; code(); });
-    seg("[data-mode]", () => {});
     $("[data-copy]").addEventListener("click", (e) => { navigator.clipboard?.writeText($("[data-code]").textContent ?? "").catch(() => {}); const b = e.currentTarget as HTMLButtonElement; b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); });
-    $("[data-finish]").addEventListener("click", () => {
-      const l = $("[data-listen]"); l.classList.add("got");
-      l.querySelector("b")!.innerHTML = `First page load from <code>${name()}</code>`;
+    const finish = () => {
       document.querySelectorAll("[data-app-title]").forEach((t) => (t.textContent = name()));
-      setTimeout(() => { toast(`${name()} is receiving data`); location.hash = "#app"; wiz(0); l.classList.remove("got"); }, 1200);
-    });
+      toast(`${name()} is receiving data`); location.hash = "#app"; setTimeout(() => wiz(0), 300);
+    };
+    $("[data-finish]").addEventListener("click", finish);
+    $("[data-finish2]").addEventListener("click", finish);
 
     // App tabs
     const tabs = [...document.querySelectorAll<HTMLElement>("[data-tab]")];
@@ -426,6 +476,52 @@ const steps = ["Create app", "Connect it", "Finish"];
     .l-start li { display: flex; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 2px; } .l-start li > span { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 14px; }
     .l-start b { display: block; color: #fff; font-weight: 500; } .l-start small { color: var(--dim); font-size: 14px; }
     @media (max-width: 1100px) { .l-hero, .l-cols { grid-template-columns: 1fr; } .l-props { border: 0; padding: 0; } .l-art { min-height: 300px; } .l-start ol { grid-template-columns: 1fr; } }
+    /* ---------- Setup, as designed: a centred card with the steps in a rail, no app sidebar ---------- */
+    .focus .side { display: none; } .focus .app { grid-template-columns: 1fr; }
+    .focus .page[data-screen="setup"] { display: grid; place-items: center; min-height: calc(100vh - 56px); padding: 48px 24px; }
+    .wcard { display: grid; grid-template-columns: 300px minmax(0, 1fr); width: min(1240px, 100%); height: min(760px, calc(100vh - 140px)); min-height: 640px; box-shadow: 0 8px 30px rgba(0, 0, 0, .35); }
+    .wrail { padding: 40px 36px; background: #16181d; }
+    .wlogo { display: flex; align-items: center; gap: 12px; margin: 0 0 90px; font-size: 18px; color: #fff; }
+    .vsteps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 34px; }
+    .vsteps > li { display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 0 16px; font-size: 17px; letter-spacing: .02em; text-transform: uppercase; color: var(--text); }
+    .vsteps > li > span { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .2); background: #111217; font-size: 14px; color: #fff; text-transform: none; }
+    .vsteps > li.on { color: #6e9fff; } .vsteps > li.on > span { border-color: transparent; background: #3d71d9; }
+    .vsteps > li.done > span { border-color: transparent; background: var(--good); color: #0b0c0e; }
+    .vsteps ul { grid-column: 2; margin: 18px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; font-size: 15px; letter-spacing: 0; text-transform: none; color: var(--dim); }
+    .vsteps ul .or { padding-top: 16px; border-top: 1px solid var(--line); }
+    .vsteps > li.on ul { color: var(--text); }
+    .wmain { position: relative; display: flex; flex-direction: column; padding: 40px 44px 36px; background: var(--raise); overflow: auto; }
+    .trouble-top { position: absolute; right: 44px; top: 36px; margin: 0; color: var(--dim); font-size: 14px; }
+    .wmain .wiz { flex: 1; display: flex; flex-direction: column; max-width: none; padding: 0; border: 0; background: none; }
+    .wmain .wiz[hidden] { display: none; }
+    .wtitle { margin: 28px 0 20px; font-size: 24px; font-weight: 500; color: #fff; }
+    .windent { padding-left: 20px; }
+    .lbl2 { display: block; margin: 0 0 4px; font-size: 17px; color: #fff; } .help2 { margin: 0 0 14px; color: var(--dim); font-size: 14px; }
+    .windent .field { margin-bottom: 24px; } .windent .inline .field { margin: 0; }
+    .addbtn { min-width: 140px; justify-content: center; }
+    .cors { margin-top: 16px; } .cors summary { color: #6e9fff; cursor: pointer; }
+    .wmain .wiz-foot { margin-top: auto; padding-top: 28px; } .wmain .wiz-foot .btn { min-width: 140px; justify-content: center; }
+    @media (max-width: 900px) { .wcard { grid-template-columns: 1fr; } .wlogo { margin-bottom: 24px; } .vsteps { flex-direction: row; gap: 16px; } .vsteps ul { display: none; } }
+    /* setup steps 2 and 3, as designed */
+    .vsteps ul li.on { color: #6e9fff; }
+    .vsteps > li.done > span { font-size: 0; } .vsteps > li.done > span::before { content: "✓"; font-size: 15px; }
+    .vsteps > li.done { color: #6e9fff; } .vsteps > li.done > span { background: transparent; border-color: rgba(204, 204, 220, .3); color: #fff; }
+    .okbox { display: flex; gap: 14px; align-items: center; margin-bottom: 24px; padding: 14px 18px; border: 1px solid rgba(60, 195, 154, .55); border-radius: 2px; background: rgba(60, 195, 154, .12); }
+    .okbox > span { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--good); color: #0b0c0e; font-weight: 700; } .okbox div { display: flex; flex-direction: column; } .okbox b { color: #fff; font-weight: 500; } .okbox small { color: var(--text); font-size: 14px; }
+    .srcs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
+    .src { display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid var(--line); border-radius: 2px; background: #1c1f24; } .src.on { border-color: #5794f2; }
+    .src b { display: flex; align-items: center; gap: 10px; color: #fff; font-weight: 500; font-size: 16px; } .src span { color: var(--text); min-height: 44px; } .src .sel { justify-content: center; border-radius: 999px; margin-top: auto; }
+    .imp { margin-top: 4px; } .drop { display: block; padding: 26px; border: 1px dashed rgba(204, 204, 220, .25); border-radius: 2px; text-align: center; color: var(--dim); cursor: pointer; } .drop:hover { border-color: #5794f2; color: var(--text); }
+    .fws { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .fw { height: 38px; border: 0; border-radius: 2px; background: #2c3035; color: var(--text); cursor: pointer; } .fw.on { background: var(--blue); color: #fff; } .fw:not(.on):hover { background: #34383e; }
+    .codepanel { padding: 16px 18px 18px; border-radius: 2px; background: #1a1d21; }
+    .pms { display: flex; gap: 4px; margin-bottom: 14px; } .pms button { padding: 8px 18px; border: 0; border-radius: 2px; background: none; color: var(--dim); cursor: pointer; } .pms button.on { background: #2c3035; color: #fff; }
+    .codebox.flat { margin: 0 0 16px; border: 0; background: none; } .codebox.flat pre { padding: 8px 40px 8px 4px; }
+    .copy.icon { width: 32px; padding: 0; display: grid; place-items: center; }
+    .bigcheck { display: grid; place-items: center; width: 64px; height: 64px; margin: 0 auto 22px; border-radius: 50%; background: var(--good); color: #0b0c0e; font-size: 32px; font-weight: 700; }
+    .sumpanel { padding: 20px 22px; border-radius: 2px; background: #1a1d21; } .sumpanel b { display: block; margin-bottom: 12px; color: #fff; font-weight: 500; font-size: 17px; }
+    .sumpanel dl { display: grid; grid-template-columns: 220px 1fr; gap: 10px 16px; margin: 0; } .sumpanel dt { color: var(--text); } .sumpanel dd { margin: 0; color: #fff; overflow-wrap: anywhere; }
+    .ns { margin-top: 26px; } .nextcard { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 18px 22px; border: 1px solid transparent; border-radius: 2px; background: #1a1d21; text-align: left; cursor: pointer; } .nextcard:hover { border-color: #5794f2; } .nextcard b { color: #fff; font-weight: 500; } .nextcard span { color: var(--dim); }
   </style>
 </body>
 </html>
