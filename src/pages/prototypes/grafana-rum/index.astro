@@ -1,0 +1,400 @@
+---
+// Grafana Frontend Observability (RUM), rebuilt in code from Nilson's original design file: the landing page, the
+// three-step setup (create the app, connect it, finish), the app list and an app's overview with web vitals,
+// errors and sessions. Charts are drawn from generated sample data.
+const A = "/prototypes/grafana-apm"; // shared shell assets: font and logo
+
+function rng(seed: number) { let s = seed; return () => ((s = (s * 16807) % 2147483647) / 2147483647); }
+function series(seed: number, n: number, base: number, spread: number) {
+  const r = rng(seed); let v = base; const out: number[] = [];
+  for (let i = 0; i < n; i++) { v = Math.max(0, v + (r() - 0.5) * spread); out.push(v); }
+  return out;
+}
+const path = (vals: number[], w: number, h: number, max: number) =>
+  "M" + vals.map((v, i) => `${((i / (vals.length - 1)) * w).toFixed(1)},${(h - (Math.min(v, max) / max) * h).toFixed(1)}`).join("L");
+const loads = series(5, 60, 5, 3), errs = series(9, 60, 1.5, 1.4), onload = series(13, 60, 4, 1.6);
+const onloadMax = Math.ceil(Math.max(...onload)) + 1;
+const W = 600, H = 150;
+
+const vitals = [
+  { id: "ttfb", name: "Time to First Byte", v: "826", unit: "ms", good: 62, ni: 25, poor: 13, state: "needs" },
+  { id: "fcp", name: "First Contentful Paint", v: "0.21", unit: "s", good: 91, ni: 6, poor: 3, state: "good" },
+  { id: "lcp", name: "Largest Contentful Paint", v: "2.1", unit: "s", good: 78, ni: 15, poor: 7, state: "good" },
+  { id: "cls", name: "Cumulative Layout Shift", v: "0.23", unit: "", good: 54, ni: 21, poor: 25, state: "poor" },
+  { id: "fid", name: "First Input Delay", v: "48", unit: "ms", good: 94, ni: 4, poor: 2, state: "good" },
+  { id: "inp", name: "Interaction to Next Paint", v: "234", unit: "ms", good: 70, ni: 22, poor: 8, state: "needs" },
+];
+const pages = [
+  ["/", "826ms", "0.22s", "1.9s", "0.02"], ["/products", "740ms", "1.02s", "4.6s", "0.31"], ["/products/:id/detail", "630ms", "0.98s", "2.4s", "0.08"],
+  ["/cart", "530ms", "2.1s", "6.0s", "0.12"], ["/checkout", "412ms", "0.4s", "1.2s", "0.01"],
+];
+const errors = [
+  { msg: "TypeError: Cannot read properties of undefined (reading 'price')", file: "ProductCard.tsx:42", count: 128, users: 64, trend: series(21, 24, 6, 5) },
+  { msg: "ChunkLoadError: Loading chunk 482 failed", file: "webpack/runtime/jsonp", count: 41, users: 37, trend: series(22, 24, 3, 3) },
+  { msg: "Unhandled Promise rejection: 503 from /api/cart", file: "api/cart.ts:18", count: 19, users: 12, trend: series(23, 24, 2, 2) },
+];
+const sessions = [
+  ["a91f…2c", "Chrome 129 · macOS", "Lisbon", "6 pages", "1 error", "4m 12s"],
+  ["77be…e0", "Safari 18 · iOS", "Berlin", "3 pages", "", "1m 48s"],
+  ["c3d0…91", "Firefox 131 · Windows", "Madrid", "9 pages", "2 errors", "7m 03s"],
+  ["0e5a…7b", "Chrome 129 · Android", "Porto", "2 pages", "", "0m 52s"],
+];
+const side = [
+  ["Kubernetes", ["Nodes", "Dashboards", "Alerts"]],
+  ["Application", ["Services", "Service map"]],
+  ["Frontend", ["Applications", "Error awareness", "Starred"]],
+  ["Synthetics", ["Checks", "Probes"]],
+] as const;
+const frameworks = ["React", "Angular", "Vue", "JavaScript", "Other"];
+const steps = ["Create app", "Connect it", "Finish"];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Frontend Observability · Prototype</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preload" href={`${A}/inter.woff2`} as="font" type="font/woff2" crossorigin />
+  <style is:global>
+    @font-face { font-family: "Inter"; src: url("/prototypes/grafana-apm/inter.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+    :root { --page: #111217; --panel: #181b1f; --raise: #22252b; --line: rgba(204, 204, 220, .12); --text: #ccccdc; --dim: rgba(204, 204, 220, .65); --blue: #3d71d9; --link: #6e9fff; --good: #3cc39a; --ni: #ff9830; --poor: #ff5286; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--page); color: var(--text); font: 15px/1.5 Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    button { font: inherit; color: inherit; } a { color: inherit; }
+    [data-screen] { display: none; } [data-screen].active { display: block; animation: in .25s ease; }
+    @keyframes in { from { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <img src={`${A}/grafana.svg`} alt="Grafana" width="26" height="26" />
+    <nav class="crumbs" data-crumbs aria-label="Breadcrumb"></nav>
+    <label class="search"><svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m10.6 10.6 3.4 3.4" stroke="currentColor" stroke-width="1.4"/></svg><input placeholder="Search or jump to" aria-label="Search" /><kbd>⌘K</kbd></label>
+    <span class="avatar" aria-hidden="true"></span>
+  </header>
+
+  <div class="app">
+    <aside class="side">
+      <p class="side-title"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 9h3l2-6 4 10 2-4h3" fill="none" stroke="#ff8833" stroke-width="1.6"/></svg>Observability</p>
+      {side.map(([g, items]) => (
+        <div class="side-group"><p>{g}</p>{items.map((it) => <a href={it === "Applications" ? "#apps" : it === "Error awareness" ? "#app-errors" : "#landing"} data-side={it}>{it}</a>)}</div>
+      ))}
+      <div class="side-foot"><a href="#landing">Documentation</a><a href="#landing">Give feedback</a></div>
+    </aside>
+
+    <div class="content">
+      <!-- 1. Landing: what RUM gives you, how to start, how billing works -->
+      <main class="screen page" data-screen="landing" data-crumb="Home/Frontend" data-side-on="Applications">
+        <section class="hero">
+          <div>
+            <p class="eyebrow">Frontend Observability</p>
+            <h1 class="title big">See what your users see.</h1>
+            <p class="lede">Real user monitoring for web apps: web vitals, errors with full stack traces, and every session linked to the backend traces behind it.</p>
+            <div class="row"><a class="btn primary big" href="#setup">Start observing</a><a class="lnk" href="#app">Explore a demo app →</a></div>
+          </div>
+          <div class="hero-card" aria-hidden="true">
+            <div class="hc-row"><span>LCP</span><b class="good">2.1 s</b><i style="--g:78;--n:15"></i></div>
+            <div class="hc-row"><span>INP</span><b class="ni">234 ms</b><i style="--g:70;--n:22"></i></div>
+            <div class="hc-row"><span>CLS</span><b class="poor">0.23</b><i style="--g:54;--n:21"></i></div>
+            <svg viewBox={`0 0 ${W} 90`} preserveAspectRatio="none"><path d={path(loads, W, 90, 12)} stroke="#5794f2" fill="none" /><path d={path(errs, W, 90, 12)} stroke="#ff5286" fill="none" /></svg>
+          </div>
+        </section>
+        <div class="props">
+          {[["Monitor the experience", "Track and report the web vitals that decide how fast your app feels."], ["Track errors with stack traces", "Similar errors are grouped and ranked, down to the exact line."], ["Follow the whole journey", "Link a frontend session to the request traces behind it, end to end."]].map(([t, d]) => (
+            <div class="prop"><b>{t}</b><span>{d}</span></div>
+          ))}
+        </div>
+        <h2 class="sec">How to get started</h2>
+        <ol class="howto">
+          {[["Register your application", "Its name and the domains it sends data from."], ["Add the Faro Web SDK", "One package and five lines in your entry file."], ["Watch real sessions arrive", "Vitals, errors and sessions, linked to backend traces."]].map(([t, d], i) => (
+            <li><span>{i + 1}</span><div><b>{t}</b><small>{d}</small></div></li>
+          ))}
+        </ol>
+        <p class="billing">Frontend Observability data is stored as logs and traces in your Grafana Cloud stack and billed at regular Grafana Cloud pricing. <a class="lnk" href="#landing">How billing works →</a></p>
+      </main>
+
+      <!-- 2. Setup: three steps in one place -->
+      <main class="screen page" data-screen="setup" data-crumb="Home/Frontend/New application" data-side-on="Applications">
+        <a class="back-link" href="#landing">← Frontend Observability</a>
+        <h1 class="title">Set up a frontend app</h1>
+        <ol class="stepper" data-stepper>{steps.map((st, i) => <li data-st={i}><span>{i + 1}</span>{st}</li>)}</ol>
+
+        <section class="wiz" data-wiz="0">
+          <label class="lbl" for="appname">App name</label>
+          <input id="appname" class="field" value="acme-monitoring" data-appname />
+          <p class="help">A unique name to tell this app apart from the others in your stack.</p>
+          <label class="lbl" for="dom">Allowed domains</label>
+          <div class="inline"><input id="dom" class="field" placeholder="*.acme.com" data-dom /><button class="btn big" data-add-dom>Add</button></div>
+          <p class="chips" data-chips><span>*.acme-monitoring.com<button aria-label="Remove">×</button></span></p>
+          <p class="help">Only these origins can send data (CORS). <a class="lnk" href="#setup">Advanced CORS settings</a></p>
+          <div class="wiz-foot"><a class="btn big" href="#landing">Cancel</a><button class="btn primary big" data-next="1">Create app</button></div>
+        </section>
+
+        <section class="wiz" data-wiz="1" hidden>
+          <p class="ok-line">✓ <b data-appname-out>acme-monitoring</b> created. Now connect it.</p>
+          <div class="choices">
+            {[["sdk", "Automatic setup", "Add the SDK: React, Angular, Vue or plain JavaScript"], ["manual", "Manual configuration", "Point an existing OpenTelemetry web setup at Grafana"], ["import", "Import a configuration", "Upload a config file you already have"]].map(([id, t, d], i) => (
+              <button class:list={["choice", { on: i === 0 }]} data-mode={id}><b>{t}</b><span>{d}</span></button>
+            ))}
+          </div>
+          <label class="lbl">Framework</label>
+          <div class="seg big">{frameworks.map((f, i) => <button class:list={{ on: i === 0 }} data-fw={f}>{f}</button>)}</div>
+          <label class="lbl">Install with</label>
+          <div class="seg big">{["npm", "yarn", "CDN"].map((m, i) => <button class:list={{ on: i === 0 }} data-pm={m}>{m}</button>)}</div>
+          <div class="codebox"><button class="copy" data-copy>Copy</button><pre data-code></pre></div>
+          <div class="wiz-foot"><button class="btn big" data-next="0">Back</button><button class="btn primary big" data-next="2">I’ve added it</button></div>
+        </section>
+
+        <section class="wiz" data-wiz="2" hidden>
+          <div class="listen" data-listen><span class="spin" aria-hidden="true"></span><div><b>Waiting for the first page load from <code data-appname-out2>acme-monitoring</code></b><span>Open your app in a browser. This updates on its own.</span></div></div>
+          <dl class="summary">
+            <div><dt>App name</dt><dd data-sum-name>acme-monitoring</dd></div>
+            <div><dt>Framework</dt><dd data-sum-fw>React</dd></div>
+            <div><dt>Allowed domains</dt><dd data-sum-dom>*.acme-monitoring.com</dd></div>
+            <div><dt>Endpoint</dt><dd><code>https://faro-collector-prod-eu-west-2.grafana.net/collect</code></dd></div>
+          </dl>
+          <div class="wiz-foot"><button class="btn big" data-next="1">Back</button><button class="btn primary big" data-finish>View the app</button></div>
+        </section>
+      </main>
+
+      <!-- 3. Applications -->
+      <main class="screen page" data-screen="apps" data-crumb="Home/Frontend/Applications" data-side-on="Applications">
+        <div class="row-head"><h1 class="title">Applications</h1><a class="btn primary" href="#setup">+ New application</a></div>
+        <div class="apps">
+          <a class="appcard" href="#app">
+            <header><b data-app-title>acme-monitoring</b><span class="pill-ok">Receiving data</span></header>
+            <div class="nums"><span><em>12</em> errors</span><span><em>1.2k</em> page loads</span><span><em class="good">2.1 s</em> LCP</span></div>
+            <svg viewBox={`0 0 ${W} 60`} preserveAspectRatio="none"><path d={path(loads, W, 60, 12)} stroke="#5794f2" fill="none" /><path d={path(errs, W, 60, 12)} stroke="#ff5286" fill="none" /></svg>
+          </a>
+          <a class="appcard ghost" href="#setup"><span>+ Add another app</span></a>
+        </div>
+      </main>
+
+      <!-- 4. One app: overview, errors, sessions -->
+      <main class="screen page" data-screen="app" data-crumb="Home/Frontend/Applications/APP" data-side-on="Applications">
+        <div class="row-head"><h1 class="title"><span data-app-title>acme-monitoring</span></h1><span class="tools"><span class="sel">Last 1 hour</span><button class="btn">Explore</button></span></div>
+        <div class="tabs" role="tablist">
+          {[["overview", "Overview"], ["errors", "Errors", "3"], ["sessions", "Sessions"], ["settings", "Settings"]].map(([id, l, n]) => (
+            <button class="tab" role="tab" data-tab={id} aria-selected={id === "overview" ? "true" : "false"}>{l}{n && <span class="count">{n}</span>}</button>
+          ))}
+        </div>
+
+        <section data-pane="overview">
+          <div class="alert" data-alert><b>You’re close to your free session limit.</b><span>41,280 of 50,000 sessions used this month. Sampling keeps you under it, or upgrade for more.</span><button class="x" aria-label="Dismiss" data-dismiss>×</button></div>
+          <h2 class="sec">Web vitals</h2>
+          <div class="vitals">
+            {vitals.map((v) => (
+              <figure class:list={["vital", v.state]}>
+                <figcaption><b>{v.id.toUpperCase()}</b><span>{v.name}</span></figcaption>
+                <p class="vv">{v.v}<small>{v.unit}</small></p>
+                <i class="dist" style={`--g:${v.good};--n:${v.ni}`}></i>
+                <span class="vlab">{v.good}% good</span>
+              </figure>
+            ))}
+          </div>
+          <div class="two">
+            <figure class="chart"><figcaption>Page loads and JavaScript errors</figcaption>
+              <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"><g class="grid">{[1, 2, 3].map((i) => <line x1="0" x2={W} y1={(i * H) / 4} y2={(i * H) / 4} />)}</g><path d={path(loads, W, H, 12)} stroke="#5794f2" class="ln" /><path d={path(errs, W, H, 12)} stroke="#ff5286" class="ln" /></svg>
+              <ul class="legend"><li style="--c:#5794f2">page loads</li><li style="--c:#ff5286">errors</li></ul>
+            </figure>
+            <figure class="chart"><figcaption>onLoad time (mean)</figcaption>
+              <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none"><g class="grid">{[1, 2, 3].map((i) => <line x1="0" x2={W} y1={(i * H) / 4} y2={(i * H) / 4} />)}</g><path d={path(onload, W, H, onloadMax)} stroke="#3cc39a" class="ln" /></svg>
+              <ul class="legend"><li style="--c:#3cc39a">onLoad, s</li></ul>
+            </figure>
+          </div>
+          <h2 class="sec">Page performance</h2>
+          <table class="tbl"><thead><tr><th>Page</th><th>TTFB</th><th>FCP</th><th>LCP</th><th>CLS</th></tr></thead><tbody>
+            {pages.map(([p, a, b, c, d]) => <tr><td>{p}</td><td>{a}</td><td>{b}</td><td class:list={{ poor: parseFloat(c) > 4, ni: parseFloat(c) > 2.5 && parseFloat(c) <= 4 }}>{c}</td><td class:list={{ poor: parseFloat(d) > 0.25, ni: parseFloat(d) > 0.1 && parseFloat(d) <= 0.25 }}>{d}</td></tr>)}
+          </tbody></table>
+        </section>
+
+        <section data-pane="errors" hidden>
+          <ul class="errs">
+            {errors.map((e, i) => (
+              <li><button class="err" data-err={i}><span><b>{e.msg}</b><small>{e.file}</small></span><span class="en"><em>{e.count}</em> events · {e.users} users</span><svg viewBox="0 0 120 26" class="sp"><path d={path(e.trend, 120, 26, 12)} stroke="#ff5286" fill="none" /></svg></button>
+                <pre class="stack" hidden>{`${e.msg}\n    at ${e.file}\n    at renderWithHooks (react-dom.development.js:16305)\n    at mountIndeterminateComponent (react-dom.development.js:20069)\n\nSession: a91f…2c · Chrome 129 · trace 4bf92f3577b34da6`}</pre></li>
+            ))}
+          </ul>
+        </section>
+
+        <section data-pane="sessions" hidden>
+          <table class="tbl"><thead><tr><th>Session</th><th>Browser</th><th>Location</th><th>Pages</th><th>Errors</th><th>Duration</th></tr></thead><tbody>
+            {sessions.map((r) => <tr>{r.map((c, i) => <td class:list={{ poor: i === 4 && c }}>{c || "—"}</td>)}</tr>)}
+          </tbody></table>
+        </section>
+
+        <section data-pane="settings" hidden>
+          <dl class="summary"><div><dt>App name</dt><dd data-app-title>acme-monitoring</dd></div><div><dt>Allowed domains</dt><dd>*.acme-monitoring.com</dd></div><div><dt>Session sampling</dt><dd>100%</dd></div></dl>
+        </section>
+      </main>
+    </div>
+  </div>
+  <p class="toast" role="status" aria-live="polite"></p>
+
+  <script>
+    const screens = [...document.querySelectorAll<HTMLElement>("[data-screen]")];
+    const crumbs = document.querySelector<HTMLElement>("[data-crumbs]")!;
+    const toastEl = document.querySelector<HTMLElement>(".toast")!;
+    let tt = 0;
+    const toast = (t: string) => { toastEl.textContent = t; toastEl.classList.add("on"); clearTimeout(tt); tt = window.setTimeout(() => toastEl.classList.remove("on"), 2200); };
+    const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
+
+    // Router: #landing, #setup, #apps, #app, #app-errors
+    function show() {
+      let id = location.hash.slice(1) || "landing", tab = "";
+      if (id === "app-errors") { id = "app"; tab = "errors"; }
+      const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
+      screens.forEach((s) => s.classList.toggle("active", s === target));
+      const appName = document.querySelector("[data-app-title]")?.textContent ?? "acme-monitoring";
+      const parts = (target.dataset.crumb ?? "Home").replace("APP", appName).split("/");
+      crumbs.innerHTML = parts.map((p, i) => (i === parts.length - 1 ? `<b>${p}</b>` : `<a href="${i === 0 ? "#landing" : i === 2 ? "#apps" : "#landing"}">${p}</a>`)).join("<i>/</i>");
+      document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" ? "Error awareness" : target.dataset.sideOn)));
+      if (tab) openTab(tab);
+      scrollTo(0, 0);
+    }
+    addEventListener("hashchange", show);
+
+    // Setup wizard
+    const name = () => $<HTMLInputElement>("[data-appname]").value.trim() || "acme-monitoring";
+    let fw = "React", pm = "npm";
+    function wiz(n: number) {
+      document.querySelectorAll<HTMLElement>("[data-wiz]").forEach((w) => (w.hidden = w.dataset.wiz !== String(n)));
+      document.querySelectorAll<HTMLElement>("[data-st]").forEach((s) => { const i = +s.dataset.st!; s.classList.toggle("on", i === n); s.classList.toggle("done", i < n); });
+      document.querySelectorAll("[data-appname-out], [data-appname-out2], [data-sum-name]").forEach((e) => (e.textContent = name()));
+      $("[data-sum-fw]").textContent = fw;
+      $("[data-sum-dom]").textContent = [...document.querySelectorAll("[data-chips] span")].map((c) => c.firstChild!.textContent).join(", ") || "—";
+      code();
+    }
+    function code() {
+      const pkg = fw === "React" ? "@grafana/faro-react" : "@grafana/faro-web-sdk";
+      const install = pm === "npm" ? `npm install ${pkg}` : pm === "yarn" ? `yarn add ${pkg}` : `<script src="https://unpkg.com/@grafana/faro-web-sdk/dist/bundle/faro-web-sdk.iife.js"><\/script>`;
+      $("[data-code]").textContent = `${install}\n\n// In your ${fw === "Other" ? "app's" : fw} entry file\nimport { initializeFaro } from '${pkg}';\n\ninitializeFaro({\n  url: 'https://faro-collector-prod-eu-west-2.grafana.net/collect/8f2…',\n  app: { name: '${name()}', version: '1.0.0', environment: 'production' },\n});`;
+    }
+    document.querySelectorAll<HTMLElement>("[data-next]").forEach((b) => b.addEventListener("click", () => {
+      const n = +b.dataset.next!;
+      if (n === 1 && b.textContent === "Create app") toast(`${name()} created`);
+      wiz(n);
+    }));
+    $("[data-add-dom]").addEventListener("click", () => {
+      const v = $<HTMLInputElement>("[data-dom]").value.trim(); if (!v) return;
+      const chip = document.createElement("span"); chip.innerHTML = `${v}<button aria-label="Remove">×</button>`;
+      $("[data-chips]").appendChild(chip); $<HTMLInputElement>("[data-dom]").value = "";
+    });
+    $("[data-chips]").addEventListener("click", (e) => { const b = (e.target as HTMLElement).closest("button"); if (b) b.parentElement!.remove(); });
+    const seg = (sel: string, fn: (b: HTMLElement) => void) => document.querySelectorAll<HTMLElement>(sel).forEach((b) => b.addEventListener("click", () => { b.parentElement!.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b)); fn(b); }));
+    seg("[data-fw]", (b) => { fw = b.dataset.fw!; code(); });
+    seg("[data-pm]", (b) => { pm = b.dataset.pm!; code(); });
+    seg("[data-mode]", () => {});
+    $("[data-copy]").addEventListener("click", (e) => { navigator.clipboard?.writeText($("[data-code]").textContent ?? "").catch(() => {}); const b = e.currentTarget as HTMLButtonElement; b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); });
+    $("[data-finish]").addEventListener("click", () => {
+      const l = $("[data-listen]"); l.classList.add("got");
+      l.querySelector("b")!.innerHTML = `First page load from <code>${name()}</code>`;
+      document.querySelectorAll("[data-app-title]").forEach((t) => (t.textContent = name()));
+      setTimeout(() => { toast(`${name()} is receiving data`); location.hash = "#app"; wiz(0); l.classList.remove("got"); }, 1200);
+    });
+
+    // App tabs
+    const tabs = [...document.querySelectorAll<HTMLElement>("[data-tab]")];
+    function openTab(id: string) { tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id))); document.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== id)); }
+    tabs.forEach((t) => t.addEventListener("click", () => openTab(t.dataset.tab!)));
+    document.querySelectorAll<HTMLElement>("[data-err]").forEach((b) => b.addEventListener("click", () => { const s = b.nextElementSibling as HTMLElement; s.hidden = !s.hidden; b.classList.toggle("open", !s.hidden); }));
+    $("[data-dismiss]").addEventListener("click", () => ($("[data-alert]").hidden = true));
+
+    wiz(0);
+    show();
+  </script>
+
+  <style>
+    .topbar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 14px; height: 56px; padding: 0 20px; background: #16181d; border-bottom: 1px solid var(--line); }
+    .crumbs { display: flex; gap: 10px; align-items: center; font-size: 16px; color: var(--dim); }
+    .crumbs :global(a) { color: var(--dim); text-decoration: none; } .crumbs :global(a:hover) { color: #fff; } .crumbs :global(b) { font-weight: 500; color: #fff; } .crumbs :global(i) { font-style: normal; opacity: .6; }
+    .search { display: flex; align-items: center; gap: 8px; width: min(440px, 32vw); height: 36px; margin-left: auto; padding: 0 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--page); color: var(--dim); }
+    .search input { flex: 1; border: 0; background: none; color: var(--text); font: inherit; outline: 0; }
+    kbd { font: 11px Inter, sans-serif; padding: 1px 6px; border: 1px solid var(--line); border-radius: 2px; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; background: #2c3035; }
+    .app { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: calc(100vh - 56px); }
+    .side { position: sticky; top: 56px; align-self: start; height: calc(100vh - 56px); overflow: auto; padding: 22px 14px; display: flex; flex-direction: column; background: #16181d; border-right: 1px solid var(--line); }
+    .side-title { display: flex; gap: 10px; align-items: center; margin: 0 0 18px 8px; font-size: 19px; font-weight: 600; color: #fff; }
+    .side-group { margin-bottom: 18px; } .side-group p { margin: 0 0 6px 8px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--dim); }
+    .side-group a { display: block; padding: 7px 8px; border-radius: 2px; color: var(--text); text-decoration: none; } .side-group a:hover { color: #fff; background: var(--raise); }
+    .side-group a.on { color: #fff; background: var(--raise); box-shadow: inset 2px 0 0 #ff8833; }
+    .side-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; } .side-foot a { padding: 7px 8px; text-decoration: none; }
+    .page { padding: 40px 40px 96px; min-width: 0; }
+    .eyebrow { margin: 0 0 8px; color: var(--dim); } .back-link { display: inline-block; margin-bottom: 10px; color: var(--link); text-decoration: none; }
+    .title { margin: 0 0 12px; font-size: 30px; line-height: 1.2; font-weight: 400; color: #fff; } .title.big { font-size: 44px; font-weight: 500; letter-spacing: -.01em; }
+    .lede { max-width: 60ch; margin: 0 0 26px; font-size: 18px; color: var(--text); }
+    .row { display: flex; align-items: center; gap: 22px; } .lnk { color: var(--link); text-decoration: none; } .lnk:hover { text-decoration: underline; }
+    .btn { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 1px solid var(--line); border-radius: 2px; background: var(--raise); color: var(--text); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer; white-space: nowrap; }
+    .btn:hover { background: #2c3035; } .btn.primary { border-color: transparent; background: var(--blue); color: #fff; } .btn.primary:hover { background: #4e7fe0; } .btn.big { height: 42px; padding: 0 20px; font-size: 15px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px; align-items: center; padding: 20px 0 40px; }
+    .hero-card { padding: 22px 24px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); }
+    .hc-row { display: grid; grid-template-columns: 56px 80px 1fr; align-items: center; gap: 14px; margin-bottom: 14px; } .hc-row span { color: var(--dim); font-weight: 600; } .hc-row b { font-size: 20px; font-weight: 500; }
+    .hc-row i, .dist { display: block; height: 6px; border-radius: 1px; background: linear-gradient(90deg, var(--good) 0 calc(var(--g) * 1%), var(--ni) 0 calc((var(--g) + var(--n)) * 1%), var(--poor) 0); }
+    .hero-card svg { width: 100%; height: 90px; margin-top: 6px; } .hero-card path { stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+    .good { color: var(--good); } .ni { color: var(--ni); } .poor { color: var(--poor); }
+    .props { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 40px; }
+    .prop { display: flex; flex-direction: column; gap: 6px; padding: 22px 24px; border-radius: 2px; background: var(--raise); } .prop b { font-size: 17px; font-weight: 500; color: #fff; } .prop span { color: var(--text); }
+    .sec { margin: 24px 0 14px; font-size: 19px; font-weight: 500; color: #fff; }
+    .howto { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0 0 32px; padding: 0; list-style: none; }
+    .howto li { display: flex; gap: 14px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 2px; } .howto li > span { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 14px; }
+    .howto b { display: block; color: #fff; font-weight: 500; } .howto small { color: var(--dim); font-size: 14px; }
+    .billing { color: var(--dim); max-width: 80ch; }
+    .stepper { display: flex; gap: 28px; margin: 6px 0 28px; padding: 0; list-style: none; color: var(--dim); }
+    .stepper li { display: flex; align-items: center; gap: 10px; } .stepper span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .3); font-size: 13px; }
+    .stepper li.on { color: #fff; font-weight: 500; } .stepper li.on span { border-color: transparent; background: var(--blue); color: #fff; } .stepper li.done span { border-color: transparent; background: var(--good); color: #0b0c0e; }
+    .wiz { padding: 28px 30px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); }
+    .lbl { display: block; margin: 18px 0 8px; color: var(--dim); } .lbl:first-child { margin-top: 0; }
+    .field { width: 100%; height: 42px; padding: 0 14px; border: 1px solid rgba(204, 204, 220, .2); border-radius: 2px; background: #0e0f12; color: #fff; font: inherit; } .field:focus { outline: 2px solid #5794f2; outline-offset: -1px; }
+    .inline { display: flex; gap: 12px; } .help { margin: 8px 0 0; color: var(--dim); font-size: 14px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; } .chips :global(span) { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 2px; background: var(--raise); font: 13px ui-monospace, monospace; }
+    .chips :global(button) { border: 0; background: none; color: var(--dim); cursor: pointer; }
+    .wiz-foot { display: flex; justify-content: flex-end; gap: 12px; margin-top: 28px; }
+    .ok-line { margin: 0 0 18px; color: var(--good); } .ok-line b { color: #fff; font-weight: 500; }
+    .choices { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .choice { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border: 0; border-radius: 2px; background: var(--raise); text-align: left; cursor: pointer; } .choice b { color: #fff; font-weight: 500; } .choice span { color: var(--dim); font-size: 14px; }
+    .choice.on, .choice:hover { box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, .6); }
+    .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 2px; background: #16181d; } .seg button { padding: 7px 16px; border: 0; border-radius: 2px; background: none; color: var(--text); cursor: pointer; } .seg button.on { background: #2c3035; color: #fff; font-weight: 500; }
+    .codebox { position: relative; margin-top: 18px; border: 1px solid var(--line); border-radius: 2px; background: #0b0c0e; }
+    .codebox pre { margin: 0; padding: 20px 22px; overflow-x: auto; font: 14px/1.7 ui-monospace, monospace; color: #e6e6ef; }
+    .copy { position: absolute; top: 10px; right: 10px; height: 32px; padding: 0 12px; border: 1px solid rgba(204, 204, 220, .25); border-radius: 2px; background: #16181d; color: #fff; cursor: pointer; }
+    .listen { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border: 1px solid var(--line); border-radius: 2px; background: #121722; } .listen div { display: flex; flex-direction: column; } .listen b { color: #fff; font-weight: 500; } .listen code { font-size: 15px; }
+    .spin { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(110, 159, 255, .25); border-top-color: #6e9fff; animation: spin 1s linear infinite; } @keyframes spin { to { rotate: 360deg; } }
+    .listen.got { border-color: rgba(60, 195, 154, .5); } .listen.got .spin { animation: none; border-color: var(--good); background: var(--good); }
+    .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; margin: 22px 0 0; } .summary dt { color: var(--dim); font-size: 14px; } .summary dd { margin: 2px 0 0; color: #fff; overflow-wrap: anywhere; }
+    .row-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; } .tools { display: flex; gap: 10px; }
+    .sel { display: inline-flex; align-items: center; height: 32px; padding: 0 10px; border: 1px solid var(--line); border-radius: 2px; background: var(--page); font-size: 13px; color: var(--dim); }
+    .apps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .appcard { display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; border-radius: 2px; background: var(--raise); text-decoration: none; transition: box-shadow .15s ease; } .appcard:hover { box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, .6); }
+    .appcard header { display: flex; justify-content: space-between; align-items: center; } .appcard b { color: #fff; font-weight: 500; font-size: 17px; }
+    .pill-ok { padding: 1px 8px; border-radius: 2px; background: rgba(60, 195, 154, .15); color: var(--good); font-size: 12px; }
+    .nums { display: flex; gap: 22px; color: var(--dim); font-size: 14px; } .nums em { font-style: normal; font-size: 20px; color: #fff; margin-right: 4px; } .nums em.good { color: var(--good); }
+    .appcard svg { width: 100%; height: 60px; } .appcard path { stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    .appcard.ghost { align-items: center; justify-content: center; min-height: 180px; background: none; box-shadow: inset 0 0 0 1px rgba(204, 204, 220, .2); color: var(--dim); }
+    .tabs { display: flex; gap: 2px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
+    .tab { display: flex; gap: 6px; align-items: center; padding: 10px 14px 12px; border: 0; background: none; color: var(--dim); font-weight: 500; cursor: pointer; } .tab:hover { color: #fff; } .tab[aria-selected="true"] { color: #fff; box-shadow: inset 0 -2px 0 #f55f3e; }
+    .count { padding: 0 6px; border-radius: 8px; background: var(--raise); font-size: 11px; }
+    .alert { position: relative; display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; padding: 14px 44px 14px 18px; border-left: 3px solid var(--ni); border-radius: 2px; background: rgba(255, 152, 48, .1); } .alert b { color: #fff; font-weight: 500; } .alert[hidden] { display: none; }
+    .x { position: absolute; right: 10px; top: 10px; border: 0; background: none; color: var(--dim); font-size: 18px; cursor: pointer; }
+    .vitals { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+    .vital { margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); border-top: 3px solid var(--good); } .vital.needs { border-top-color: var(--ni); } .vital.poor { border-top-color: var(--poor); }
+    .vital figcaption { display: flex; flex-direction: column; } .vital figcaption b { color: #fff; font-weight: 600; } .vital figcaption span { color: var(--dim); font-size: 12px; }
+    .vv { margin: 10px 0 10px; font-size: 30px; font-weight: 500; color: #fff; } .vv small { margin-left: 3px; font-size: 15px; color: var(--dim); }
+    .vlab { display: block; margin-top: 6px; font-size: 12px; color: var(--dim); }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 16px; }
+    .chart { margin: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 2px; background: var(--panel); } .chart figcaption { margin-bottom: 8px; color: var(--link); font-size: 13px; }
+    .chart svg { width: 100%; height: 170px; } .grid line { stroke: rgba(204, 204, 220, .07); } .ln { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+    .legend { display: flex; gap: 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 12px; } .legend li::before { content: ""; display: inline-block; width: 12px; height: 3px; margin-right: 6px; vertical-align: middle; background: var(--c); }
+    .tbl { width: 100%; border-collapse: collapse; } .tbl th { text-align: left; padding: 10px; font-weight: 500; color: var(--dim); border-bottom: 1px solid var(--line); } .tbl td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+    .errs { margin: 0; padding: 0; list-style: none; } .errs li { border-bottom: 1px solid var(--line); }
+    .err { display: grid; grid-template-columns: minmax(0, 1fr) 200px 130px; align-items: center; gap: 20px; width: 100%; padding: 16px 10px; border: 0; background: none; text-align: left; cursor: pointer; } .err:hover, .err.open { background: rgba(255, 255, 255, .03); }
+    .err b { display: block; color: #fff; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .err small { color: var(--dim); font-family: ui-monospace, monospace; }
+    .en { color: var(--dim); font-size: 14px; } .en em { font-style: normal; color: var(--poor); font-size: 17px; } .sp { width: 120px; height: 26px; } .sp path { stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+    .stack { margin: 0 10px 16px; padding: 16px 18px; border-left: 3px solid var(--poor); background: #0b0c0e; font: 13px/1.7 ui-monospace, monospace; white-space: pre-wrap; }
+    .toast { position: fixed; left: 50%; bottom: 28px; z-index: 50; translate: -50% 12px; margin: 0; padding: 10px 16px; border-radius: 2px; background: #2c3235; color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); opacity: 0; pointer-events: none; transition: opacity .2s ease, translate .2s ease; } .toast.on { opacity: 1; translate: -50% 0; }
+    :is(.btn, .tab, .choice, .seg button, .appcard, .err, .side-group a):focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
+    @media (max-width: 1300px) { .vitals { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hero { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .app { grid-template-columns: 1fr; } .side { display: none; } .props, .howto, .choices, .apps, .two, .summary { grid-template-columns: 1fr; } .vitals { grid-template-columns: 1fr 1fr; } .page { padding: 24px 16px 80px; } }
+  </style>
+</body>
+</html>
