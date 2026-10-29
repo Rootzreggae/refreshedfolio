@@ -1,24 +1,8 @@
 ---
 // Case study: Grafana Cloud onboarding. The page is one pinned scene: the prototype rises out of the hero and a camera
 // moves over it chapter by chapter, with headlines sliding in from the edges and the colour shifting. The details peel
-// up over it at the end. Play opens a full-screen theatre with the guided demo; Try it opens the prototype in a tab.
-import { type Step } from "../../components/case/PrototypeStage.astro";
+// up over it at the end. Play opens the working prototype in a new tab.
 import Chapters, { type Chapter } from "../../components/case/Chapters.astro";
-import Theater from "../../components/case/Theater.astro";
-import Dock from "../../components/case/Dock.astro";
-
-// The guided demo: what the cursor does and what the caption says (voice clips can be added per step later)
-const steps: Step[] = [
-  { hash: "#welcome", caption: "Every new user arrives with the same question: what is Grafana Cloud? This screen answers it before asking for anything.", wait: 5200 },
-  { click: ".active .button", caption: "Every new user arrives with the same question: what is Grafana Cloud? This screen answers it before asking for anything.", wait: 600 },
-  { caption: "Then one question about them: what did you come here to do? Goals, not product names.", wait: 4600 },
-  { hover: '.active .card[data-path="kube"]', caption: "Point at a path and its docs come to you. No new tab, no digging through documentation.", wait: 4800 },
-  { hover: '.active .card[data-path="mlt"]', caption: "Each path says what it takes, so nobody starts something they can’t finish.", wait: 4200 },
-  { click: '.active .card[data-path="kube"]', caption: "A short confirmation, then straight into the product.", wait: 700 },
-  { caption: "A short confirmation, then straight into the product.", wait: 2200 },
-  { hover: ".active .menu .current", caption: "They land on the real page with the next step ready. The pulsing menu item brings them back to onboarding any time.", wait: 6000 },
-  { caption: "That’s the flow. Your turn: click anything.", wait: 2600 },
-];
 
 // The story in three chapters. Camera keys: at = 0..1 through the chapter, zoom around the focus point (fx, fy)
 const chapters: Chapter[] = [
@@ -142,8 +126,7 @@ const facts: [string, string][] = [
         <h1 class="hero-title"><span>Grafana Cloud</span> <span>onboarding</span></h1>
         <p class="lede">New users signed up without knowing what they’d signed up for. I redesigned their first ten minutes around one question: what is Grafana Cloud?</p>
         <div class="actions">
-          <button class="watch" data-watch><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Watch the demo · 35s</button>
-          <a class="try" href="/prototypes/grafana-onboarding/" target="_blank" rel="noopener">Try it yourself ↗</a>
+          <a class="play" href="/prototypes/grafana-onboarding/" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Play the prototype</a>
         </div>
         <p class="facts">Product Designer · Grafana Labs · 2022 · Shipped</p>
       </div>
@@ -205,15 +188,12 @@ const facts: [string, string][] = [
       <footer class="foot"><a href="/projects/grafana" class="back">← Grafana projects</a></footer>
     </div>
 
-    <Theater src="/prototypes/grafana-onboarding/#welcome" url="grafana.com/cloud" steps={steps} />
-    <Dock after=".hero-in" sections={[["#ch-question", "The question"], ["#ch-goals", "Goals and docs"], ["#ch-real", "Somewhere real"], ["#shipped", "What shipped"], ["#process", "How I got there"], ["#change", "What I’d change"]]} facts={facts} />
 
     <script>
       import Lenis from "lenis";
       import "lenis/dist/lenis.css";
       // Smooth, inertial scrolling (skipped when the reader asks for less motion)
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) new Lenis({ autoRaf: true, anchors: true });
-      document.querySelectorAll("[data-watch]").forEach((b) => b.addEventListener("click", () => document.dispatchEvent(new Event("theater:open"))));
       // Images in the details wipe into view
       const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { rootMargin: "0px 0px -10% 0px" });
       document.querySelectorAll(".wipe").forEach((f) => io.observe(f));
@@ -242,13 +222,11 @@ const facts: [string, string][] = [
       .lede { grid-column: 2; grid-row: 2; font-size: clamp(17px, 1.3vw, 21px); line-height: 1.5; color: rgba(255, 255, 255, .88); max-width: 36ch; animation: up .9s .25s cubic-bezier(.2, .7, .2, 1) both; }
       .actions { grid-column: 1; display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; animation: up .9s .35s cubic-bezier(.2, .7, .2, 1) both; }
       .facts { grid-column: 2; margin-top: 30px; align-self: center; color: rgba(255, 255, 255, .72); font-size: 15px; }
-      .watch, .try { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; transition: translate .2s ease, scale .2s ease, background .2s ease, border-color .2s ease; }
-      .watch { border: 0; background: #fff; color: #1d3a5f; }
-      .watch:hover { translate: 0 -2px; scale: 1.03; }
-      .watch:hover svg { rotate: -8deg; transition: rotate .2s ease; }
-      .try { border: 1px solid rgba(255, 255, 255, .35); color: #fff; }
-      .try:hover { border-color: #fff; translate: 0 -2px; }
-      .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
+      .play { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; transition: translate .2s ease, scale .2s ease, background .2s ease, border-color .2s ease; }
+      .play { border: 0; background: #fff; color: #1d3a5f; }
+      .play:hover { translate: 0 -2px; scale: 1.03; }
+      .play:hover svg { rotate: -8deg; transition: rotate .2s ease; }
+      .play:focus-visible, summary:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
 
       /* The details: a light card that peels up over the scene */
       .rest { position: relative; z-index: 2; margin-top: -14vh; padding-bottom: 140px; border-radius: 36px 36px 0 0; background: #f4f1ec; color: #17212b; box-shadow: 0 -10px 40px rgba(0, 0, 0, .18); }
