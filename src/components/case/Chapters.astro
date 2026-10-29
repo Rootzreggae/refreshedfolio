@@ -281,7 +281,7 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
 
   /* The prototype is the scene: full screen, no frame */
   .stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #181b1f; }
-  .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; transition: transform .12s linear; }
+  .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
   .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
   /* A light shade in the chapter colour behind the headline only */
   .shade { position: absolute; left: 0; right: 0; top: 0; height: 30vh; z-index: 2; pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--tint, #1d3a5f) 82%, transparent), color-mix(in srgb, var(--tint, #1d3a5f) 50%, transparent) 50%, transparent); }

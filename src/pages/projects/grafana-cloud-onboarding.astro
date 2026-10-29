@@ -209,8 +209,8 @@ const facts: [string, string][] = [
     <script>
       import Lenis from "lenis";
       import "lenis/dist/lenis.css";
-      // Smooth, inertial scrolling (skipped when the reader asks for less motion)
-      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) new Lenis({ autoRaf: true, anchors: true });
+      // Smooth, eased scrolling drives every scene transition; on desktop it runs for everyone, like the references
+      if (matchMedia("(min-width: 901px)").matches) new Lenis({ autoRaf: true, anchors: true, lerp: 0.085, wheelMultiplier: 0.9 });
       // The details card is tossed in: tilted while it rises, flat once it lands
       const rest = document.querySelector<HTMLElement>(".rest")!;
       const toss = () => { const top = rest.getBoundingClientRect().top; const u = Math.min(1, Math.max(0, (innerHeight - top) / (innerHeight * 0.8))); rest.style.rotate = `${(1 - u) * -3}deg`; };
