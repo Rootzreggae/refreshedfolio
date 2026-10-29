@@ -404,12 +404,12 @@ const steps = ["Create app", "Connect it", "Finish"];
     .l-app { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 17px; color: #fff; }
     .ds { display: inline-flex; align-items: center; gap: 12px; height: 36px; padding: 0 14px 0 6px; border: 1px solid var(--line); border-radius: 2px; color: var(--text); }
     .ds i { width: 26px; height: 26px; border-radius: 2px; background: #2c3035; }
-    .l-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr); gap: 56px; align-items: end; padding: 0 0 0 36px; }
+    .l-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 660px); gap: 56px; align-items: end; padding: 0 0 0 36px; }
     .l-title { margin: 32px 0 26px; font-size: clamp(30px, 2.4vw, 40px); line-height: 1.25; font-weight: 300; color: #fff; max-width: 22ch; }
     .l-lede { margin: 0 0 30px; max-width: 58ch; font-size: 17px; color: var(--text); }
     .landing .btn.big { gap: 10px; margin-bottom: 40px; }
-    .l-screen { margin: 0; align-self: end; } .l-screen img { display: block; width: 100%; }
-    .l-power { padding: 34px 36px 56px; background: var(--raise); }
+    .l-screen { margin: 0; align-self: end; justify-self: end; width: 100%; max-width: 660px; } .l-screen img { display: block; width: 100%; }
+    .l-power { position: relative; overflow: hidden; padding: 34px 36px 56px; background: var(--raise); }
     .l-power h2 { margin: 0 0 36px; text-align: center; font-size: clamp(20px, 1.6vw, 26px); line-height: 1.4; font-weight: 400; color: #fff; }
     .l-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .l-props { margin: 0; padding: 0 36px 0 0; list-style: none; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 56px; justify-content: center; }
@@ -417,7 +417,10 @@ const steps = ["Create app", "Connect it", "Finish"];
     .l-ic { flex: none; display: grid; place-items: center; width: 76px; height: 76px; border-radius: 50%; background: #3a3d44; } .l-ic img { width: 54px; height: 54px; object-fit: contain; }
     .l-props b { display: block; max-width: 18ch; font-size: 19px; line-height: 1.2; font-weight: 500; color: #fff; } .l-props em { font-style: normal; color: #6e9fff; }
     .l-props p { margin: 8px 0 0; color: var(--text); font-size: 14px; } .l-props p a { color: #6e9fff; text-decoration: none; }
-    .l-art { position: relative; min-height: 420px; } .l-art .base { position: absolute; right: -36px; bottom: -56px; width: 92%; } .l-art .obj { position: absolute; left: 50%; top: 50%; width: 40%; translate: -50% -55%; }
+    /* the slab and the object keep their designed proportions and stay inside the band */
+    .l-art { position: relative; min-height: 440px; display: grid; place-items: center; }
+    .l-art .base { position: absolute; right: -36px; bottom: -56px; width: min(92%, 560px); }
+    .l-art .obj { position: relative; width: min(42%, 230px); translate: -6% -8%; }
     .l-start { padding: 40px 36px 0; } .l-start h2 { margin: 0 0 16px; font-size: 19px; font-weight: 500; color: #fff; }
     .l-start ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 0 0 24px; padding: 0; list-style: none; }
     .l-start li { display: flex; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 2px; } .l-start li > span { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 14px; }
