@@ -49,6 +49,8 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
       <div class="cam" data-cam><iframe src={src} title="" tabindex="-1" data-cam-frame></iframe></div>
     </div>
 
+    <div class="shade top" aria-hidden="true"></div>
+    <div class="shade bottom" aria-hidden="true"></div>
     <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
     <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(sections)}>
       <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
@@ -230,6 +232,11 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   /* The prototype is the scene: full screen, no frame */
   .stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #181b1f; }
   .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; transition: transform .12s linear; }
+
+  /* A light shade in the chapter colour, only where the type sits, so text separates from the prototype */
+  .shade { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
+  .shade.top { top: 0; height: 30vh; background: linear-gradient(color-mix(in srgb, var(--tint, #1d3a5f) 82%, transparent), color-mix(in srgb, var(--tint, #1d3a5f) 50%, transparent) 50%, transparent); }
+  .shade.bottom { bottom: 0; height: 26vh; background: linear-gradient(transparent, color-mix(in srgb, var(--tint, #1d3a5f) 55%, transparent) 50%, color-mix(in srgb, var(--tint, #1d3a5f) 85%, transparent)); }
 
   /* The travelling pill */
   .pill { position: absolute; left: 0; bottom: 24px; z-index: 4; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
