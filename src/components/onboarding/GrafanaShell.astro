@@ -1,0 +1,83 @@
+---
+// The Grafana app frame a path lands in: side menu with the onboarding entry pulsing, and a way back into onboarding.
+interface Props { id: string; pulse?: boolean }
+const { id, pulse = true } = Astro.props;
+const N = "/prototypes/grafana-onboarding/nav";
+const items = [
+  ["search", "Search"], ["plus", "Create"], ["dashboards", "Dashboards"], ["explore", "Explore"],
+  ["alerting", "Alerting"], ["config", "Configuration"], ["admin", "Server admin"],
+];
+---
+<main class="app" data-screen={id}>
+  <nav class="menu" aria-label="Grafana">
+    <img class="home" src={`${N}/grafana.svg`} alt="Grafana" width="32" height="32" />
+    <ul>
+      {items.map(([icon, label]) => (
+        <li><span class="item" title={label}><img src={`${N}/${icon}.svg`} alt={label} width="24" height="24" /></span></li>
+      ))}
+      <li class="onboarding">
+        <a class="item current" href="#welcome" title="Onboarding">
+          <img src={`${N}/onboarding.svg`} alt="Onboarding" width="28" height="28" />
+        </a>
+        {pulse && <span class="pulse" aria-hidden="true"></span>}
+        {pulse && <span class="hint">Restart your onboarding here</span>}
+      </li>
+    </ul>
+    <div class="foot">
+      <span class="avatar" aria-hidden="true"></span>
+      <img src={`${N}/help.svg`} alt="Help" width="28" height="28" />
+    </div>
+  </nav>
+
+  <div class="page"><slot /></div>
+
+  <a class="restart" href="#welcome"><img src={`${N}/restart.svg`} alt="" width="20" height="20" />Restart</a>
+</main>
+
+<style>
+  .app { grid-template-columns: 60px 1fr; min-height: 100vh; background: #111217; color: #ccccdc; }
+
+  .menu { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; background: #1e2028; padding: 15px 0 13px; z-index: 2; }
+  .home { margin-bottom: 70px; }
+  .menu ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 25px; }
+  .menu li { position: relative; display: flex; justify-content: center; }
+  .item { display: grid; place-items: center; width: 60px; height: 24px; opacity: .75; transition: opacity .15s ease; }
+  .item:hover { opacity: 1; }
+  .item.current { opacity: 1; height: 28px; }
+  /* the active entry: orange edge, like the rest of Grafana's menu */
+  .item.current::before { content: ""; position: absolute; left: 0; top: -2px; bottom: -2px; width: 4px; border-radius: 0 2px 2px 0; background: linear-gradient(180deg, #f55f3e, #ff8833); }
+  .foot { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 13px; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #ff8833, #6ccf8e); }
+
+  .pulse { position: absolute; left: 23px; top: -11px; width: 25px; height: 25px; border-radius: 50%; background: #6ccf8e; pointer-events: none; }
+  .pulse::before { content: ""; position: absolute; inset: 9px; border-radius: 50%; background: #1a7f4b; }
+  .pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 0 rgba(108, 207, 142, .7); animation: ping 1.8s ease-out infinite; }
+  @keyframes ping { to { box-shadow: 0 0 0 14px rgba(108, 207, 142, 0); } }
+
+  .hint {
+    position: absolute; left: 66px; top: 50%; translate: 0 -50%; padding: 8px 12px; border-radius: 4px; white-space: nowrap;
+    background: #2c3235; color: #ccccdc; font-size: 13px; line-height: 18px; box-shadow: 0 4px 16px rgba(0, 0, 0, .45);
+    /* slides in, nudges three times, then gets out of the way; the pulse keeps pointing */
+    opacity: 0; animation: hint .5s 1s ease-out forwards, bob 2.4s 1.5s ease-in-out 3, out .4s 8.7s ease-in forwards; pointer-events: none;
+  }
+  .hint::before { content: ""; position: absolute; left: -6px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 0; border-right-color: #2c3235; }
+  @keyframes hint { from { opacity: 0; translate: 8px -50%; } to { opacity: 1; translate: 0 -50%; } }
+  @keyframes bob { 50% { translate: 4px -50%; } }
+  @keyframes out { to { opacity: 0; } }
+
+  .page { min-width: 0; }
+
+  .restart {
+    position: fixed; right: 32px; bottom: 32px; z-index: 3; display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 2px;
+    background: linear-gradient(90deg, #f55f3e, #ff8833); color: #fff; font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: none;
+    box-shadow: 0 4px 16px rgba(245, 95, 62, .35); transition: filter .15s ease;
+  }
+  .restart:hover { filter: brightness(1.08); }
+  .restart:focus-visible, .item:focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .menu { display: none; }
+    .restart { right: 16px; bottom: 16px; }
+  }
+</style>

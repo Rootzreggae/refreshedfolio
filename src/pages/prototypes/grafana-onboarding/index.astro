@@ -1,6 +1,8 @@
 ---
 // Grafana Cloud onboarding, rebuilt in code from the original Figma file (2022) and refined.
 import ChoiceScreen from "../../../components/onboarding/ChoiceScreen.astro";
+import GrafanaShell from "../../../components/onboarding/GrafanaShell.astro";
+import HostedPrometheus from "../../../components/onboarding/HostedPrometheus.astro";
 
 const A = "/prototypes/grafana-onboarding";
 const benefits = [
@@ -30,39 +32,39 @@ const setup = [
 ];
 
 const sources = [
-  { id: "prom", icon: "ds-prom.png", to: "done-prom", title: "Prometheus metrics", body: "Remote-write from your Prometheus, or let the agent scrape for you.", meta: ["metrics", "~10 min"],
+  { id: "prom", icon: "ds-prom.svg", to: "done-prom", title: "Prometheus metrics", body: "Remote-write from your Prometheus, or let the agent scrape for you.", meta: ["metrics", "~10 min"],
     doc: { title: "Prometheus", body: "An open source monitoring system with a multidimensional data model and PromQL. Grafana Cloud stores your Prometheus metrics long term, highly available, with nothing to run.", link: "Learn more about Prometheus" } },
-  { id: "loki", icon: "ds-loki.png", to: "done-loki", title: "Logs with Loki", body: "Ship logs from files, containers or systemd. Loki indexes labels, not content, so it stays cheap.", meta: ["logs", "~10 min"],
+  { id: "loki", icon: "ds-loki.svg", to: "done-loki", title: "Logs with Loki", body: "Ship logs from files, containers or systemd. Loki indexes labels, not content, so it stays cheap.", meta: ["logs", "~10 min"],
     doc: { title: "Grafana Loki", body: "A horizontally scalable log aggregation system inspired by Prometheus. It indexes a set of labels for each stream instead of the full text, which keeps it cost effective and easy to operate.", link: "Learn more about Grafana Loki" } },
-  { id: "tempo", icon: "ds-tempo.png", to: "done-tempo", title: "Traces with Tempo", body: "Send OpenTelemetry, Jaeger or Zipkin traces and jump from a trace to its logs.", meta: ["traces", "~10 min"],
+  { id: "tempo", icon: "ds-tempo.svg", to: "done-tempo", title: "Traces with Tempo", body: "Send OpenTelemetry, Jaeger or Zipkin traces and jump from a trace to its logs.", meta: ["traces", "~10 min"],
     doc: { title: "Grafana Tempo", body: "A high-scale distributed tracing backend that only needs object storage, deeply integrated with Grafana, Prometheus and Loki.", link: "Learn more about Grafana Tempo" } },
-  { id: "graphite", icon: "ds-graphite.png", to: "done-graphite", title: "Graphite metrics", body: "Point your existing Graphite setup at a hosted, horizontally scalable backend.", meta: ["metrics", "~10 min"],
+  { id: "graphite", icon: "ds-graphite.svg", to: "done-graphite", title: "Graphite metrics", body: "Point your existing Graphite setup at a hosted, horizontally scalable backend.", meta: ["metrics", "~10 min"],
     doc: { title: "Graphite", body: "Keep your Graphite metrics and lose the maintenance: a replicated, horizontally scalable service with fast queries and access policies for your data.", link: "Learn more about Graphite" } },
 ];
 
 const dataFor = [
-  { id: "agent", icon: "ds-agent.png", to: "done-console", title: "Install the agent", body: "Collect data with ready-made integrations, dashboards and alerts.", meta: ["~10 min", "access to your hosts"],
+  { id: "agent", icon: "ds-agent.svg", to: "done-console", title: "Install the agent", body: "Collect data with ready-made integrations, dashboards and alerts.", meta: ["~10 min", "access to your hosts"],
     doc: { title: "Grafana Agent", body: "The agent runs on your hosts, collects Prometheus-style metrics and logs, and sends them to Grafana Cloud.", link: "Learn more on installing the Grafana Agent" } },
-  { id: "external", icon: "ds-external.png", to: "done-console-ext", title: "Connect an external data source", body: "Query data where it already lives, without copying it.", meta: ["~5 min", "the source’s URL and credentials"],
+  { id: "external", icon: "ds-external.svg", to: "done-console-ext", title: "Connect an external data source", body: "Query data where it already lives, without copying it.", meta: ["~5 min", "the source’s URL and credentials"],
     doc: { title: "Data sources", body: "Grafana connects natively to dozens of databases and services, and community plugins cover many more. Search for yours in Integrations and Connections and follow the steps.", link: "Learn more about installing data sources" } },
 ];
 
 const explore = [
-  { id: "tour", icon: "ex-tour.png", to: "done-home", title: "Take a product tour", body: "An interactive walkthrough of the main features.", meta: ["~2 min", "nothing to install"],
+  { id: "tour", icon: "ex-tour.svg", to: "done-home", title: "Take a product tour", body: "An interactive walkthrough of the main features.", meta: ["~2 min", "nothing to install"],
     doc: { title: "Product tour", body: "See where dashboards, Explore, alerting and your data sources live, then try them on sample data." } },
-  { id: "demo", icon: "ex-demo.png", to: "done-play", title: "Try a demo environment", body: "A sandbox full of sample data to click around in.", meta: ["~5 min", "nothing to install"],
+  { id: "demo", icon: "ex-demo.svg", to: "done-play", title: "Try a demo environment", body: "A sandbox full of sample data to click around in.", meta: ["~5 min", "nothing to install"],
     doc: { title: "Demo environment", body: "A live Grafana with real-looking data and ready-made dashboards. Change anything, nothing breaks." } },
-  { id: "easy", icon: "ex-data.png", to: "connect", title: "Connect data you already have", body: "Start with something close at hand, like your own machine.", meta: ["~5 min"],
+  { id: "easy", icon: "ex-data.svg", to: "connect", title: "Connect data you already have", body: "Start with something close at hand, like your own machine.", meta: ["~5 min"],
     doc: { title: "Your own data, quickly", body: "The fastest way to see your own data in Grafana Cloud is the machine you are on, or a ready-made source like TestData.", link: "Learn more on connecting your data" } },
 ];
 
 const connect = [
-  { id: "linux", icon: "os-linux.png", to: "done-console-paid", title: "Linux server" },
+  { id: "linux", icon: "os-linux.svg", to: "done-console-paid", title: "Linux server" },
   { id: "windows", icon: "os-windows.png", to: "done-console-paid", title: "Windows" },
   { id: "macos", icon: "os-macos.png", to: "done-console-paid", title: "macOS" },
-  { id: "testdata", icon: "os-testdata.png", to: "done-console-paid", title: "TestData DB" },
-  { id: "synthetic", icon: "os-synthetic.png", to: "done-console-paid", title: "Synthetic monitoring" },
-  { id: "other", icon: "os-other.png", to: "done-console-paid", title: "Something else" },
+  { id: "testdata", icon: "os-testdata.svg", to: "done-console-paid", title: "TestData DB" },
+  { id: "synthetic", icon: "os-synthetic.svg", to: "done-console-paid", title: "Synthetic monitoring" },
+  { id: "other", icon: "os-other.svg", to: "done-console-paid", title: "Something else" },
 ];
 
 // Where each path lands: the Grafana screen, the Restart button on it, and the onboarding entry in the menu.
@@ -160,7 +162,9 @@ const dests = {
     </div>
   </main>
 
-  <!-- 4. The product, with a way back into onboarding -->
+  <!-- 4. The product, with a way back into onboarding. Coded where it matters, the original screen elsewhere -->
+  <GrafanaShell id="dest-prom"><HostedPrometheus /></GrafanaShell>
+
   <main class="dest" data-screen="dest">
     <div class="shot">
       <img class="shot-img" alt="" />
@@ -270,8 +274,10 @@ const dests = {
       const [, kind, dest] = hash.match(/^(done|dest)-(.+)$/) ?? [];
       const known = Boolean(kind && dests[dest]);
       if (known && kind === "done") timer = window.setTimeout(() => location.replace(`#dest-${dest}`), 1700);
-      if (known && kind === "dest") land(dest);
-      const id = known ? kind : hash;
+      if (known && kind === "dest" && !screens.some((s) => s.dataset.screen === hash)) land(dest);
+      // a destination rebuilt in code has its own screen; the rest use the original screenshot
+      const coded = kind === "dest" && screens.some((s) => s.dataset.screen === hash);
+      const id = coded ? hash : known ? kind : hash;
       const target = screens.find((s) => s.dataset.screen === id) ?? screens.find((s) => s.classList.contains("active")) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       scrollTo(0, 0);

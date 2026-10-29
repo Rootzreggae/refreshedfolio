@@ -1,0 +1,281 @@
+---
+// Hosted Prometheus metrics: where "Send metrics → Prometheus" lands. Rebuilt from the 2022 Grafana Cloud screen, and it works:
+// the method and platform change the instructions, copy buttons copy, "Create API key" fills in the config.
+const A = "/prototypes/grafana-onboarding";
+const stack = {
+  query: "https://prometheus-us-central1.grafana.net/api/prom",
+  push: "https://prometheus-us-central1.grafana.net/api/prom/push",
+  user: "448076",
+};
+const copy = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>`;
+---
+<div class="hp" data-hp>
+  <header class="head">
+    <a class="back" href="#mlt" aria-label="Back"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12H5m6-7-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <img src={`${A}/ds-prom.svg`} alt="" width="32" height="30" />
+    <h1>Hosted Prometheus metrics</h1>
+    <span class="badge"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 12.5h7a3 3 0 0 0 .4-6A4.5 4.5 0 0 0 3.3 7.6 2.5 2.5 0 0 0 4.5 12.5Z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>Hosted data</span>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <span class="tab on" aria-current="page">Configuration Details</span>
+    <span class="tab">Related Content</span>
+  </nav>
+
+  <div class="body">
+    <section class="panel steps">
+      <h2>1. Choose a method for forwarding metrics</h2>
+      <p class="indent">There are several ways to send your Prometheus data to your Grafana Cloud Prometheus metrics service. Visit our documentation to read more about each methodology.</p>
+      <div class="choices indent" role="radiogroup" aria-label="Method">
+        <button class="choice" role="radio" aria-checked="true" data-method="agent">
+          <strong><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15h16v5H4zM7 15V9h4v6M9 9V4" fill="none" stroke="currentColor" stroke-width="1.4"/><circle cx="16.5" cy="17.5" r="1" fill="currentColor"/></svg>Via Grafana Agent</strong>
+          <span>Use a lightweight Prometheus collector to send your metrics, and get advantage of Grafana Cloud alerting. You don’t have to store your data locally.</span>
+        </button>
+        <button class="choice" role="radio" aria-checked="false" data-method="local">
+          <strong><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h7a2.5 2.5 0 0 0 .3-5A3.5 3.5 0 0 0 5.6 5 2 2 0 0 0 5 9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 12h8v4h-8zM12 16h8v4h-8zM8 9v6h4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>From my local Prometheus server</strong>
+          <span>Ship copies of scraped samples to Grafana Cloud while also maintaining a local copy of your Prometheus data.</span>
+        </button>
+      </div>
+
+      <div data-for="agent">
+        <p class="label indent">Show Instructions for</p>
+        <div class="segmented indent" role="radiogroup" aria-label="Instructions for">
+          <button role="radio" aria-checked="true" data-mode="standard">Standard</button>
+          <button role="radio" aria-checked="false" data-mode="kube">Kubernetes</button>
+        </div>
+
+        <div data-mode-for="standard">
+          <h2>2. Choose your platform</h2>
+          <div class="selects indent">
+            <label>Select your OS
+              <select data-os><option value="linux">Linux</option><option value="darwin">macOS</option><option value="windows">Windows</option></select>
+            </label>
+            <label>Architecture
+              <select data-arch><option value="amd64">Amd64</option><option value="arm64">Arm64</option></select>
+            </label>
+          </div>
+          <h2>3. Download and install the binary for your OS</h2>
+          <p class="indent">Run these commands to download and extract the agent binary file.</p>
+        </div>
+        <div data-mode-for="kube" hidden>
+          <h2>2. Deploy the agent to your cluster</h2>
+          <p class="indent">Run this from a machine with <code>kubectl</code> access to your cluster. It creates the agent’s namespace, service account and DaemonSet.</p>
+        </div>
+        <div class="code indent"><pre data-install></pre><button class="copy" data-copy-from="[data-install]" aria-label="Copy commands" set:html={copy} /></div>
+
+        <h2>4. Set the configuration</h2>
+        <div class="choices indent" role="radiogroup" aria-label="Configuration">
+          <button class="choice" role="radio" aria-checked="true" data-config="new">
+            <strong>Create new config</strong>
+            <span>I do not have an agent-config.yaml, or I am setting this up for the first time</span>
+          </button>
+          <button class="choice" role="radio" aria-checked="false" data-config="existing">
+            <strong>Update existing config manually</strong>
+            <span>I already have an agent-config.yaml, I know what it is and how to edit it</span>
+          </button>
+        </div>
+        <p class="indent">Click below to generate a Grafana.com API key with the MetricsPublisher role. This API key will appear as the password in the configuration below.</p>
+        <form class="key indent" data-key>
+          <label for="key-name"><b>API Key name</b>The name will help you view and revoke this key in grafana.com later.</label>
+          <input id="key-name" placeholder="API key name" autocomplete="off" />
+          <button class="primary" type="submit">Create API key</button>
+        </form>
+        <div class="code indent" data-config-out hidden><pre></pre><button class="copy" data-copy-from="[data-config-out] pre" aria-label="Copy configuration" set:html={copy} /></div>
+      </div>
+
+      <div data-for="local" hidden>
+        <h2>2. Add Grafana Cloud as a remote write target</h2>
+        <p class="indent">Add this to your <code>prometheus.yml</code> and reload Prometheus. It keeps scraping and storing locally, and also sends a copy of every sample here.</p>
+        <div class="code indent"><pre data-remote></pre><button class="copy" data-copy-from="[data-remote]" aria-label="Copy configuration" set:html={copy} /></div>
+        <p class="indent dim">Replace <code>&lt;API key&gt;</code> with a key that has the MetricsPublisher role.</p>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <h3>About this service</h3>
+        <p>Your Grafana Cloud stack includes a massively scalable, high-performance, and highly available Prometheus endpoint. Bring together the raw, unsampled metrics for all your applications and infrastructure, spread around the globe, in one place - with 13-months retention (Pro).</p>
+      </section>
+      <section class="panel">
+        <h3>Stack details</h3>
+        {[
+          ["Query endpoint", "Use this URL to query hosted metrics data, for example, in the data source config in Grafana.", stack.query],
+          ["Remote write endpoint", "Use this URL to send Prometheus metrics to Grafana Cloud.", stack.push],
+          ["Username / Instance ID", "Your Grafana Cloud Prometheus username.", stack.user],
+        ].map(([title, help, value]) => (
+          <div class="field">
+            <h4>{title}</h4>
+            <p class="small">{help}</p>
+            <div class="code"><pre>{value}</pre><button class="copy" data-copy={value} aria-label={`Copy ${title}`} set:html={copy} /></div>
+          </div>
+        ))}
+        <p>For more information, visit Grafana.com</p>
+      </section>
+      <section class="panel links">
+        <h3>Manage Grafana Cloud</h3>
+        <ul>{["Subscription and billing", "API keys", "Team members"].map((l) => <li><a href="#dest-prom">{l}</a></li>)}</ul>
+        <h3>Looking for extra help?</h3>
+        <ul>{["Integrations documentation", "Learn more about Grafana Agent", "Quickstarts"].map((l) => <li><a href="#dest-prom">{l}</a></li>)}</ul>
+      </section>
+    </aside>
+  </div>
+  <p class="toast" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-hp]")!;
+  const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const push = "https://prometheus-us-central1.grafana.net/api/prom/push";
+  const user = "448076";
+  let apiKey = "<API key>";
+
+  // A radio group of buttons: one checked at a time
+  function radios(selector: string, onPick: (el: HTMLElement) => void) {
+    const els = [...root.querySelectorAll<HTMLElement>(selector)];
+    els.forEach((el) => el.addEventListener("click", () => {
+      els.forEach((x) => x.setAttribute("aria-checked", String(x === el)));
+      onPick(el);
+    }));
+  }
+
+  function install() {
+    const os = $<HTMLSelectElement>("[data-os]").value;
+    const arch = $<HTMLSelectElement>("[data-arch]").value;
+    const kube = $("[data-mode=kube]").getAttribute("aria-checked") === "true";
+    const zip = `agent-${os}-${arch}${os === "windows" ? ".exe" : ""}.zip`;
+    $("[data-install]").textContent = kube
+      ? `kubectl create namespace grafana-agent;\nkubectl apply -n grafana-agent -f \\\n  https://raw.githubusercontent.com/grafana/agent/main/production/kubernetes/agent-bare.yaml;`
+      : os === "windows"
+        ? `Invoke-WebRequest "https://github.com/grafana/agent/releases/latest/download/${zip}" -OutFile "${zip}";\nExpand-Archive "${zip}" -DestinationPath .;`
+        : `curl -O -L "https://github.com/grafana/agent/releases/latest/download/${zip}";\nunzip "${zip}";\nchmod a+x agent-${os}-${arch};`;
+  }
+
+  function config() {
+    const auth = `    basic_auth:\n      username: ${user}\n      password: ${apiKey}`;
+    $("[data-remote]").textContent = `remote_write:\n  - url: ${push}\n${auth}`;
+    $("[data-config-out] pre").textContent = `metrics:\n  global:\n    scrape_interval: 60s\n  configs:\n  - name: hosted-prometheus\n    scrape_configs:\n      - job_name: node\n        static_configs:\n        - targets: ['localhost:9100']\n    remote_write:\n      - url: ${push}\n${auth.replace(/^/gm, "    ")}`;
+  }
+
+  radios("[data-method]", (el) => root.querySelectorAll<HTMLElement>("[data-for]").forEach((s) => (s.hidden = s.dataset.for !== el.dataset.method)));
+  radios("[data-mode]", (el) => {
+    root.querySelectorAll<HTMLElement>("[data-mode-for]").forEach((s) => (s.hidden = s.dataset.modeFor !== el.dataset.mode));
+    install();
+  });
+  radios("[data-config]", () => {});
+  $("[data-os]").addEventListener("change", install);
+  $("[data-arch]").addEventListener("change", install);
+
+  // A pretend key, so the config below reads like the real thing
+  $("[data-key]").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = $<HTMLInputElement>("#key-name").value.trim() || "onboarding";
+    apiKey = "glc_" + btoa(`${name}:${Date.now()}`).replace(/=+$/, "");
+    config();
+    $("[data-config-out]").hidden = false;
+    toast(`API key “${name}” created`);
+  });
+
+  const toastEl = $(".toast");
+  let toastTimer = 0;
+  function toast(text: string) {
+    toastEl.textContent = text;
+    toastEl.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => toastEl.classList.remove("on"), 1800);
+  }
+  root.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>(".copy");
+    if (!btn) return;
+    const text = btn.dataset.copy ?? root.querySelector(btn.dataset.copyFrom!)?.textContent ?? "";
+    navigator.clipboard?.writeText(text).catch(() => {});
+    toast("Copied to clipboard");
+  });
+
+  install();
+  config();
+</script>
+
+<style>
+  .hp { --panel: #181b1f; --line: rgba(204, 204, 220, .12); --dim: rgba(204, 204, 220, .65); --blue: #3d71d9; --link: #6e9fff; font-size: 14px; line-height: 21px; }
+  .head { display: flex; align-items: center; gap: 14px; padding: 26px 32px 0; }
+  .back { display: grid; place-items: center; color: #ccccdc; margin-right: 18px; }
+  .head h1 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 400; color: #d8d9da; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; margin-left: 18px; padding: 3px 8px; border: 1px solid var(--line); border-radius: 2px; font-size: 12px; line-height: 18px; }
+  .tabs { display: flex; gap: 0; padding: 16px 0 0 64px; border-bottom: 1px solid var(--line); }
+  .tab { padding: 10px 16px 12px; color: var(--dim); font-weight: 500; }
+  .tab.on { color: #d8d9da; box-shadow: inset 0 -3px 0 #f55f3e; }
+
+  .body { display: grid; grid-template-columns: minmax(0, 1fr) 424px; gap: 24px; align-items: start; max-width: 1440px; padding: 40px 48px 120px 64px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 2px; padding: 32px; }
+  .steps { padding: 32px 34px 40px; }
+  .steps h2 { margin: 32px 0 14px; font-size: 18px; line-height: 26px; font-weight: 500; color: #d8d9da; }
+  .steps h2:first-child { margin-top: 18px; }
+  .indent { margin-left: 22px; max-width: 700px; }
+  .steps p { margin-top: 0; margin-bottom: 18px; }
+  .dim { color: var(--dim); }
+  code { font-family: "Roboto Mono", ui-monospace, monospace; font-size: 12.5px; padding: 1px 4px; border-radius: 2px; background: #22252b; }
+
+  .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 336px)); gap: 16px; margin-bottom: 28px; }
+  .choice {
+    position: relative; display: flex; flex-direction: column; gap: 12px; padding: 22px 24px; text-align: left; font: inherit; color: #ccccdc; cursor: pointer;
+    background: #111217; border: 1px solid var(--line); border-radius: 2px; transition: box-shadow .15s ease, border-color .15s ease;
+  }
+  .choice strong { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: #d8d9da; }
+  .choice span { font-size: 12px; line-height: 16px; color: var(--dim); }
+  .choice:hover { border-color: rgba(87, 148, 242, .6); }
+  .choice[aria-checked="true"] { border-color: #5794f2; box-shadow: 0 0 10px rgba(50, 116, 217, .7); }
+  .choice[aria-checked="true"]::after { content: ""; position: absolute; right: 14px; top: 16px; width: 12px; height: 6px; border: solid #5794f2; border-width: 0 0 2px 2px; rotate: -45deg; }
+
+  .label { margin: 0 0 8px; font-weight: 500; }
+  .segmented { display: inline-flex; padding: 2px; border: 1px solid var(--line); border-radius: 2px; margin-bottom: 8px; }
+  .segmented button { font: inherit; font-weight: 500; color: var(--dim); background: none; border: 0; padding: 4px 16px; border-radius: 2px; cursor: pointer; }
+  .segmented [aria-checked="true"] { background: #2c3235; color: #d8d9da; }
+
+  .selects { display: flex; gap: 16px; margin-bottom: 8px; }
+  .selects label { display: flex; flex-direction: column; gap: 8px; font-size: 12px; font-weight: 500; }
+  select {
+    width: 210px; height: 32px; padding: 0 30px 0 8px; font: inherit; font-size: 14px; color: #ccccdc; appearance: none; cursor: pointer;
+    background: #111217 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23ccccdc' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 10px center;
+    border: 1px solid var(--line); border-radius: 2px;
+  }
+
+  .code { position: relative; background: #111217; border: 1px solid var(--line); border-radius: 2px; margin-bottom: 28px; }
+  .code pre { margin: 0; padding: 18px 56px 18px 16px; font-family: "Roboto Mono", ui-monospace, monospace; font-size: 12.5px; line-height: 18px; white-space: pre-wrap; word-break: break-all; color: #d8d9da; }
+  .copy { position: absolute; top: 8px; right: 8px; display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 2px; background: #22252b; color: #ccccdc; cursor: pointer; }
+  .copy:hover { background: #2c3235; }
+
+  .key { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; margin-bottom: 24px; }
+  .key label { display: flex; flex-direction: column; font-size: 12px; line-height: 16px; }
+  .key input { width: 100%; max-width: 706px; height: 32px; padding: 0 8px; font: inherit; color: #ccccdc; background: #111217; border: 1px solid var(--line); border-radius: 2px; }
+  .key input:focus { outline: 2px solid #5794f2; outline-offset: -1px; }
+  .primary { margin-top: 8px; height: 32px; padding: 0 16px; font: inherit; font-weight: 500; color: #fff; background: var(--blue); border: 0; border-radius: 2px; cursor: pointer; }
+  .primary:hover { background: #4e7fe0; }
+
+  .side { display: flex; flex-direction: column; gap: 24px; }
+  .side h3 { margin: 0 0 10px; font-size: 18px; line-height: 26px; font-weight: 500; color: #d8d9da; }
+  .side p { margin: 0; }
+  .field { margin-top: 16px; }
+  .field h4 { margin: 0 0 6px; font-size: 14px; font-weight: 500; color: #d8d9da; }
+  .field .small { margin-bottom: 10px; font-size: 12px; line-height: 16px; }
+  .field .code { margin-bottom: 0; }
+  .links h3 + ul { margin-bottom: 26px; }
+  .links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .links a { color: var(--link); text-decoration: none; }
+  .links a::before { content: "→"; margin-right: 8px; color: var(--dim); font-size: 12px; }
+  .links a:hover { text-decoration: underline; }
+
+  .choice:focus-visible, .segmented button:focus-visible, select:focus-visible, .copy:focus-visible, .primary:focus-visible, .back:focus-visible, .links a:focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
+
+  .toast { position: fixed; left: 50%; bottom: 32px; translate: -50% 12px; margin: 0; padding: 10px 16px; border-radius: 4px; background: #2c3235; color: #d8d9da; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); opacity: 0; pointer-events: none; transition: opacity .2s ease, translate .2s ease; }
+  .toast.on { opacity: 1; translate: -50% 0; }
+
+  @media (max-width: 1180px) { .body { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) {
+    .head { padding: 20px 16px 0; flex-wrap: wrap; }
+    .badge { margin-left: 0; }
+    .tabs { padding-left: 16px; }
+    .body { padding: 20px 16px 96px; }
+    .indent { margin-left: 0; }
+    .choices { grid-template-columns: 1fr; }
+    .selects { flex-direction: column; }
+  }
+</style>
