@@ -49,11 +49,10 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     <div class="shade top" aria-hidden="true"></div>
     <div class="shade bottom" aria-hidden="true"></div>
 
-    <nav class="indicator" aria-label="Sections">
-      {["Intro", ...chapters.map((c) => c.label.replace(/^About the |^About /, ""))].map((label, i) => (
-        <button class="seg" data-seg={i}><span class="fill"></span><span class="lab">{String(i).padStart(2, "0")} {label}</span></button>
-      ))}
-    </nav>
+    <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
+    <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(["Intro", ...chapters.map((c) => c.label.replace(/^About (the )?/, "").replace(/^./, (m) => m.toUpperCase())))])}>
+      <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
+    </button>
   </div>
 
   <!-- The same story without the pinned scene: phones and reduced motion -->
@@ -83,12 +82,16 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   const layers = [...root.querySelectorAll<HTMLElement>(".hero, .ch")];
   const ghosts = [...root.querySelectorAll<HTMLElement>(".ghost")];
   const heroBg = root.dataset.heroBg!;
-  const segs = [...root.querySelectorAll<HTMLElement>("[data-seg]")];
-  // Clicking a segment jumps to the start of that section
-  segs.forEach((s, n) => s.addEventListener("click", () => {
-    const top = root.getBoundingClientRect().top + scrollY + n * innerHeight * 1.3 + (n ? innerHeight * 0.3 : 0);
-    scrollTo({ top, behavior: "smooth" });
-  }));
+  const pill = root.querySelector<HTMLElement>("[data-pill]")!;
+  const pillNum = root.querySelector<HTMLElement>("[data-pill-num]")!;
+  const pillLabel = root.querySelector<HTMLElement>("[data-pill-label]")!;
+  const labels: string[] = JSON.parse(pill.dataset.labels!);
+  let section = -1;
+  // Clicking the pill jumps to the start of the next section
+  pill.addEventListener("click", () => {
+    const n = Math.min(section + 1, labels.length - 1);
+    scrollTo({ top: root.getBoundingClientRect().top + scrollY + n * innerHeight * 1.3 + (n ? innerHeight * 0.3 : 0), behavior: "smooth" });
+  });
   // Scroll-linked motion only moves when the reader scrolls, so it stays on with Reduce Motion; phones get the stacked story
   const pinned = () => matchMedia("(min-width: 901px)").matches;
 
@@ -159,11 +162,16 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     stage.style.scale = String(mix(0.9, 1, rise));
     stage.style.borderRadius = `${mix(28, 0, rise)}px`;
 
-    // Section indicator: each segment fills as you move through it
-    segs.forEach((s, n) => {
-      s.style.setProperty("--p", String(clamp(p - n)));
-      s.classList.toggle("on", n === i);
-    });
+    // The pill travels left to right across the whole scene, and names the section it's in
+    const total = data.length + 1;
+    const travel = innerWidth - pill.offsetWidth - 48;
+    pill.style.translate = `${24 + travel * clamp(p / total)}px 0`;
+    if (i !== section) {
+      section = i;
+      pillNum.textContent = String(i).padStart(2, "0");
+      pillLabel.textContent = labels[i];
+      pill.classList.remove("swap"); void pill.offsetWidth; pill.classList.add("swap");
+    }
 
     // Camera
     if (i === 0) { aim(1, 0.5, 0.5, w, h); show(data[0].keys.find((k) => k.hash)?.hash); }
@@ -226,14 +234,15 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .shade.top { top: 0; height: 46vh; background: linear-gradient(var(--tint, #1d3a5f) 0%, color-mix(in srgb, var(--tint, #1d3a5f) 70%, transparent) 45%, transparent); }
   .shade.bottom { bottom: 0; height: 34vh; background: linear-gradient(transparent, color-mix(in srgb, var(--tint, #1d3a5f) 80%, transparent) 60%, var(--tint, #1d3a5f)); }
 
-  /* Section indicator along the bottom */
-  .indicator { position: absolute; left: 50%; bottom: 22px; z-index: 4; display: flex; gap: 6px; translate: -50% 0; padding: 6px; border-radius: 999px; background: rgba(8, 14, 24, .55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-  .seg { position: relative; overflow: hidden; height: 30px; min-width: 120px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .1); color: rgba(255, 255, 255, .78); font: inherit; font-size: 12px; letter-spacing: .03em; cursor: pointer; transition: min-width .3s ease, background .3s ease; }
-  .seg.on { min-width: 190px; color: #fff; }
-  .fill { position: absolute; inset: 0; transform-origin: 0 50%; scale: var(--p, 0) 1; background: rgba(255, 178, 122, .35); }
-  .lab { position: relative; white-space: nowrap; }
-  .seg:hover { background: rgba(255, 255, 255, .18); }
-  .seg:focus-visible { outline: 2px solid #ffb27a; outline-offset: 2px; }
+  /* The travelling pill */
+  .pill { position: absolute; left: 0; bottom: 24px; z-index: 4; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
+  .pill:hover { background: rgba(255, 255, 255, .22); scale: 1.03; }
+  .pill:hover .mark { rotate: -8deg; scale: 1.06; }
+  .mark { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #ff8833, #f55f3e); transition: rotate .25s ease, scale .25s ease; }
+  .pill-num { color: #ffb27a; font-variant-numeric: tabular-nums; }
+  .pill.swap .pill-label, .pill.swap .pill-num { animation: swap .4s ease; }
+  @keyframes swap { from { opacity: 0; translate: 0 8px; } }
+  .pill:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
   .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
 
   .stacked { display: none; }
