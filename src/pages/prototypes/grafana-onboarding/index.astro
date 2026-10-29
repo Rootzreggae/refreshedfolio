@@ -9,20 +9,18 @@ const benefits = [
   "Manage your on-call rotations through simpler workflows and interfaces",
 ];
 
-// The five ways in. Each card brings its own short docs into the left panel when selected.
+// Four ways in, each card says what it takes. Hovering or focusing a card brings its docs into the left panel.
 const paths = [
-  { id: "explore", icon: "icon-explore", title: "I’m just exploring", sub: "Learn more about Grafana Cloud",
-    doc: { title: "Explore Grafana Cloud", body: "Explore Grafana Cloud with a guided tour and become acquainted with some of its features. Connect your data to the cloud to get the most out of it." } },
-  { id: "dashboard", icon: "icon-dash", title: "Create a dashboard", sub: "Visualize and/or monitor data",
-    doc: { title: "Dashboard", body: "Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored. Create, explore, and share beautiful dashboards with your team and foster a data driven culture.\n\nThe easiest way to get started is with Grafana Cloud, our fully composable observability stack.", link: "Learn more on creating your first dashboard" } },
-  { id: "mlt", icon: "icon-mlt", title: "Get hosted metrics, logs, traces", sub: "Send existing data to Grafana Cloud",
-    doc: { title: "Made for you, managed by us", body: "Grafana Cloud is a composable observability platform, integrating metrics, traces and logs with Grafana. Leverage the best open source observability software – including Prometheus, Loki, and Tempo – without the overhead of installing, maintaining, and scaling your observability stack.", link: "Learn more on metrics, logs and traces" } },
-  { id: "oncall", icon: "icon-oncall", title: "Set up an on-call rotation", sub: "Simpler workflows for your team",
-    doc: { title: "The easiest way to do\non-call management", body: "Grafana OnCall is an easy-to-use on-call management tool that will help reduce toil in on-call management through simpler workflows and interfaces that are tailored specifically for engineers.", link: "Learn more about on-call management" } },
-  { id: "kube", icon: "icon-kube", title: "Monitor Kubernetes clusters", sub: "Visibility into health and performance",
-    doc: { title: "Monitoring Kubernetes with Grafana", body: "Kubernetes Monitoring in Grafana Cloud is the full solution for all levels of Kubernetes usage within your organization.\n\nSimply install the Grafana Agent onto your Kubernetes cluster(s) and in minutes, the Kube-state metrics will be shipped to Prometheus and Grafana. From there, you’ll have out-of-the-box access to your Kubernetes infrastructure’s metrics, logs, and Kubernetes events as well as prebuilt dashboards and alerts.", link: "Learn more on Kubernetes with Grafana" } },
+  { id: "mlt", icon: "icon-mlt", title: "Send metrics, logs and traces", body: "Connect Prometheus, Loki or Tempo, or point an agent you already run at your stack.", meta: ["~10 min", "access to your hosts"],
+    doc: { title: "Made for you, managed by us", body: "Grafana Cloud integrates metrics, traces and logs with Grafana. Use Prometheus, Loki and Tempo without installing, maintaining or scaling them yourself.", link: "Learn more on metrics, logs and traces" } },
+  { id: "kube", icon: "icon-kube", title: "Monitor Kubernetes", body: "Install the agent on your cluster and get cluster, node and pod views out of the box.", meta: ["~15 min", "kubectl access"],
+    doc: { title: "Monitoring Kubernetes with Grafana", body: "Install the Grafana Agent on your cluster and in minutes your metrics, logs and Kubernetes events arrive in Grafana Cloud, with prebuilt dashboards and alerts.", link: "Learn more on Kubernetes with Grafana" } },
+  { id: "dashboard", icon: "icon-dash", title: "Build a dashboard", body: "Start from sample data, or connect a data source you already use.", meta: ["~5 min", "no setup needed"],
+    doc: { title: "Dashboards", body: "Query, visualize and alert on your metrics no matter where they are stored, then share the dashboard with your team.", link: "Learn more on creating your first dashboard" } },
+  { id: "oncall", icon: "icon-oncall", title: "Set up on-call", body: "Create a schedule, add your team and route alerts to whoever is on shift.", meta: ["~10 min", "your teammates’ emails"],
+    doc: { title: "On-call, without the toil", body: "Grafana OnCall gives engineers simpler schedules, escalations and alert routing, right next to the dashboards that fired them.", link: "Learn more about on-call management" } },
 ];
-const steps = ["Setup", "Placeholder", "Placeholder"];
+const tour = { id: "explore", doc: { title: "Explore Grafana Cloud", body: "A short guided tour of Grafana Cloud with sample data. Connect your own data whenever you are ready." } };
 ---
 <!doctype html>
 <html lang="en">
@@ -78,57 +76,49 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     </section>
   </main>
 
-  <!-- 2. Setup: pick a way in. The left panel answers "what is this?" for whatever is selected -->
+  <!-- 2. Setup: pick a way in. The left panel answers "what is this?" for the path you are looking at -->
   <main class="setup" data-screen="setup">
     <aside class="side">
       <img class="side-logo" src={`${A}/logo-stacked.svg`} alt="Grafana" width="46" height="61" />
       <div class="doc" data-doc="intro">
         <h2>What is Grafana Cloud</h2>
-        <p>Grafana Cloud is a highly available, performant, and scalable observability platform for your applications and infrastructure. It provides a centralized view over all of your observability data, whether the data lives in Grafana Cloud Metrics services or in your own bare-metal and cloud environments.</p>
-        <p class="doc-more">Learn more Grafana Cloud</p>
+        <p>A fully managed observability platform for your applications and infrastructure: one place for all your metrics, logs and traces, wherever the data lives.</p>
         <ul class="doc-links">
           {["Grafana Cloud fundamentals", "Quick starts", "Integrations"].map((l) => (
             <li><a href="#setup">{l}<img src={`${A}/arrow.svg`} alt="" width="20" height="20" /></a></li>
           ))}
         </ul>
       </div>
-      {paths.map((p) => (
-        <div class="doc small" data-doc={p.id} hidden>
+      {[...paths, tour].map((p) => (
+        <div class="doc" data-doc={p.id} hidden>
           <h2>{p.doc.title}</h2>
-          {p.doc.body.split("\n\n").map((para) => <p>{para}</p>)}
-          {p.doc.link && <a class="doc-link" href="#setup">{p.doc.link}</a>}
+          <p>{p.doc.body}</p>
+          {"link" in p.doc && <a class="doc-link" href="#setup">{p.doc.link}<img src={`${A}/arrow.svg`} alt="" width="20" height="20" /></a>}
         </div>
       ))}
       <img class="plugs" src={`${A}/plugs.svg`} alt="" width="478" height="478" aria-hidden="true" />
     </aside>
 
     <section class="main">
+      <a class="skip" href="#home">Skip to Home<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
       <div class="column">
-        <ol class="stepper">
-          {steps.map((s, i) => (
-            <li class={i === 0 ? "current" : ""}><span class="num">{i + 1}</span><span class="label">{s}</span></li>
+        <h1>How would you like to begin?</h1>
+        <p class="lede">Pick what matters most right now. We’ll walk you through it.</p>
+        <div class="cards">
+          {paths.map((p) => (
+            <a class="card" href={`#${p.id}`} data-path={p.id}>
+              <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
+              <img class="card-go" src={`${A}/arrow.svg`} alt="" width="20" height="20" />
+              <strong>{p.title}</strong>
+              <span class="card-body">{p.body}</span>
+              <span class="card-meta">{p.meta[0]}<i aria-hidden="true">·</i>{p.meta[1]}</span>
+            </a>
           ))}
-        </ol>
-        <a class="skip" href="#skip">Skip<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
-
-        <div class="center">
-          <p class="question" id="q">How would you want to begin?</p>
-          <div class="cards" role="radiogroup" aria-labelledby="q">
-            {paths.map((p) => (
-              <div class="card-slot">
-                <button class="card" role="radio" aria-checked="false" data-path={p.id}>
-                  <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
-                  <strong>{p.title}</strong>
-                  <span>{p.sub}</span>
-                </button>
-                <p class="selected"><img src={`${A}/check.svg`} alt="" width="16" height="16" />Selected</p>
-              </div>
-            ))}
-          </div>
-          <div class="actions">
-            <a class="next" href="#setup" aria-disabled="true">Next<img src={`${A}/next-arrow.svg`} alt="" width="16" height="16" /></a>
-          </div>
         </div>
+        <p class="tour">
+          <img src={`${A}/icon-explore.svg`} alt="" width="28" height="26" />
+          Not sure yet? <a href="#explore" data-path="explore">Take a 2-minute tour of Grafana Cloud</a>
+        </p>
       </div>
     </section>
   </main>
@@ -169,7 +159,7 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     }
     .button:hover { background: var(--primary-hover); }
     .button:active { background: #3563c2; }
-    .button:focus-visible, .card:focus-visible, .next:focus-visible, .skip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+    .button:focus-visible, .skip:focus-visible, .tour a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
     /* ---------- 2. Setup ---------- */
     .setup { grid-template-columns: 440px 1fr; min-height: 100vh; background: var(--canvas); }
@@ -177,64 +167,50 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     .side { position: relative; overflow: hidden; background: var(--bg); padding: 40px; display: flex; flex-direction: column; }
     .side > .doc { margin-block: auto; }
     .side-logo { display: block; }
-    .plugs { position: absolute; left: -32px; top: 574px; width: 478px; height: 478px; pointer-events: none; }
+    .plugs { position: absolute; left: -32px; bottom: -28px; width: 478px; height: 478px; pointer-events: none; }
     .doc {
-      position: relative; z-index: 1; padding: 24px; border-radius: 4px; animation: in .25s linear;
-      background: rgba(61, 113, 217, .1); display: flex; flex-direction: column; gap: 18px;
+      position: relative; z-index: 1; padding: 24px; border-radius: 4px; animation: in .2s linear;
+      background: rgba(61, 113, 217, .1); display: flex; flex-direction: column; gap: 16px;
     }
     .doc[hidden] { display: none; }
-    .doc h2 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; white-space: pre-line; }
-    .doc p { margin: 0; font-size: 16px; line-height: 22px; }
-    .doc.small p { font-size: 14px; line-height: 20px; }
-    .doc-links { list-style: none; margin: 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 18px; }
+    .doc h2 { margin: 0; font-size: 24px; line-height: 32px; font-weight: 500; }
+    .doc p { margin: 0; font-size: 14px; line-height: 21px; }
+    .doc-links { list-style: none; margin: 4px 0 0; padding: 0 0 0 18px; display: flex; flex-direction: column; gap: 14px; }
     .doc-links li { position: relative; }
     .doc-links li::before { content: ""; position: absolute; left: -14px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: var(--primary); }
-    .doc-links a, .doc-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-size: 16px; line-height: 22px; text-decoration: none; }
-    .doc-link { color: var(--link); font-size: 14px; line-height: 20px; }
+    .doc-links a, .doc-link { display: inline-flex; align-items: center; gap: 6px; color: var(--link); font-size: 14px; line-height: 22px; text-decoration: none; }
     .doc-links a:hover, .doc-link:hover { text-decoration: underline; }
-    .doc-links a img { transition: transform .15s ease; }
-    .doc-links a:hover img { transform: translateX(3px); }
+    .doc-links a img, .doc-link img { transition: transform .15s ease; }
+    .doc-links a:hover img, .doc-link:hover img { transform: translateX(3px); }
 
-    /* On wide screens the original 1440 frame left two thirds empty: keep one centred column instead */
-    .main { position: relative; padding: 71px 55px 64px; display: flex; justify-content: center; }
-    .column { width: 100%; max-width: 1000px; display: flex; flex-direction: column; min-height: calc(100vh - 135px); }
-    .center { margin-block: auto; padding-block: 48px; }
-    .stepper { list-style: none; margin: 0; padding: 0; display: flex; gap: 81px; font-size: 16px; line-height: 22px; }
-    .stepper li { display: flex; align-items: center; gap: 19px; color: var(--text-faint); }
-    .stepper .num { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .25); background: rgba(36, 41, 46, .04); }
-    .stepper .current { color: var(--text); }
-    .stepper .current .num { border: 2px solid var(--text); }
+    /* One centred column instead of the fixed 1440 frame */
+    .main { position: relative; display: flex; align-items: center; justify-content: center; padding: 96px 56px; }
+    .column { width: 100%; max-width: 920px; }
     .skip { position: absolute; right: 36px; top: 36px; display: inline-flex; align-items: center; color: var(--primary); font-weight: 700; font-size: 16px; line-height: 20px; text-decoration: none; }
     .skip img { margin-left: 4px; transition: transform .15s ease; }
     .skip:hover img { transform: translateX(3px); }
 
-    .question { margin: 0 0 32px; color: var(--text-dim); font-size: clamp(16px, 1.2vw, 18px); line-height: 1.4; }
-    /* three across; the last two sit centred under them (6-track grid, each card spans 2) */
-    .cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 48px 24px; }
-    .card-slot { position: relative; grid-column: span 2; }
-    .card-slot:nth-child(4) { grid-column: 2 / span 2; }
+    .setup h1 { margin: 0; font-size: 28px; line-height: 36px; font-weight: 500; color: var(--text); }
+    .lede { margin: 8px 0 32px; color: var(--text-dim); font-size: 16px; line-height: 22px; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     .card {
-      width: 100%; height: clamp(150px, 11vw, 170px); padding: 16px 18px; border: 0; border-radius: 2px; background: var(--bg); color: var(--text);
-      display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; font: inherit; cursor: pointer;
-      box-shadow: 0 0 0 0 transparent; transition: box-shadow .15s ease, background .15s ease;
+      position: relative; display: flex; flex-direction: column; padding: 24px; border-radius: 2px;
+      background: var(--bg); color: var(--text); text-decoration: none;
+      transition: box-shadow .15s ease;
     }
-    .card-icon { height: 26px; width: auto; margin-bottom: 14px; }
-    .card strong { font-size: clamp(14px, 1.05vw, 16px); line-height: 24px; font-weight: 700; }
-    .card span { margin-top: 8px; font-size: clamp(12px, .9vw, 13px); line-height: 16px; }
-    .card:hover { box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
-    .card[aria-checked="true"] { background: var(--canvas); box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
-    .selected { visibility: hidden; position: absolute; left: 0; right: 0; top: 100%; justify-content: center; display: flex; align-items: center; gap: 12px; margin: 16px 0 0; color: var(--link); font-size: 12px; line-height: 16px; }
-    .card[aria-checked="true"] + .selected { visibility: visible; }
+    .card:hover, .card:focus-visible { outline: 0; box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
+    .card-icon { height: 26px; width: auto; align-self: flex-start; margin-bottom: 16px; }
+    .card-go { position: absolute; right: 22px; top: 24px; opacity: .45; transition: opacity .15s ease, transform .15s ease; filter: grayscale(1) brightness(1.6); }
+    .card:hover .card-go, .card:focus-visible .card-go { opacity: 1; transform: translateX(3px); filter: none; }
+    .card strong { font-size: 16px; line-height: 24px; font-weight: 700; }
+    .card-body { margin-top: 6px; font-size: 14px; line-height: 20px; }
+    .card-meta { margin-top: auto; padding-top: 16px; display: flex; gap: 6px; color: var(--text-dim); font-size: 12px; line-height: 16px; }
+    .card-meta i { font-style: normal; }
 
-    .next {
-      display: inline-flex; align-items: center; gap: 4px; padding: 6px 16px; border-radius: 2px;
-      color: var(--text-faint); font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: underline; pointer-events: none;
-    }
-    .next img { opacity: .4; }
-    .actions { display: flex; justify-content: flex-end; margin-top: 56px; }
-    .next[aria-disabled="false"] { background: #5a86de; color: #fff; text-decoration: none; pointer-events: auto; }
-    .next[aria-disabled="false"] img { opacity: 1; filter: brightness(10); }
-    .next[aria-disabled="false"]:hover { background: var(--primary-hover); }
+    .tour { display: flex; align-items: center; gap: 10px; margin: 32px 0 0; color: var(--text-dim); font-size: 14px; line-height: 20px; }
+    .tour a { color: var(--link); text-decoration: none; }
+    .tour a:hover { text-decoration: underline; }
+    .tour img { height: 18px; width: auto; }
 
     @media (max-width: 900px) {
       .welcome { grid-template-columns: 1fr; }
@@ -247,53 +223,35 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
       .setup { grid-template-columns: 1fr; }
       .side { order: 2; padding: 24px 16px 40px; }
       .side-logo, .plugs { display: none; }
-      .doc { margin-top: 0; }
-      .main { padding: 24px 16px 32px; }
-      .stepper { gap: 16px; font-size: 14px; }
-      .stepper li:not(.current) .label { display: none; }
+      .main { padding: 72px 16px 32px; }
       .skip { top: 26px; right: 16px; }
-      .question { margin: 0 0 20px; }
-      .column { min-height: 0; }
-      .center { padding-block: 32px 0; }
-      .actions { margin-top: 24px; justify-content: flex-start; }
+      .setup h1 { font-size: 24px; line-height: 32px; }
       .cards { grid-template-columns: 1fr; gap: 12px; }
-      .cards { grid-template-columns: 1fr; }
-      .card-slot, .card-slot:nth-child(4) { grid-column: auto; }
-      .card { height: auto; }
-      .selected { display: none; }
+      .tour { flex-wrap: wrap; }
     }
   </style>
 
   <script>
-    // Hash router: #welcome (default), #setup. Unbuilt steps fall back to the welcome screen.
+    // Hash router: #welcome (default), #setup. A step that isn't built yet keeps you where you are.
     const screens = [...document.querySelectorAll<HTMLElement>("[data-screen]")];
     function show() {
       const id = location.hash.slice(1);
-      const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
+      const target = screens.find((s) => s.dataset.screen === id) ?? screens.find((s) => s.classList.contains("active")) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       scrollTo(0, 0);
     }
     addEventListener("hashchange", show);
     show();
 
-    // Setup: picking a card selects it, swaps the left panel to that path's docs, and enables Next.
-    const cards = [...document.querySelectorAll<HTMLButtonElement>(".card")];
+    // Setup: looking at a path (hover or keyboard focus) brings its docs into the left panel
     const docs = [...document.querySelectorAll<HTMLElement>("[data-doc]")];
-    const next = document.querySelector<HTMLAnchorElement>(".next")!;
-    function select(id: string | null) {
-      cards.forEach((c) => c.setAttribute("aria-checked", String(c.dataset.path === id)));
-      docs.forEach((d) => (d.hidden = d.dataset.doc !== (id ?? "intro")));
-      next.setAttribute("aria-disabled", String(!id));
-      next.href = id ? `#${id}` : "#setup";
-    }
-    cards.forEach((c) => c.addEventListener("click", (e) => {
-      e.stopPropagation();
-      select(c.getAttribute("aria-checked") === "true" ? null : c.dataset.path!);
-    }));
-    // Like the original: clicking outside the cards clears the choice
-    document.querySelector(".setup .main")!.addEventListener("click", (e) => {
-      if (!(e.target as HTMLElement).closest(".card, .next, .skip")) select(null);
+    function showDoc(id: string) { docs.forEach((d) => (d.hidden = d.dataset.doc !== id)); }
+    document.querySelectorAll<HTMLElement>(".setup [data-path]").forEach((el) => {
+      const id = el.dataset.path!;
+      el.addEventListener("mouseenter", () => showDoc(id));
+      el.addEventListener("focus", () => showDoc(id));
     });
+    document.querySelector(".setup .cards")!.addEventListener("mouseleave", () => showDoc("intro"));
   </script>
 </body>
 </html>
