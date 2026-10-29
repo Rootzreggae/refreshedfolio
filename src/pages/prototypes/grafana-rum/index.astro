@@ -47,6 +47,7 @@ const side = [
 ] as const;
 const frameworks = ["React", "Angular", "Vue", "JavaScript", "Other"];
 const steps = ["Create app", "Connect it", "Finish"];
+const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page loads, errors per 5 min
 ---
 <!doctype html>
 <html lang="en">
@@ -204,11 +205,18 @@ const steps = ["Create app", "Connect it", "Finish"];
       <main class="screen page" data-screen="apps" data-crumb="Home/Frontend/Applications" data-side-on="Applications">
         <div class="row-head"><h1 class="title">Applications</h1><a class="btn primary" href="#setup">+ New application</a></div>
         <div class="apps">
-          <a class="appcard" href="#app">
-            <header><b data-app-title>acme-monitoring</b><span class="pill-ok">Receiving data</span></header>
-            <div class="nums"><span><em>12</em> errors</span><span><em>1.2k</em> page loads</span><span><em class="good">2.1 s</em> LCP</span></div>
-            <svg viewBox={`0 0 ${W} 60`} preserveAspectRatio="none"><path d={path(loads, W, 60, 12)} stroke="#5794f2" fill="none" /><path d={path(errs, W, 60, 12)} stroke="#ff5286" fill="none" /></svg>
-          </a>
+          <div class="appcard" data-appcard>
+            <header>
+              <span class="app-ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5Z M2 12l10 5 10-5 M2 16l10 5 10-5" fill="none" stroke="#ff8833" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+              <span class="app-acts"><button aria-label="Star" data-star><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="m8 1.8 1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button><button aria-label="Edit"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13h3l7-7-3-3-7 7Z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button><button aria-label="Delete"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4h10M6 4V2.5h4V4M4.5 4l.7 9.5h5.6l.7-9.5" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></button></span>
+            </header>
+            <a class="app-name" href="#app" data-app-title-up>ACME-MONITORING</a>
+            <a class="app-body" href="#app">
+              <div class="stack">{bars.map(([l, e]) => <span><i class="e" style={`height:${e * 9}%`}></i><i class="l" style={`height:${l * 9}%`}></i></span>)}</div>
+              <ul class="stack-x"><li>08:15</li><li>08:20</li><li>08:30</li></ul>
+              <div class="tiles2"><div><span class="e">Errors</span><b class="e">5</b></div><div><span class="l">Page loads</span><b class="l">7</b></div></div>
+            </a>
+          </div>
           <a class="appcard ghost" href="#setup"><span>+ Add another app</span></a>
         </div>
       </main>
@@ -342,7 +350,8 @@ const steps = ["Create app", "Connect it", "Finish"];
     $("[data-copy]").addEventListener("click", (e) => { navigator.clipboard?.writeText($("[data-code]").textContent ?? "").catch(() => {}); const b = e.currentTarget as HTMLButtonElement; b.textContent = "Copied"; setTimeout(() => (b.textContent = "Copy"), 1400); });
     const finish = () => {
       document.querySelectorAll("[data-app-title]").forEach((t) => (t.textContent = name()));
-      toast(`${name()} is receiving data`); location.hash = "#app"; setTimeout(() => wiz(0), 300);
+      document.querySelectorAll("[data-app-title-up]").forEach((t) => (t.textContent = name().toUpperCase()));
+      toast(`${name()} is receiving data`); location.hash = "#apps"; setTimeout(() => wiz(0), 300);
     };
     $("[data-finish]").addEventListener("click", finish);
     $("[data-finish2]").addEventListener("click", finish);
@@ -352,6 +361,7 @@ const steps = ["Create app", "Connect it", "Finish"];
     function openTab(id: string) { tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id))); document.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== id)); }
     tabs.forEach((t) => t.addEventListener("click", () => openTab(t.dataset.tab!)));
     document.querySelectorAll<HTMLElement>("[data-err]").forEach((b) => b.addEventListener("click", () => { const s = b.nextElementSibling as HTMLElement; s.hidden = !s.hidden; b.classList.toggle("open", !s.hidden); }));
+    $("[data-star]").addEventListener("click", (e) => (e.currentTarget as HTMLElement).classList.toggle("on"));
     $("[data-dismiss]").addEventListener("click", () => ($("[data-alert]").hidden = true));
 
     wiz(0);
@@ -422,7 +432,7 @@ const steps = ["Create app", "Connect it", "Finish"];
     .appcard header { display: flex; justify-content: space-between; align-items: center; } .appcard b { color: #fff; font-weight: 500; font-size: 17px; }
     .pill-ok { padding: 1px 8px; border-radius: 2px; background: rgba(60, 195, 154, .15); color: var(--good); font-size: 12px; }
     .nums { display: flex; gap: 22px; color: var(--dim); font-size: 14px; } .nums em { font-style: normal; font-size: 20px; color: #fff; margin-right: 4px; } .nums em.good { color: var(--good); }
-    .appcard svg { width: 100%; height: 60px; } .appcard path { stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+    
     .appcard.ghost { align-items: center; justify-content: center; min-height: 180px; background: none; box-shadow: inset 0 0 0 1px rgba(204, 204, 220, .2); color: var(--dim); }
     .tabs { display: flex; gap: 2px; margin-bottom: 18px; border-bottom: 1px solid var(--line); }
     .tab { display: flex; gap: 6px; align-items: center; padding: 10px 14px 12px; border: 0; background: none; color: var(--dim); font-weight: 500; cursor: pointer; } .tab:hover { color: #fff; } .tab[aria-selected="true"] { color: #fff; box-shadow: inset 0 -2px 0 #f55f3e; }
@@ -522,6 +532,21 @@ const steps = ["Create app", "Connect it", "Finish"];
     .sumpanel { padding: 20px 22px; border-radius: 2px; background: #1a1d21; } .sumpanel b { display: block; margin-bottom: 12px; color: #fff; font-weight: 500; font-size: 17px; }
     .sumpanel dl { display: grid; grid-template-columns: 220px 1fr; gap: 10px 16px; margin: 0; } .sumpanel dt { color: var(--text); } .sumpanel dd { margin: 0; color: #fff; overflow-wrap: anywhere; }
     .ns { margin-top: 26px; } .nextcard { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 18px 22px; border: 1px solid transparent; border-radius: 2px; background: #1a1d21; text-align: left; cursor: pointer; } .nextcard:hover { border-color: #5794f2; } .nextcard b { color: #fff; font-weight: 500; } .nextcard span { color: var(--dim); }
+    /* app space: the card as designed */
+    .apps { grid-template-columns: repeat(auto-fill, minmax(340px, 370px)); }
+    .appcard { padding: 0; gap: 0; overflow: hidden; border: 1px solid rgba(204, 204, 220, .16); background: #22252b; }
+    .appcard:hover { box-shadow: none; border-color: rgba(87, 148, 242, .6); }
+    .appcard header { padding: 20px 20px 0; }
+    .app-ic { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 2px; background: #2c3035; }
+    .app-acts { display: flex; gap: 8px; } .app-acts button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 50%; background: #1c1f24; color: var(--dim); cursor: pointer; }
+    .app-acts button:hover { color: #fff; border-color: rgba(204, 204, 220, .35); } .app-acts button.on { color: #fade2a; }
+    .app-name { display: block; padding: 14px 20px 16px; font-size: 18px; letter-spacing: .02em; color: #fff; text-decoration: none; }
+    .app-body { display: block; padding: 12px 20px 20px; background: #1c1f24; text-decoration: none; border-top: 1px solid rgba(204, 204, 220, .08); }
+    .stack { display: flex; align-items: flex-end; gap: 10px; height: 64px; padding: 6px 10px 0; border: 1px solid var(--line); border-bottom: 0; border-radius: 2px 2px 0 0; background: #111217; }
+    .stack span { flex: 1; display: flex; flex-direction: column-reverse; height: 100%; } .stack i { display: block; } .stack .l { background: #6e9fff; } .stack .e { background: #ff5286; }
+    .stack-x { display: flex; justify-content: space-between; margin: 0 0 14px; padding: 2px 10px 6px; list-style: none; border: 1px solid var(--line); border-top: 0; border-radius: 0 0 2px 2px; background: #111217; font-size: 10px; color: var(--dim); }
+    .tiles2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .tiles2 div { display: flex; flex-direction: column; align-items: center; padding: 10px 0 6px; border: 1px solid var(--line); background: #111217; }
+    .tiles2 span { font-size: 14px; } .tiles2 b { font-size: 54px; line-height: 1.1; font-weight: 400; } .tiles2 .e { color: #ff5286; } .tiles2 .l { color: #6e9fff; }
   </style>
 </body>
 </html>
