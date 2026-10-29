@@ -17,8 +17,8 @@ export interface Chapter {
   keys: Key[];         // camera moments, at = 0..1 within the chapter
   sheet?: Row[];       // the story behind the chapter, on a sheet tossed over the scene
 }
-interface Props { src: string; url: string; chapters: Chapter[]; heroBg: string }
-const { src, url, chapters, heroBg } = Astro.props;
+interface Props { src: string; url: string; chapters: Chapter[]; heroBg: string; play?: string }
+const { src, url, chapters, heroBg, play } = Astro.props;
 const accent = (s: string) => s.split(/(\*[^*]+\*)/).map((p) => (p.startsWith("*") ? { t: p.slice(1, -1), a: true } : { t: p, a: false }));
 const first = (c: Chapter) => c.keys.find((k) => k.hash)!;
 // section names for the travelling pill: "About the question" → "Question"
@@ -63,9 +63,12 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     ))}
 
     <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
-    <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(sections)}>
-      <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
-    </button>
+    <div class="pill" data-pill data-labels={JSON.stringify(sections)}>
+      <button class="pill-sec" data-pill-next aria-label="Next section">
+        <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
+      </button>
+      {play && <a class="pill-play" href={play} target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4L12 7Z" fill="currentColor"/></svg>Play prototype</a>}
+    </div>
   </div>
 
   <!-- The same story without the pinned scene: phones -->
@@ -242,7 +245,7 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   }
 
   // Clicking the pill jumps to the next section's scene
-  pill.addEventListener("click", () => {
+  root.querySelector("[data-pill-next]")!.addEventListener("click", () => {
     const target = segs.find((s) => s.kind === "scene" && s.c + 1 > section);
     const top = root.getBoundingClientRect().top + scrollY + (target ? target.start + innerHeight * 0.3 : total);
     scrollTo({ top, behavior: "smooth" });
@@ -302,14 +305,18 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .r-text { margin: 0; max-width: 34ch; justify-self: end; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.5; color: rgba(23, 33, 43, .82); }
 
   /* The travelling pill */
-  .pill { position: absolute; left: 0; bottom: 24px; z-index: 6; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
-  .pill:hover { background: rgba(255, 255, 255, .22); scale: 1.03; }
-  .pill:hover .mark { rotate: -8deg; scale: 1.06; }
+  .pill { position: absolute; left: 0; bottom: 24px; z-index: 6; display: inline-flex; align-items: center; gap: 4px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); }
+  .pill-sec { display: inline-flex; align-items: center; gap: 10px; height: 40px; padding: 0 14px 0 5px; border: 0; border-radius: 999px; background: none; color: #fff; font: inherit; font-size: 14px; cursor: pointer; transition: background .3s ease; }
+  .pill-sec:hover { background: rgba(255, 255, 255, .12); }
+  .pill-sec:hover .mark { rotate: -8deg; scale: 1.06; }
   .mark { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #ff8833, #f55f3e); transition: rotate .25s ease, scale .25s ease; }
   .pill-num { color: #ffb27a; font-variant-numeric: tabular-nums; }
   .pill.swap .pill-label, .pill.swap .pill-num { animation: swap .4s ease; }
   @keyframes swap { from { opacity: 0; translate: 0 8px; } }
-  .pill:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
+  .pill-play { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 999px; background: #fff; color: #17212b; font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap; transition: translate .2s ease, background .2s ease; }
+  .pill-play:hover { background: #ffe9d8; translate: 0 -2px; }
+  .pill-play:hover svg { rotate: -8deg; transition: rotate .2s ease; }
+  .pill-sec:focus-visible, .pill-play:focus-visible { outline: 2px solid #ffb27a; outline-offset: 2px; }
 
   .stacked { display: none; }
   @media (max-width: 900px) {
