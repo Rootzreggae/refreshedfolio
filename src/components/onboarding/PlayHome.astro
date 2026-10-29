@@ -1,0 +1,178 @@
+---
+// Grafana Play: where "Try a demo environment" lands. Laid out like today's play.grafana.org home, with a small live
+// sample dashboard instead of the community features (no real people in a portfolio prototype).
+import "./grafana.css";
+const A = "/prototypes/grafana-onboarding";
+const links = ["Grafana Cloud", "Community Resources", "Learning Journeys", "Webinars and Videos", "Support Forum", "Upcoming Grafana Events"];
+const stats = [
+  { id: "rps", label: "Requests / s", unit: "", base: 1240, spread: 90, color: "#73bf69" },
+  { id: "p95", label: "p95 latency", unit: "ms", base: 182, spread: 24, color: "#fade2a" },
+  { id: "err", label: "Error rate", unit: "%", base: 0.42, spread: 0.18, color: "#f2495c", digits: 2 },
+  { id: "up", label: "Uptime (30d)", unit: "%", base: 99.97, spread: 0.01, color: "#5794f2", digits: 2 },
+];
+const examples = [
+  ["Node exporter full", "Linux host metrics"], ["Loki logs overview", "Log volume and errors"],
+  ["Tempo service graph", "Traces between services"], ["Business KPIs", "Orders, revenue, carts"],
+];
+---
+<div class="gp play" data-play>
+  <div class="crumbs"><span>Dashboards</span>›<span>Examples</span>›<b>Grafana Play Home</b></div>
+
+  <section class="hero">
+    <div class="hero-text">
+      <h1><img src={`${A}/nav/grafana.svg`} alt="" width="52" height="52" />Welcome to Grafana Play</h1>
+      <p>Play is a public sandbox for testing and learning Grafana that runs on Grafana Cloud.</p>
+      <p>Find interactive demos, explore how Grafana works, and see what you can build, without logging in or signing up for an account.</p>
+      <div class="pills">
+        <a href="#dest-play" data-scroll="sample">Explore the sample dashboard →</a>
+        <a href="#connect">Connect your own data →</a>
+      </div>
+    </div>
+    <img class="hero-art" src={`${A}/illus.svg`} alt="" width="300" height="300" />
+  </section>
+
+  <nav class="links" aria-label="Resources">{links.map((l) => <a href="#dest-play">{l}</a>)}</nav>
+
+  <section class="dash" id="sample" aria-label="Sample dashboard">
+    <header><h2>Sample: Web shop</h2><span class="live"><i></i>Live · refreshes every 2s</span></header>
+    <div class="stats">
+      {stats.map((s) => (
+        <div class="stat" data-stat={s.id} data-base={s.base} data-spread={s.spread} data-digits={s.digits ?? 0} data-unit={s.unit} style={`--c:${s.color}`}>
+          <span>{s.label}</span>
+          <strong>{s.base}{s.unit}</strong>
+          <svg viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><path /></svg>
+        </div>
+      ))}
+    </div>
+    <div class="row">
+      <figure class="ts">
+        <figcaption>Requests by status</figcaption>
+        <svg viewBox="0 0 600 180" preserveAspectRatio="none" data-ts aria-label="Requests by status over the last 15 minutes">
+          <g class="grid">{[0, 1, 2, 3].map((i) => <line x1="0" x2="600" y1={20 + i * 45} y2={20 + i * 45} />)}</g>
+          <path class="a" /><path class="b" /><path class="c" />
+        </svg>
+        <ul class="legend"><li class="a">2xx</li><li class="b">4xx</li><li class="c">5xx</li></ul>
+      </figure>
+      <figure class="bars">
+        <figcaption>Slowest endpoints</figcaption>
+        {[["/checkout", 92], ["/search", 71], ["/cart", 54], ["/product/:id", 38], ["/login", 22]].map(([n, v]) => (
+          <div class="bar"><span>{n}</span><i style={`--v:${v}%`}></i></div>
+        ))}
+      </figure>
+    </div>
+  </section>
+
+  <section class="examples" aria-label="More examples">
+    <h2>More example dashboards</h2>
+    <ul>{examples.map(([t, s]) => <li><a href="#dest-play"><strong>{t}</strong><span>{s}</span></a></li>)}</ul>
+  </section>
+</div>
+
+<script>
+  // A small, believable live dashboard: values drift, sparklines and the time series scroll.
+  const root = document.querySelector<HTMLElement>("[data-play]")!;
+  const N = 40;
+  const walk = (base: number, spread: number) => {
+    let v = base;
+    return () => (v = Math.min(base + spread, Math.max(base - spread, v + (Math.random() - 0.5) * spread * 0.6)));
+  };
+  const toPath = (vals: number[], w: number, h: number, lo: number, hi: number) =>
+    vals.map((v, i) => `${i ? "L" : "M"}${((i / (vals.length - 1)) * w).toFixed(1)},${(h - ((v - lo) / (hi - lo || 1)) * h).toFixed(1)}`).join("");
+
+  const stats = [...root.querySelectorAll<HTMLElement>("[data-stat]")].map((el) => {
+    const base = +el.dataset.base!, spread = +el.dataset.spread!;
+    const next = walk(base, spread);
+    return { el, base, spread, next, vals: Array.from({ length: N }, next) };
+  });
+  const series = [walk(120, 40), walk(18, 8), walk(4, 3)];
+  const ts = series.map((s) => Array.from({ length: N }, s));
+
+  function tick() {
+    for (const s of stats) {
+      s.vals.push(s.next()); s.vals.shift();
+      const d = +s.el.dataset.digits!, v = s.vals[N - 1];
+      s.el.querySelector("strong")!.textContent = (d ? v.toFixed(d) : Math.round(v).toLocaleString("en")) + s.el.dataset.unit;
+      s.el.querySelector("path")!.setAttribute("d", toPath(s.vals, 100, 24, s.base - s.spread, s.base + s.spread));
+    }
+    const paths = root.querySelectorAll<SVGPathElement>("[data-ts] path");
+    ts.forEach((vals, i) => { vals.push(series[i]()); vals.shift(); paths[i].setAttribute("d", toPath(vals, 600, 160, 0, 170)); });
+  }
+  tick();
+  let timer = 0;
+  // only animate while the page is on screen
+  new MutationObserver(() => {
+    const on = root.closest<HTMLElement>("[data-screen]")!.classList.contains("active");
+    clearInterval(timer);
+    if (on) timer = window.setInterval(tick, 2000);
+  }).observe(root.closest("[data-screen]")!, { attributes: true, attributeFilter: ["class"] });
+
+  root.querySelector("[data-scroll]")!.addEventListener("click", (e) => {
+    e.preventDefault();
+    root.querySelector("#sample")!.scrollIntoView({ behavior: "smooth" });
+  });
+</script>
+
+<style>
+  .play { padding: 0 32px 120px; max-width: 1240px; }
+  .crumbs { display: flex; gap: 10px; padding: 14px 0; color: var(--dim); }
+  .crumbs b { font-weight: 400; color: #ccccdc; }
+
+  .hero {
+    position: relative; display: flex; align-items: center; gap: 24px; margin-top: 16px; padding: 40px 48px; border-radius: 16px; overflow: hidden;
+    background: linear-gradient(100deg, #3a6fd8 0%, #6a5ad6 45%, #c04fb0 75%, #f05a3c 100%); color: #fff;
+  }
+  .hero h1 { display: flex; align-items: center; gap: 18px; margin: 0 0 20px; font-size: 40px; line-height: 48px; font-weight: 600; text-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
+  .hero p { margin: 0 0 14px; max-width: 720px; font-size: 16px; line-height: 26px; }
+  .hero-art { flex: none; width: 260px; height: auto; margin-left: auto; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .3)); }
+  .pills { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 26px; }
+  .pills a { padding: 13px 32px; border-radius: 999px; background: #fbc02d; color: #6b2a00; font-weight: 700; text-decoration: none; box-shadow: 0 4px 12px rgba(0, 0, 0, .2); transition: transform .15s ease; }
+  .pills a:hover { transform: translateY(-1px); }
+
+  .links { display: flex; justify-content: center; flex-wrap: wrap; margin: 40px 0 32px; padding-bottom: 20px; border-bottom: 3px solid #ff8833; }
+  .links a { padding: 4px 20px; color: #fff; font-weight: 600; text-decoration: none; border-left: 1px solid var(--line); }
+  .links a:first-child { border-left: 0; }
+  .links a:hover { color: #ff8833; }
+
+  .dash header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; }
+  .dash h2, .examples h2 { margin: 0; font-size: 18px; font-weight: 500; color: #d8d9da; }
+  .live { display: inline-flex; align-items: center; gap: 6px; color: var(--dim); font-size: 12px; }
+  .live i { width: 8px; height: 8px; border-radius: 50%; background: #73bf69; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 50% { opacity: .3; } }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+  .stat, .ts, .bars { margin: 0; background: #181b1f; border: 1px solid var(--line); border-radius: 2px; }
+  .stat { display: flex; flex-direction: column; padding: 10px 12px 0; }
+  .stat span, figcaption { color: #d8d9da; font-weight: 500; }
+  .stat strong { margin: 6px 0 4px; font-size: 32px; line-height: 40px; font-weight: 500; color: var(--c); font-variant-numeric: tabular-nums; }
+  .stat svg { width: calc(100% + 24px); height: 36px; margin: 0 -12px; }
+  .stat path { fill: none; stroke: var(--c); stroke-width: 1.5; vector-effect: non-scaling-stroke; transition: d .6s ease; }
+
+  .row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+  .ts, .bars { padding: 10px 12px; }
+  .ts svg { display: block; width: 100%; height: 200px; margin-top: 8px; }
+  .grid line { stroke: rgba(204, 204, 220, .08); }
+  .ts path { fill: none; stroke-width: 2; vector-effect: non-scaling-stroke; transition: d .6s ease; }
+  .ts .a { stroke: #73bf69; } .ts .b { stroke: #fade2a; } .ts .c { stroke: #f2495c; }
+  .legend { list-style: none; display: flex; gap: 16px; margin: 6px 0 0; padding: 0; font-size: 12px; color: var(--dim); }
+  .legend li::before { content: ""; display: inline-block; width: 14px; height: 4px; margin-right: 6px; vertical-align: middle; border-radius: 2px; background: currentColor; }
+  .legend .a { color: #73bf69; } .legend .b { color: #fade2a; } .legend .c { color: #f2495c; }
+  .bars { display: flex; flex-direction: column; gap: 12px; }
+  .bars figcaption { margin-bottom: 4px; }
+  .bar { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; font-size: 12px; color: var(--dim); }
+  .bar i { height: 18px; width: var(--v); border-radius: 2px; background: linear-gradient(90deg, #73bf69, #fade2a 70%, #f2495c); }
+
+  .examples { margin-top: 32px; }
+  .examples ul { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 0; padding: 0; }
+  .examples a { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; background: #181b1f; border: 1px solid var(--line); border-radius: 2px; color: #ccccdc; text-decoration: none; }
+  .examples a:hover { border-color: rgba(87, 148, 242, .6); }
+  .examples strong { color: #6e9fff; font-weight: 500; }
+  .examples span { font-size: 12px; color: var(--dim); }
+
+  @media (prefers-reduced-motion: reduce) { .stat path, .ts path { transition: none; } .live i { animation: none; } }
+  @media (max-width: 1100px) {
+    .hero-art { display: none; }
+    .stats, .examples ul { grid-template-columns: repeat(2, 1fr); }
+    .row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 900px) { .play { padding: 0 16px 96px; } .hero { padding: 28px 20px; } .hero h1 { font-size: 28px; line-height: 34px; } }
+</style>

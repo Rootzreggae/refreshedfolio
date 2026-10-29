@@ -4,6 +4,8 @@ import ChoiceScreen from "../../../components/onboarding/ChoiceScreen.astro";
 import GrafanaShell from "../../../components/onboarding/GrafanaShell.astro";
 import HostedPrometheus from "../../../components/onboarding/HostedPrometheus.astro";
 import KubernetesMonitoring from "../../../components/onboarding/KubernetesMonitoring.astro";
+import CloudHome from "../../../components/onboarding/CloudHome.astro";
+import PlayHome from "../../../components/onboarding/PlayHome.astro";
 
 const A = "/prototypes/grafana-onboarding";
 const benefits = [
@@ -166,6 +168,8 @@ const dests = {
   <!-- 4. The product, with a way back into onboarding. Coded where it matters, the original screen elsewhere -->
   <GrafanaShell id="dest-prom"><HostedPrometheus /></GrafanaShell>
   <GrafanaShell id="dest-kube"><KubernetesMonitoring /></GrafanaShell>
+  <GrafanaShell id="dest-home"><CloudHome /></GrafanaShell>
+  <GrafanaShell id="dest-play"><PlayHome /></GrafanaShell>
 
   <main class="dest" data-screen="dest">
     <div class="shot">
