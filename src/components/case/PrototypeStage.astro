@@ -36,11 +36,14 @@ const { src, url, steps, width = 1440, height = 900 } = Astro.props;
   let scale = 1;
 
   // Render the prototype at its design size and scale it down to the frame
-  new ResizeObserver(() => {
+  const fit = () => {
     scale = view.clientWidth / W;
     frame.style.transform = `scale(${scale})`;
     view.style.height = `${H * scale}px`;
-  }).observe(view);
+  };
+  new ResizeObserver(fit).observe(view);
+  addEventListener("resize", fit);
+  frame.addEventListener("load", fit);
 
   const doc = () => frame.contentDocument!;
   const find = (sel: string) => doc().querySelector<HTMLElement>(sel);
@@ -127,7 +130,7 @@ const { src, url, steps, width = 1440, height = 900 } = Astro.props;
 </script>
 
 <style>
-  .stage { margin: 0; border-radius: 10px; overflow: hidden; background: #0b0c0e; box-shadow: 0 8px 24px rgba(0, 0, 0, .18), 0 0 0 1px rgba(255, 255, 255, .08); }
+  .stage { margin: 0; border-radius: 16px; overflow: hidden; background: #0b0c0e; box-shadow: 0 8px 24px rgba(0, 0, 0, .18), 0 0 0 1px rgba(255, 255, 255, .08); }
   .chrome { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; background: #1b1d22; }
   .chrome i { width: 10px; height: 10px; border-radius: 50%; background: #3a3d44; }
   .chrome span { flex: 1; margin-left: 10px; color: rgba(255, 255, 255, .45); font: 12px/1 ui-monospace, monospace; text-align: center; transform: translateX(-24px); }

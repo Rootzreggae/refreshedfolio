@@ -13,11 +13,11 @@ const { src, url, hover = "", width = 1440, height = 900 } = Astro.props;
     const view = pf.querySelector<HTMLElement>(".view")!;
     const frame = pf.querySelector("iframe")!;
     const W = +pf.dataset.w!, H = +pf.dataset.h!;
-    new ResizeObserver(() => {
-      const k = view.clientWidth / W;
-      frame.style.transform = `scale(${k})`;
-      view.style.height = `${H * k}px`;
-    }).observe(view);
+    // The frame's height comes from its aspect ratio; only the scale of the prototype inside follows its width
+    const fit = () => { frame.style.transform = `scale(${view.clientWidth / W})`; };
+    new ResizeObserver(fit).observe(view);
+    addEventListener("resize", fit);
+    frame.addEventListener("load", fit);
     // Show the hover state this beat is about
     frame.addEventListener("load", () => {
       const sel = pf.dataset.hover;
@@ -32,10 +32,10 @@ const { src, url, hover = "", width = 1440, height = 900 } = Astro.props;
 </script>
 
 <style>
-  .pf { margin: 0; border-radius: 10px; overflow: hidden; background: #0b0c0e; box-shadow: 0 6px 20px rgba(0, 0, 0, .16), 0 0 0 1px rgba(255, 255, 255, .08); }
+  .pf { margin: 0; border-radius: 16px; overflow: hidden; background: #0b0c0e; box-shadow: 0 6px 20px rgba(0, 0, 0, .16), 0 0 0 1px rgba(255, 255, 255, .08); }
   .chrome { display: flex; align-items: center; gap: 6px; height: 26px; padding: 0 12px; background: #1b1d22; }
   .chrome i { width: 9px; height: 9px; border-radius: 50%; background: #3a3d44; }
   .chrome span { flex: 1; color: rgba(255, 255, 255, .4); font: 11px/1 ui-monospace, monospace; text-align: center; transform: translateX(-20px); }
-  .view { position: relative; overflow: hidden; aspect-ratio: 16 / 10; }
+  .view { position: relative; overflow: hidden; aspect-ratio: 1440 / 900; }
   .view iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; background: #181b1f; }
 </style>

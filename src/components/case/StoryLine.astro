@@ -1,7 +1,7 @@
 ---
 // The scroll story: a heading, then one line that drops from it, curves to the left and runs down the page as a spine.
 // The line draws itself as you scroll; each beat (a dot, a short statement, a visual) lights up as the line reaches it.
-// Beats are the children: <div class="beat"><div class="beat-text">…</div><div class="beat-visual">…</div></div>
+// Beats are the children: <div class="beat"><div class="beat-text"><span class="dot"></span>…</div><div class="beat-visual">…</div></div>
 import { words } from "./words";
 interface Props { id: string; heading: string }
 const { id, heading } = Astro.props;
@@ -69,12 +69,12 @@ const { id, heading } = Astro.props;
 </script>
 
 <style>
-  .storyline { position: relative; padding: 120px clamp(16px, 4vw, 72px) 80px; }
+  .storyline { position: relative; padding: 120px clamp(24px, 11vw, 320px) 80px; }
   .sl-heading { position: relative; z-index: 1; margin: 0 auto; max-width: 18ch; text-align: center; font-size: clamp(34px, 4vw, 60px); line-height: 1.08; font-weight: 400; }
   .sl-svg { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; overflow: visible; }
   .sl-track { fill: none; stroke: rgba(255, 255, 255, .08); stroke-width: 1.5; }
   .sl-path { fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: 1.5; stroke-linecap: round; }
-  .sl-beats { position: relative; padding-top: 360px; }
+  .sl-beats { position: relative; padding-top: 340px; }
 
   /* Words light up in order; accent words take the brand colour */
   .storyline :global(.w) { color: rgba(255, 255, 255, .22); transition: color .5s ease; }
@@ -85,14 +85,15 @@ const { id, heading } = Astro.props;
   .storyline :global(.on .w:nth-child(6)) { transition-delay: .25s; } .storyline :global(.on .w:nth-child(7)) { transition-delay: .3s; }
   .storyline :global(.on .w:nth-child(n + 8)) { transition-delay: .35s; }
 
-  .storyline :global(.beat) { position: relative; display: grid; grid-template-columns: 56px minmax(0, 400px) minmax(0, 1fr); gap: 0 clamp(32px, 4vw, 72px); align-items: start; margin-bottom: 200px; }
-  .storyline :global(.beat-text) { grid-column: 2; }
-  .storyline :global(.dot) { position: absolute; left: 22px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: #0f1d2e; border: 1.5px solid rgba(255, 255, 255, .3); transition: background .3s ease, border-color .3s ease, box-shadow .3s ease; }
+  /* A beat: statement on the left (dot on the spine), its visual on the right, centred on each other */
+  .storyline :global(.beat) { position: relative; display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.5fr); gap: 0 4vw; align-items: center; margin-bottom: clamp(140px, 16vw, 280px); }
+  .storyline :global(.beat-text) { position: relative; padding-left: 34px; }
+  .storyline :global(.dot) { position: absolute; left: -6px; top: calc(.6em - 6px); font-size: clamp(30px, 2.9vw, 54px); width: 12px; height: 12px; border-radius: 50%; background: #0f1d2e; border: 1.5px solid rgba(255, 255, 255, .3); transition: background .3s ease, border-color .3s ease, box-shadow .3s ease; }
   .storyline :global(.beat.on .dot) { background: #fff; border-color: #fff; box-shadow: 0 0 0 6px rgba(255, 136, 51, .18); }
-  .storyline :global(.beat h3) { margin: 0 0 16px; font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(26px, 2.4vw, 36px); line-height: 1.15; }
-  .storyline :global(.beat p) { color: rgba(255, 255, 255, .62); max-width: 36ch; margin: 0 0 12px; opacity: 0; translate: 0 10px; transition: opacity .6s .25s ease, translate .6s .25s ease; }
+  .storyline :global(.beat h3) { margin: 0 0 18px; max-width: 14ch; font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(30px, 2.9vw, 54px); line-height: 1.12; letter-spacing: -.01em; }
+  .storyline :global(.beat p) { color: rgba(255, 255, 255, .55); font-size: 16px; line-height: 1.55; max-width: 34ch; margin: 0 0 10px; opacity: 0; translate: 0 10px; transition: opacity .6s .25s ease, translate .6s .25s ease; }
   .storyline :global(.beat.on p) { opacity: 1; translate: 0 0; }
-  .storyline :global(.beat-visual) { grid-column: 3; margin-top: 90px; opacity: 0; translate: 0 70px; scale: .96; transition: opacity .9s cubic-bezier(.2, .7, .2, 1), translate .9s cubic-bezier(.2, .7, .2, 1), scale .9s cubic-bezier(.2, .7, .2, 1); }
+  .storyline :global(.beat-visual) { opacity: 0; translate: 0 70px; scale: .96; transition: opacity .9s cubic-bezier(.2, .7, .2, 1), translate .9s cubic-bezier(.2, .7, .2, 1), scale .9s cubic-bezier(.2, .7, .2, 1); }
   .storyline :global(.beat-visual.in) { opacity: 1; translate: 0 0; scale: 1; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -100,10 +101,10 @@ const { id, heading } = Astro.props;
     .storyline :global(.beat-visual), .storyline :global(.beat p) { opacity: 1; translate: none; scale: none; }
   }
   @media (max-width: 900px) {
-    .storyline { padding: 80px 16px 40px; }
+    .storyline { padding: 80px 16px 40px 24px; }
     .sl-beats { padding-top: 220px; }
-    .storyline :global(.beat) { grid-template-columns: 28px minmax(0, 1fr); gap: 0 14px; margin-bottom: 110px; }
-    .storyline :global(.dot) { left: 8px; }
-    .storyline :global(.beat-visual) { grid-column: 2; margin-top: 28px; }
+    .storyline :global(.beat) { grid-template-columns: minmax(0, 1fr); margin-bottom: 110px; }
+    .storyline :global(.beat-text) { padding-left: 24px; }
+    .storyline :global(.beat-visual) { margin: 24px 0 0 24px; }
   }
 </style>
