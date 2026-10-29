@@ -48,8 +48,6 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     <div class="stage" data-stage-cam aria-hidden="true">
       <div class="cam" data-cam><iframe src={src} title="" tabindex="-1" data-cam-frame></iframe></div>
     </div>
-    <div class="shade top" aria-hidden="true"></div>
-    <div class="shade bottom" aria-hidden="true"></div>
 
     <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
     <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(sections)}>
@@ -216,7 +214,7 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .ghost { grid-area: 1 / 1; font-family: "NB International", sans-serif; font-size: 28vw; line-height: 1; white-space: nowrap; color: #fff; opacity: 0; }
 
   .hero { position: absolute; inset: 0; z-index: 3; }
-  .ch { position: absolute; inset: 0; z-index: 3; pointer-events: none; visibility: hidden; text-shadow: 0 2px 18px rgba(0, 0, 0, .22); }
+  .ch { position: absolute; inset: 0; z-index: 3; pointer-events: none; visibility: hidden; text-shadow: 0 1px 2px rgba(0, 0, 0, .45), 0 4px 28px rgba(0, 0, 0, .45); }
   .corner { position: absolute; top: 26px; margin: 0; font-size: 13px; letter-spacing: .04em; color: rgba(255, 255, 255, .72); }
   .corner.l { left: clamp(24px, 4vw, 64px); } .corner.r { right: clamp(24px, 4vw, 64px); }
 
@@ -225,17 +223,21 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .half { max-width: 46%; translate: calc((1 - var(--in, 0)) * -40vw) calc(var(--out, 0) * -8vh); }
   .half.right { text-align: right; translate: calc((1 - var(--in, 0)) * 40vw) calc(var(--out, 0) * -8vh); }
   .half em { font-style: normal; color: #ffb27a; }
-  .body { position: absolute; bottom: 92px; margin: 0; max-width: 30ch; font-size: 15px; line-height: 1.55; color: rgba(255, 255, 255, .8); translate: 0 calc((1 - var(--in, 0)) * 20px); }
+  /* Narration: spoken-caption cards, frosted so they read over any part of the prototype */
+  .body {
+    position: absolute; bottom: 100px; margin: 0; max-width: 26ch; padding: 18px 22px 20px; border-radius: 18px;
+    background: rgba(10, 16, 28, .62); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .1), 0 8px 30px rgba(0, 0, 0, .25);
+    font-family: "NB International", sans-serif; font-size: clamp(18px, 1.35vw, 24px); line-height: 1.35; letter-spacing: -.005em; color: #fff;
+    opacity: calc(var(--in, 0) * 1); translate: 0 calc((1 - var(--in, 0)) * 28px);
+  }
+  .body::before { content: ""; display: block; width: 26px; height: 3px; margin-bottom: 12px; border-radius: 2px; background: #ffb27a; }
+  .br { transition-delay: .08s; }
   .bl { left: clamp(24px, 4vw, 64px); } .br { right: clamp(24px, 4vw, 64px); text-align: right; }
 
   /* The prototype is the scene: full screen, no frame */
   .stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #181b1f; }
   .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; transition: transform .12s linear; }
-  /* Soft shade in the chapter colour so type reads over the imagery */
-  .shade { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
-  /* Shades only where the type is: solid behind it, then gone fast, so the middle of the screen stays clear */
-  .shade.top { top: 0; height: 32vh; background: linear-gradient(var(--tint, #1d3a5f) 0%, color-mix(in srgb, var(--tint, #1d3a5f) 92%, transparent) 55%, transparent); }
-  .shade.bottom { bottom: 0; height: 27vh; background: linear-gradient(transparent, color-mix(in srgb, var(--tint, #1d3a5f) 94%, transparent) 42%, var(--tint, #1d3a5f)); }
 
   /* The travelling pill */
   .pill { position: absolute; left: 0; bottom: 24px; z-index: 4; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
