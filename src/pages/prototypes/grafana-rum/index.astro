@@ -24,15 +24,6 @@ const vitals = [
   { id: "fid", name: "First Input Delay", v: "48", unit: "ms", good: 94, ni: 4, poor: 2, state: "good" },
   { id: "inp", name: "Interaction to Next Paint", v: "234", unit: "ms", good: 70, ni: 22, poor: 8, state: "needs" },
 ];
-const pages = [
-  ["/", "826ms", "0.22s", "1.9s", "0.02"], ["/products", "740ms", "1.02s", "4.6s", "0.31"], ["/products/:id/detail", "630ms", "0.98s", "2.4s", "0.08"],
-  ["/cart", "530ms", "2.1s", "6.0s", "0.12"], ["/checkout", "412ms", "0.4s", "1.2s", "0.01"],
-];
-const errors = [
-  { msg: "TypeError: Cannot read properties of undefined (reading 'price')", file: "ProductCard.tsx:42", count: 128, users: 64, trend: series(21, 24, 6, 5) },
-  { msg: "ChunkLoadError: Loading chunk 482 failed", file: "webpack/runtime/jsonp", count: 41, users: 37, trend: series(22, 24, 3, 3) },
-  { msg: "Unhandled Promise rejection: 503 from /api/cart", file: "api/cart.ts:18", count: 19, users: 12, trend: series(23, 24, 2, 2) },
-];
 const sessions = [
   ["a91f…2c", "Chrome 129 · macOS", "Lisbon", "6 pages", "1 error", "4m 12s"],
   ["77be…e0", "Safari 18 · iOS", "Berlin", "3 pages", "", "1m 48s"],
@@ -80,6 +71,14 @@ const msets = [
   { id: "tech", tab: "Technical Metrics", title: "Technical Metrics", cols: ["JS Errors", "Failed Requests", "Long Tasks"], last: "Page Weight",
     rows: [["12", "3", "41", "2.4 MB"], ["4", "0", "18", "1.1 MB"], ["9", "6", "33", "3.8 MB"], ["2", "1", "12", "1.2 MB"], ["7", "2", "27", "3.6 MB"], ["0", "0", "6", "0.9 MB"]].map((v, i) => [pageIds[i], ...v]) },
 ];
+const jsErrors = [
+  ["TypeError", "Failed to fetch", 2, 7, "wave"], ["Error", "{}", 3, 2, "bump"], ["SyntaxError", "Unexpected end of JSON input", 27, 26, "noise"],
+  ["Error", "Script error", 1, 4, "bump"], ["Error", "Request failed with status code of 401", 24, 19, "noise"], ["Error", "Request failed with status code of 403", 4, 5, "wave"],
+  ["Error", "ResizeObserver loop completed with undelivered notifications", 5, 8, "ramp"], ["Error", "Cannot read properties of undefined reading ('pathname')", 2, 5, "wave"],
+  ["Error", "JSON.parse: unexpected end of data at line 1 column 1 of JSON data", 2, 6, "bump"], ["Error", "Non-Error exception captured with keys: message", 2, 11, "wave"],
+  ["Error", "Non-Error exception captured with keys: refID, message, status, traceID", 2, 20, "bump"], ["Error", "NetworkError when attempting to fetch resource.", 2, 23, "wave"],
+] as const;
+const spkDown = (i: number) => smooth(Array.from({ length: 28 }, (_, k) => 9 - 8 / (1 + Math.exp(-(k / 27 - 0.5) * 10))), 200, 32, 10);
 const views = [["/", "2347ms", 826, "18ms"], ["product_detail", "743ms", 740, "4ms"], ["/products/1/detail", "200ms", 630, "120ms"], ["product_detail", "1114ms", 530, "4ms"], ["/products/1/detail", "123ms", 412, "4ms"], ["product_detail", "355ms", 90, "4ms"]];
 const p75 = [
   { title: "Page Load, p75", ticks: ["25 s", "20 s", "15 s", "10 s", "5 s", "0 ms"], color: "#f2b736", legend: [["TTFB", "#73bf69"], ["FCP", "#f2b736"], ["LCP", "#b877d9"]], d: series(51, 90, 6, 4).map((v, i) => v + (i > 45 && i < 80 ? 10 + Math.sin(i / 6) * 4 : 0)), max: 26 },
@@ -338,12 +337,19 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
         </section>
 
         <section data-pane="errors" hidden>
-          <ul class="errs">
-            {errors.map((e, i) => (
-              <li><button class="err" data-err={i}><span><b>{e.msg}</b><small>{e.file}</small></span><span class="en"><em>{e.count}</em> events · {e.users} users</span><svg viewBox="0 0 120 26" class="sp"><path d={path(e.trend, 120, 26, 12)} stroke="#ff5286" fill="none" /></svg></button>
-                <pre class="stack" hidden>{`${e.msg}\n    at ${e.file}\n    at renderWithHooks (react-dom.development.js:16305)\n    at mountIndeterminateComponent (react-dom.development.js:20069)\n\nSession: a91f…2c · Chrome 129 · trace 4bf92f3577b34da6`}</pre></li>
-            ))}
-          </ul>
+          <section class="tpanel">
+            <header><h3>Javascript Errors</h3><label class="flt wide"><input placeholder="Search" aria-label="Search errors" data-efilter /></label></header>
+            <table class="ptbl etbl"><thead><tr><th>Type</th><th>Message</th><th>Count</th><th>Users Impacted</th><th>Action</th></tr></thead><tbody>
+              {jsErrors.map(([t, m, c, u, k], i) => { const col = k === "noise" ? "#e0226e" : k === "ramp" ? "#ff9830" : "#3cc39a", d = k === "ramp" ? spkDown(i) : spk(200 + (i % 3), k as (typeof kinds)[number]); return <>
+                <tr data-erow={`${t} ${m}`}><td>{t}</td><td class="msg"><button class="lnk" data-err={i}>{m}</button></td>
+                  <td><span class="pv n">{c}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp"><path d={area(d, 200, 32)} fill={col} opacity=".18" /><path d={d} stroke={col} fill="none" /></svg></td>
+                  <td><span class="pv n">{u}</span><svg viewBox="0 0 200 32" preserveAspectRatio="none" class="psp s"><path d={area(d, 200, 32)} fill={col} opacity=".18" /><path d={d} stroke={col} fill="none" /></svg></td>
+                  <td><button class="watch" data-watch aria-pressed="false"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z" fill="none" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path class="slash" d="M2.5 13.5 13.5 2.5" stroke="currentColor" stroke-width="1.3"/></svg><span>Watch</span></button></td></tr>
+                <tr class="stackrow" hidden><td colspan="5"><pre>{`${t}: ${m}\n    at fetchCart (webpack://shop-web/src/api/cart.ts:42:11)\n    at CartProvider (webpack://shop-web/src/state/cart.tsx:18:5)\n    at renderWithHooks (react-dom.development.js:16305)\n\nLast seen 2 min ago · Chrome 129, Safari 18 · trace 4bf92f3577b34da6`}</pre></td></tr>
+              </>; })}
+            </tbody></table>
+            <footer class="pager">Showing 1 of 10 entries <span><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>›</button></span></footer>
+          </section>
         </section>
 
         <section data-pane="sessions" hidden>
@@ -438,7 +444,9 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     const tabs = [...document.querySelectorAll<HTMLElement>("[data-tab]")];
     function openTab(id: string) { tabs.forEach((t) => t.setAttribute("aria-selected", String(t.dataset.tab === id))); document.querySelectorAll<HTMLElement>("[data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== id)); }
     tabs.forEach((t) => t.addEventListener("click", () => openTab(t.dataset.tab!)));
-    document.querySelectorAll<HTMLElement>("[data-err]").forEach((b) => b.addEventListener("click", () => { const s = b.nextElementSibling as HTMLElement; s.hidden = !s.hidden; b.classList.toggle("open", !s.hidden); }));
+    document.querySelectorAll<HTMLElement>("[data-err]").forEach((b) => b.addEventListener("click", () => { const s = b.closest("tr")!.nextElementSibling as HTMLElement; s.hidden = !s.hidden; }));
+    document.querySelectorAll<HTMLElement>("[data-watch]").forEach((b) => b.addEventListener("click", () => { const on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on)); b.querySelector("span")!.textContent = on ? "Watching" : "Watch"; }));
+    $("[data-efilter]").addEventListener("input", (e) => { const q = (e.target as HTMLInputElement).value.toLowerCase(); document.querySelectorAll<HTMLElement>("[data-erow]").forEach((r) => { r.hidden = !r.dataset.erow!.toLowerCase().includes(q); if (r.hidden) (r.nextElementSibling as HTMLElement).hidden = true; }); });
     $("[data-compare]").addEventListener("change", (e) => ($<HTMLSelectElement>("[data-cmp-sel]").disabled = !(e.target as HTMLInputElement).checked));
     document.querySelectorAll<HTMLElement>("[data-mset-btn]").forEach((b) => b.addEventListener("click", () => {
       document.querySelectorAll<HTMLElement>("[data-mset-btn]").forEach((x) => { x.classList.toggle("on", x === b); x.setAttribute("aria-selected", String(x === b)); });
@@ -533,13 +541,9 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     .chart svg { width: 100%; height: 170px; } .grid line { stroke: rgba(204, 204, 220, .07); } .ln { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
     .legend { display: flex; gap: 14px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 12px; } .legend li::before { content: ""; display: inline-block; width: 12px; height: 3px; margin-right: 6px; vertical-align: middle; background: var(--c); }
     .tbl { width: 100%; border-collapse: collapse; } .tbl th { text-align: left; padding: 10px; font-weight: 500; color: var(--dim); border-bottom: 1px solid var(--line); } .tbl td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
-    .errs { margin: 0; padding: 0; list-style: none; } .errs li { border-bottom: 1px solid var(--line); }
-    .err { display: grid; grid-template-columns: minmax(0, 1fr) 200px 130px; align-items: center; gap: 20px; width: 100%; padding: 16px 10px; border: 0; background: none; text-align: left; cursor: pointer; } .err:hover, .err.open { background: rgba(255, 255, 255, .03); }
-    .err b { display: block; color: #fff; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .err small { color: var(--dim); font-family: ui-monospace, monospace; }
     .en { color: var(--dim); font-size: 14px; } .en em { font-style: normal; color: var(--poor); font-size: 17px; } .sp { width: 120px; height: 26px; } .sp path { stroke-width: 1.4; vector-effect: non-scaling-stroke; }
-    .stack { margin: 0 10px 16px; padding: 16px 18px; border-left: 3px solid var(--poor); background: #0b0c0e; font: 13px/1.7 ui-monospace, monospace; white-space: pre-wrap; }
     .toast { position: fixed; left: 50%; bottom: 28px; z-index: 50; translate: -50% 12px; margin: 0; padding: 10px 16px; border-radius: 2px; background: #2c3235; color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, .5); opacity: 0; pointer-events: none; transition: opacity .2s ease, translate .2s ease; } .toast.on { opacity: 1; translate: -50% 0; }
-    :is(.btn, .tab, .choice, .seg button, .appcard, .err, .side-group a):focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
+    :is(.btn, .tab, .choice, .seg button, .appcard, .lnk, .watch, .side-group a):focus-visible { outline: 2px solid #5794f2; outline-offset: 2px; }
     @media (max-width: 1300px) { .vitals { grid-template-columns: repeat(3, minmax(0, 1fr)); } .hero { grid-template-columns: 1fr; } }
     @media (max-width: 900px) { .app { grid-template-columns: 1fr; } .side { display: none; } .props, .howto, .choices, .apps, .two, .summary { grid-template-columns: 1fr; } .vitals { grid-template-columns: 1fr 1fr; } .page { padding: 24px 16px 80px; } }
     /* ---------- Landing, after the original design ---------- */
@@ -673,6 +677,13 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     .pager { display: flex; justify-content: flex-end; align-items: center; gap: 14px; padding: 10px; color: var(--text); font-size: 13px; } .pager span { display: flex; gap: 6px; }
     .pager button { min-width: 26px; height: 26px; border: 0; border-radius: 2px; background: #22252b; color: var(--text); cursor: pointer; } .pager button.on { background: var(--blue); color: #fff; }
     .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .three .chart { padding: 14px 18px; } .three figcaption.plain { margin-bottom: 14px; color: #fff; font-size: 15px; }
+    .flt.wide input { width: min(480px, 28vw); }
+    .etbl th:nth-child(3), .etbl th:nth-child(4) { width: 1%; } .etbl td:nth-child(3) .psp { width: 170px; } .etbl td:nth-child(4) .psp { width: 110px; }
+    .etbl .pv.n { min-width: 34px; } .etbl td.msg { width: 70%; } .etbl .lnk { padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; }
+    .etbl td:last-child, .etbl th:last-child { width: 1%; border-left: 0; }
+    .watch { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px; border: 0; background: none; color: var(--text); font: inherit; cursor: pointer; }
+    .watch[aria-pressed="true"] { color: #fff; } .watch[aria-pressed="true"] .slash { display: none; } .watch[aria-pressed="false"] svg { opacity: .7; }
+    .stackrow td { padding: 0; border-left: 0; } .stackrow pre { margin: 0; padding: 14px 16px; border-left: 3px solid #f2495c; background: #111217; font: 12px/1.7 ui-monospace, monospace; color: #ff7383; white-space: pre-wrap; } .etbl tr[hidden] { display: none; }
     @media (max-width: 1400px) { .statrow { grid-template-columns: repeat(4, minmax(0, 1fr)); } .st:nth-child(5) { border-left: 0; } .three { grid-template-columns: 1fr; } }
   </style>
 </body>
