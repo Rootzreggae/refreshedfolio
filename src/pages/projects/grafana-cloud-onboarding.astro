@@ -236,7 +236,7 @@ const facts: [string, string][] = [
       @font-face { font-family: "NB International"; src: url("/font/NB International Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
-      body { background: #0f1d2e; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
+      body { background: #1d3a5f; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; font-size: 18px; line-height: 1.6; overflow-x: hidden; }
       h1, h2, .beat h2 { font-family: "NB International", -apple-system, sans-serif; font-weight: 400; letter-spacing: -.01em; }
       a { color: inherit; }
 
@@ -248,17 +248,17 @@ const facts: [string, string][] = [
       .eyebrow { color: #ff8833; font-size: 15px; letter-spacing: .04em; margin-bottom: 18px; }
       .hero h1 { font-size: clamp(40px, 4.6vw, 68px); line-height: 1.05; margin-bottom: 26px; }
       .lede { font-size: clamp(19px, 1.5vw, 23px); line-height: 1.5; color: rgba(255, 255, 255, .86); max-width: 34ch; }
-      .facts { margin-top: 22px; color: rgba(255, 255, 255, .55); font-size: 15px; }
+      .facts { margin-top: 22px; color: rgba(255, 255, 255, .64); font-size: 15px; }
       .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
       .watch, .try { display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 500; text-decoration: none; cursor: pointer; }
-      .watch { border: 0; background: #fff; color: #0f1d2e; }
+      .watch { border: 0; background: #fff; color: #1d3a5f; }
       .watch:hover { background: #e8edf3; }
       .try { border: 1px solid rgba(255, 255, 255, .25); color: #fff; }
       .try:hover { border-color: rgba(255, 255, 255, .6); }
       .watch:focus-visible, .try:focus-visible, summary:focus-visible { outline: 2px solid #ff8833; outline-offset: 3px; }
 
       .shots img { width: 100%; display: block; border-radius: 16px; box-shadow: 0 6px 20px rgba(0, 0, 0, .16); }
-      .shots figcaption { margin-top: 8px; color: rgba(255, 255, 255, .5); font-size: 14px; }
+      .shots figcaption { margin-top: 8px; color: rgba(255, 255, 255, .64); font-size: 14px; }
       .shots.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
       .block { max-width: 1200px; margin: 0 auto; padding: 96px clamp(16px, 4vw, 72px) 0; }
@@ -273,14 +273,14 @@ const facts: [string, string][] = [
       summary { display: flex; align-items: baseline; gap: 16px; padding: 28px 0; cursor: pointer; list-style: none; }
       summary::-webkit-details-marker { display: none; }
       summary span { font-family: "NB International", sans-serif; font-size: clamp(26px, 2.6vw, 38px); }
-      summary small { color: rgba(255, 255, 255, .5); font-size: 16px; }
+      summary small { color: rgba(255, 255, 255, .64); font-size: 16px; }
       summary::after { content: "+"; margin-left: auto; font-size: 32px; line-height: 1; color: rgba(255, 255, 255, .6); transition: rotate .25s ease; }
       details[open] summary::after { rotate: 45deg; }
       .process { padding-bottom: 48px; }
       .process h3 { margin: 40px 0 14px; font-size: 20px; font-weight: 500; }
       .process > p { color: rgba(255, 255, 255, .78); max-width: 62ch; }
       .process figure img { width: 100%; border-radius: 10px; display: block; }
-      .process figcaption { margin-top: 8px; color: rgba(255, 255, 255, .5); font-size: 14px; }
+      .process figcaption { margin-top: 8px; color: rgba(255, 255, 255, .64); font-size: 14px; }
       .principles { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; counter-reset: p; }
       .principles li { display: flex; flex-direction: column; gap: 6px; padding: 18px 20px; border-radius: 12px; background: rgba(255, 255, 255, .05); counter-increment: p; }
       .principles li::before { content: "0" counter(p); color: #ff8833; font-size: 13px; }
