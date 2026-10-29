@@ -1,20 +1,21 @@
 ---
 // A pinned scroll scene: the hero, then chapters, all on one stage. The prototype is the object that carries through;
 // scroll moves a camera over it (zoom + focus point), switches its screen and hover state, and brings in each chapter's
-// split headline, corner label, ghost word and colour. Phones get a calm stacked version.
+// split headline, corner label, ghost word and colour. After a chapter, a paper sheet can be tossed in over the scene
+// with the story in rows (decision, evidence, why), then tossed away again. Phones get a calm stacked version.
 import ProtoFrame from "./ProtoFrame.astro";
 
 export interface Key { at: number; zoom: number; fx: number; fy: number; hash?: string; hover?: string }
+export interface Row { kicker: string; title: string; img: string; alt: string; text: string }
 export interface Chapter {
   id: string;
-  label: string;       // corner label, e.g. "About Welcome"
+  label: string;       // corner label, e.g. "About setup"
   left: string;        // headline half that slides in from the left
   right: string;       // headline half that slides in from the right (*accent* words allowed)
-  bodyL?: string;
-  bodyR?: string;
   ghost: string;       // giant background word
   bg: string;          // background colour
   keys: Key[];         // camera moments, at = 0..1 within the chapter
+  sheet?: Row[];       // the story behind the chapter, on a sheet tossed over the scene
 }
 interface Props { src: string; url: string; chapters: Chapter[]; heroBg: string }
 const { src, url, chapters, heroBg } = Astro.props;
@@ -25,75 +26,87 @@ const sections = ["Intro", ...chapters.map((c) => c.label.replace(/^About (the )
 // the hero is rendered twice: inside the pinned scene, and at the top of the stacked version
 const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
 ---
-<section class="chapters" data-chapters data-hero-bg={heroBg} style={`--n:${chapters.length + 1}`}>
-  {chapters.map((c, i) => <span class="anchor" id={c.id} style={`top:calc(${i + 1} * var(--len) + 10vh)`}></span>)}
+<section class="chapters" data-chapters data-hero-bg={heroBg}>
+  {chapters.map((c) => <span class="anchor" id={c.id} data-anchor></span>)}
   <div class="scene" data-scene>
-    <div class="ghosts" aria-hidden="true">{chapters.map((c, i) => <span class="ghost" data-ch={i + 1}>{c.ghost}</span>)}</div>
+    <div class="ghosts" aria-hidden="true">{chapters.map((c) => <span class="ghost">{c.ghost}</span>)}</div>
 
-    <div class="hero" data-ch="0"><Fragment set:html={hero} /></div>
+    <div class="hero" data-layer><Fragment set:html={hero} /></div>
 
     {chapters.map((c, i) => (
-      <div class="ch" data-ch={i + 1} aria-hidden="true">
+      <div class="ch" data-layer aria-hidden="true">
         <p class="corner l">{c.label}</p>
         <p class="corner r">Chapter {String(i + 1).padStart(2, "0")}</p>
         <h2 class="split">
           <span class="half left">{c.left}</span>
           <span class="half right">{accent(c.right).map((p) => (p.a ? <em>{p.t}</em> : p.t))}</span>
         </h2>
-        {c.bodyL && <p class="body bl">{c.bodyL}</p>}
-        {c.bodyR && <p class="body br">{c.bodyR}</p>}
       </div>
     ))}
 
     <div class="stage" data-stage-cam aria-hidden="true">
       <div class="cam" data-cam><iframe src={src} title="" tabindex="-1" data-cam-frame></iframe></div>
     </div>
+    <div class="shade" aria-hidden="true"></div>
 
-    <div class="shade top" aria-hidden="true"></div>
-    <div class="shade bottom" aria-hidden="true"></div>
+    {chapters.map((c, i) => c.sheet && (
+      <article class="sheet" data-sheet={i} style={`--rows:${c.sheet.length}`}>
+        <header class="sheet-head"><span>{sections[i + 1]}</span><span>Chapter {String(i + 1).padStart(2, "0")} · Notes</span></header>
+        {c.sheet.map((r, j) => (
+          <div class="row" data-row>
+            <div class="r-left"><span class="kicker">{r.kicker}</span><strong>{r.title}</strong><span class="num">{String(j + 1).padStart(2, "0")}</span></div>
+            <figure class="r-fig"><img src={r.img} alt={r.alt} loading="lazy" /></figure>
+            <p class="r-text">{r.text}</p>
+          </div>
+        ))}
+      </article>
+    ))}
+
     <!-- One pill that travels along the bottom as you scroll, naming the section you're in -->
     <button class="pill" data-pill aria-label="Next section" data-labels={JSON.stringify(sections)}>
       <span class="mark" aria-hidden="true"></span><span class="pill-num" data-pill-num>00</span><span class="pill-label" data-pill-label>Intro</span>
     </button>
   </div>
 
-  <!-- The same story without the pinned scene: phones and reduced motion -->
+  <!-- The same story without the pinned scene: phones -->
   <div class="stacked">
     <div class="hero-flat"><Fragment set:html={hero} /></div>
     {chapters.map((c, i) => (
       <article class="flat" id={`${c.id}-flat`} style={`--bg:${c.bg}`}>
         <p class="corner-flat">{c.label} · Chapter {String(i + 1).padStart(2, "0")}</p>
         <h2>{c.left} {accent(c.right).map((p) => (p.a ? <em>{p.t}</em> : p.t))}</h2>
-        {c.bodyL && <p>{c.bodyL}</p>}
-        {c.bodyR && <p>{c.bodyR}</p>}
         <ProtoFrame src={`${src.split("#")[0]}${first(c).hash}`} url={url} hover={c.keys.find((k) => k.hover)?.hover} />
+        {c.sheet && (
+          <div class="flat-sheet">
+            {c.sheet.map((r) => (
+              <div class="flat-row"><span class="kicker">{r.kicker}</span><strong>{r.title}</strong><img src={r.img} alt={r.alt} loading="lazy" /><p>{r.text}</p></div>
+            ))}
+          </div>
+        )}
       </article>
     ))}
   </div>
 
-  <script type="application/json" data-chapter-data set:html={JSON.stringify(chapters.map((c) => ({ bg: c.bg, keys: c.keys })))} />
+  <script type="application/json" data-chapter-data set:html={JSON.stringify(chapters.map((c) => ({ bg: c.bg, keys: c.keys, sheet: !!c.sheet })))} />
 </section>
 
 <script>
   type Key = { at: number; zoom: number; fx: number; fy: number; hash?: string; hover?: string };
+  type Seg = { kind: "hero" | "scene" | "sheet"; c: number; len: number; start: number };
   const root = document.querySelector<HTMLElement>("[data-chapters]")!;
-  const data: { bg: string; keys: Key[] }[] = JSON.parse(root.querySelector("[data-chapter-data]")!.textContent!);
+  const data: { bg: string; keys: Key[]; sheet: boolean }[] = JSON.parse(root.querySelector("[data-chapter-data]")!.textContent!);
   const stage = root.querySelector<HTMLElement>("[data-stage-cam]")!;
   const cam = root.querySelector<HTMLElement>("[data-cam]")!;
   const frame = root.querySelector<HTMLIFrameElement>("[data-cam-frame]")!;
-  const layers = [...root.querySelectorAll<HTMLElement>(".hero, .ch")];
+  const layers = [...root.querySelectorAll<HTMLElement>("[data-layer]")]; // 0 = hero, 1.. = chapters
   const ghosts = [...root.querySelectorAll<HTMLElement>(".ghost")];
+  const anchors = [...root.querySelectorAll<HTMLElement>("[data-anchor]")];
+  const sheets = new Map([...root.querySelectorAll<HTMLElement>("[data-sheet]")].map((s) => [+s.dataset.sheet!, s]));
   const heroBg = root.dataset.heroBg!;
   const pill = root.querySelector<HTMLElement>("[data-pill]")!;
   const pillNum = root.querySelector<HTMLElement>("[data-pill-num]")!;
   const pillLabel = root.querySelector<HTMLElement>("[data-pill-label]")!;
   const labels: string[] = JSON.parse(pill.dataset.labels!);
-  let section = -1;
-  // Clicking the pill jumps to the start of the next section
-  pill.addEventListener("click", () => {
-    const n = Math.min(section + 1, labels.length - 1);
-    scrollTo({ top: root.getBoundingClientRect().top + scrollY + n * innerHeight * 1.3 + (n ? innerHeight * 0.3 : 0), behavior: "smooth" });
-  });
   // Scroll-linked motion only moves when the reader scrolls, so it stays on with Reduce Motion; phones get the stacked story
   const pinned = () => matchMedia("(min-width: 901px)").matches;
 
@@ -103,6 +116,22 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   const mix = (a: number, b: number, t: number) => a + (b - a) * t;
   const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
   const mixColor = (a: string, b: string, t: number) => `rgb(${hex(a).map((v, i) => Math.round(mix(v, hex(b)[i], t))).join(",")})`;
+
+  // The timeline: hero, then each chapter's scene, then its sheet if it has one (lengths in screens of scroll)
+  let segs: Seg[] = [], total = 0;
+  function layout() {
+    segs = [{ kind: "hero", c: -1, len: 1.3, start: 0 }];
+    data.forEach((d, c) => {
+      segs.push({ kind: "scene", c, len: 1.3, start: 0 });
+      if (d.sheet) segs.push({ kind: "sheet", c, len: 1.9, start: 0 });
+    });
+    let at = 0;
+    for (const s of segs) { s.start = at; at += s.len * innerHeight; }
+    total = at;
+    root.style.height = pinned() ? `${total + innerHeight}px` : "";
+    // anchors (for links to a chapter) sit just after each scene starts
+    segs.filter((s) => s.kind === "scene").forEach((s) => (anchors[s.c].style.top = `${s.start + innerHeight * 0.3}px`));
+  }
 
   // Prototype screen + hover, applied only when they change
   let shownHash = "", shownHover = "";
@@ -133,18 +162,23 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     let a = keys[0], b = keys[0];
     for (const k of keys) { if (k.at <= t) a = k; if (k.at >= t) { b = k; break; } b = k; }
     const u = a === b ? 0 : ease(clamp((t - a.at) / (b.at - a.at)));
-    // the latest screen/hover at or before t
     const past = keys.filter((k) => k.at <= t);
     const hash = [...past].reverse().find((k) => k.hash)?.hash ?? keys.find((k) => k.hash)?.hash;
     const hoverKey = [...past].reverse().find((k) => k.hash || k.hover !== undefined);
     return { zoom: mix(a.zoom, b.zoom, u), fx: mix(a.fx, b.fx, u), fy: mix(a.fy, b.fy, u), hash, hover: hoverKey?.hover };
   }
 
+  let section = -1;
+  const colourOf = (s: Seg) => (s.kind === "hero" ? heroBg : data[s.c].bg);
+
   function render() {
     if (!pinned()) return;
-    const len = innerHeight * 1.3;
-    const p = clamp(-root.getBoundingClientRect().top / len, 0, data.length + 0.999); // 0 = hero, 1.. = chapters
-    const i = Math.floor(p), t = p - i;
+    const off = clamp(-root.getBoundingClientRect().top, 0, total - 1);
+    let n = segs.findIndex((s) => off < s.start + s.len * innerHeight);
+    if (n < 0) n = segs.length - 1;
+    const seg = segs[n];
+    const t = clamp((off - seg.start) / (seg.len * innerHeight));
+
     // Full-bleed: the prototype covers the whole screen; the camera moves over it
     const w = stage.clientWidth, h = stage.clientHeight;
     const k = Math.max(w / 1440, h / 900);
@@ -152,63 +186,79 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
     cam.style.width = `${1440 * k}px`;
     cam.style.height = `${900 * k}px`;
 
-    // Background colour drifts from one chapter to the next near the boundary
-    const cols = [heroBg, ...data.map((d) => d.bg)];
-    const colour = mixColor(cols[i], cols[Math.min(i + 1, cols.length - 1)], range(t, 0.82, 1));
+    // Colour drifts into the next segment's colour near the end of this one
+    const next = segs[Math.min(n + 1, segs.length - 1)];
+    const colour = mixColor(colourOf(seg), colourOf(next), range(t, 0.82, 1));
     root.style.backgroundColor = colour;
     root.style.setProperty("--tint", colour);
 
     // Stage: rises out of the hero until it fills the screen, then holds
-    const rise = i === 0 ? range(t, 0.05, 0.75) : 1;
+    const rise = seg.kind === "hero" ? range(t, 0.05, 0.75) : 1;
     stage.style.translate = `0 ${mix(innerHeight * 0.62, 0, rise)}px`;
     stage.style.scale = String(mix(0.9, 1, rise));
     stage.style.borderRadius = `${mix(28, 0, rise)}px`;
 
-    // The pill travels left to right across the whole scene, and names the section it's in
-    const total = data.length + 1;
-    const travel = innerWidth - pill.offsetWidth - 48;
-    pill.style.translate = `${24 + travel * clamp(p / total)}px 0`;
-    if (i !== section) {
-      section = i;
-      pillNum.textContent = String(i).padStart(2, "0");
-      pillLabel.textContent = labels[i];
-      pill.classList.remove("swap"); void pill.offsetWidth; pill.classList.add("swap");
-    }
+    // Camera: follows the chapter's keys; holds the last moment while its sheet is up
+    if (seg.kind === "hero") { aim(1, 0.5, 0.5, w, h); show(data[0].keys.find((x) => x.hash)?.hash); }
+    else { const f = frameAt(data[seg.c].keys, seg.kind === "scene" ? t : 1); aim(f.zoom, f.fx, f.fy, w, h); show(f.hash, f.hover); }
 
-    // Camera
-    if (i === 0) { aim(1, 0.5, 0.5, w, h); show(data[0].keys.find((k) => k.hash)?.hash); }
-    else { const f = frameAt(data[i - 1].keys, t); aim(f.zoom, f.fx, f.fy, w, h); show(f.hash, f.hover); }
-
-    // Layers: hero text leaves; each chapter's headline halves slide in from the edges, then lift away
-    layers.forEach((el, n) => {
-      const local = p - n;
-      const inT = n === 0 ? 1 : range(local, 0, 0.22);
-      const outT = range(local, n === 0 ? 0.08 : 0.8, n === 0 ? 0.5 : 0.98);
-      const on = local > -0.05 && local < 1.02;
-      el.style.visibility = on ? "visible" : "hidden";
+    // Text layers: hero leaves; a chapter's headline halves slide in from the edges, then lift away
+    layers.forEach((el, li) => {
+      const mine = li === 0 ? seg.kind === "hero" : seg.kind === "scene" && seg.c === li - 1;
+      const inT = li === 0 ? 1 : mine ? range(t, 0, 0.22) : 0;
+      const outT = mine ? range(t, li === 0 ? 0.08 : 0.8, li === 0 ? 0.5 : 0.98) : 1;
+      el.style.visibility = mine ? "visible" : "hidden";
       el.style.opacity = String(Math.min(inT, 1 - outT));
       el.style.setProperty("--in", String(inT));
       el.style.setProperty("--out", String(outT));
-      el.classList.toggle("live", on && outT < 0.5);
     });
-    ghosts.forEach((g, n) => {
-      const local = p - (n + 1);
-      g.style.opacity = String(local > -0.3 && local < 1.1 ? 0.07 * Math.min(range(local, -0.3, 0.1), 1 - range(local, 0.85, 1.1)) / 1 : 0);
-      g.style.translate = `${mix(12, -12, clamp(local))}vw 0`;
+    ghosts.forEach((g, gi) => {
+      const mine = seg.kind === "scene" && seg.c === gi;
+      g.style.opacity = String(mine ? 0.07 * Math.min(range(t, 0, 0.3), 1 - range(t, 0.8, 1)) : 0);
+      g.style.translate = `${mix(12, -12, mine ? t : 0)}vw 0`;
     });
-    document.dispatchEvent(new CustomEvent("chapter", { detail: { index: i } }));
+
+    // Sheets: tossed in tilted, settle flat while the rows appear, then tossed away the other way
+    sheets.forEach((sheet, c) => {
+      const mine = seg.kind === "sheet" && seg.c === c;
+      sheet.style.visibility = mine ? "visible" : "hidden";
+      if (!mine) return;
+      const inT = range(t, 0, 0.3), outT = range(t, 0.8, 1);
+      sheet.style.translate = `0 ${mix(108, 0, inT) - outT * 112}vh`;
+      sheet.style.rotate = `${mix(-4, 0, inT) + outT * 3}deg`;
+      sheet.querySelectorAll<HTMLElement>("[data-row]").forEach((r, j) => r.style.setProperty("--r", String(range(t, 0.2 + j * 0.1, 0.36 + j * 0.1))));
+    });
+
+    // The pill travels left to right across the whole scene, and names the section it's in
+    const travel = innerWidth - pill.offsetWidth - 48;
+    pill.style.translate = `${24 + travel * clamp(off / total)}px 0`;
+    const sec = seg.c + 1;
+    if (sec !== section) {
+      section = sec;
+      pillNum.textContent = String(sec).padStart(2, "0");
+      pillLabel.textContent = labels[sec];
+      pill.classList.remove("swap"); void pill.offsetWidth; pill.classList.add("swap");
+    }
   }
+
+  // Clicking the pill jumps to the next section's scene
+  pill.addEventListener("click", () => {
+    const target = segs.find((s) => s.kind === "scene" && s.c + 1 > section);
+    const top = root.getBoundingClientRect().top + scrollY + (target ? target.start + innerHeight * 0.3 : total);
+    scrollTo({ top, behavior: "smooth" });
+  });
 
   let raf = 0;
   const tick = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); };
   addEventListener("scroll", tick, { passive: true });
-  addEventListener("resize", tick);
+  addEventListener("resize", () => { layout(); tick(); });
   frame.addEventListener("load", () => { shownHash = ""; tick(); });
+  layout();
   render();
 </script>
 
 <style>
-  .chapters { --len: 130vh; position: relative; height: calc(var(--n) * var(--len) + 100vh); transition: background-color .2s linear; }
+  .chapters { position: relative; transition: background-color .2s linear; }
   .anchor { position: absolute; left: 0; width: 1px; height: 1px; }
   .scene { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 
@@ -225,21 +275,34 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .half { max-width: 46%; translate: calc((1 - var(--in, 0)) * -40vw) calc(var(--out, 0) * -8vh); }
   .half.right { text-align: right; translate: calc((1 - var(--in, 0)) * 40vw) calc(var(--out, 0) * -8vh); }
   .half em { font-style: normal; color: #ffb27a; }
-  /* Narration: plain text over the scene, a touch heavier and brighter so it holds up without a backing */
-  .body { position: absolute; bottom: 100px; margin: 0; max-width: 30ch; font-size: 17px; line-height: 1.5; font-weight: 500; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 2px 16px rgba(0, 0, 0, .45); translate: 0 calc((1 - var(--in, 0)) * 20px); }
-  .bl { left: clamp(24px, 4vw, 64px); } .br { right: clamp(24px, 4vw, 64px); text-align: right; }
 
   /* The prototype is the scene: full screen, no frame */
   .stage { position: absolute; inset: 0; z-index: 1; overflow: hidden; background: #181b1f; }
   .cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; transition: transform .12s linear; }
+  .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
+  /* A light shade in the chapter colour behind the headline only */
+  .shade { position: absolute; left: 0; right: 0; top: 0; height: 30vh; z-index: 2; pointer-events: none; background: linear-gradient(color-mix(in srgb, var(--tint, #1d3a5f) 82%, transparent), color-mix(in srgb, var(--tint, #1d3a5f) 50%, transparent) 50%, transparent); }
 
-  /* A light shade in the chapter colour, only where the type sits, so text separates from the prototype */
-  .shade { position: absolute; left: 0; right: 0; z-index: 2; pointer-events: none; }
-  .shade.top { top: 0; height: 30vh; background: linear-gradient(color-mix(in srgb, var(--tint, #1d3a5f) 82%, transparent), color-mix(in srgb, var(--tint, #1d3a5f) 50%, transparent) 50%, transparent); }
-  .shade.bottom { bottom: 0; height: 26vh; background: linear-gradient(transparent, color-mix(in srgb, var(--tint, #1d3a5f) 55%, transparent) 50%, color-mix(in srgb, var(--tint, #1d3a5f) 85%, transparent)); }
+  /* The sheet: paper tossed over the scene */
+  .sheet {
+    position: absolute; left: clamp(20px, 3vw, 56px); right: clamp(20px, 3vw, 56px); top: 5vh; bottom: 96px; z-index: 5; visibility: hidden;
+    display: flex; flex-direction: column; padding: 28px clamp(24px, 3vw, 48px) 8px; border-radius: 22px; background: #f4f1ec; color: #17212b;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .3); transform-origin: 50% 100%; will-change: translate, rotate;
+  }
+  .sheet-head { display: flex; justify-content: space-between; padding-bottom: 14px; font-size: 13px; letter-spacing: .04em; color: rgba(23, 33, 43, .72); }
+  .row { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr); gap: 0 clamp(24px, 3vw, 56px); align-items: center; border-top: 1px solid rgba(23, 33, 43, .14); opacity: var(--r, 0); translate: 0 calc((1 - var(--r, 0)) * 24px); }
+  .r-left { display: flex; flex-direction: column; gap: 6px; align-self: center; }
+  .kicker { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: #9a4609; }
+  .r-left strong { font-family: "NB International", sans-serif; font-weight: 400; font-size: clamp(22px, 1.9vw, 34px); line-height: 1.12; letter-spacing: -.01em; }
+  .num { margin-top: 6px; font-size: 13px; color: rgba(23, 33, 43, .6); font-variant-numeric: tabular-nums; }
+  /* each row gets an equal share of the sheet; the image keeps its own shape and fits inside its row */
+  .sheet { --rowh: calc((100vh - 5vh - 96px - 78px) / var(--rows, 3)); }
+  .r-fig { margin: 0; display: flex; align-items: center; justify-content: center; }
+  .r-fig img { display: block; width: auto; height: auto; max-width: 100%; max-height: calc(var(--rowh) - 28px); border-radius: 10px; box-shadow: 0 6px 20px rgba(23, 33, 43, .14); clip-path: inset(0 calc((1 - var(--r, 0)) * 100%) 0 0 round 10px); }
+  .r-text { margin: 0; max-width: 34ch; justify-self: end; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.5; color: rgba(23, 33, 43, .82); }
 
   /* The travelling pill */
-  .pill { position: absolute; left: 0; bottom: 24px; z-index: 4; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
+  .pill { position: absolute; left: 0; bottom: 24px; z-index: 6; display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 20px 0 8px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; font: inherit; font-size: 14px; cursor: pointer; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); transition: background .3s ease, scale .2s ease; }
   .pill:hover { background: rgba(255, 255, 255, .22); scale: 1.03; }
   .pill:hover .mark { rotate: -8deg; scale: 1.06; }
   .mark { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #ff8833, #f55f3e); transition: rotate .25s ease, scale .25s ease; }
@@ -247,18 +310,21 @@ const hero = Astro.slots.has("hero") ? await Astro.slots.render("hero") : "";
   .pill.swap .pill-label, .pill.swap .pill-num { animation: swap .4s ease; }
   @keyframes swap { from { opacity: 0; translate: 0 8px; } }
   .pill:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
-  .cam iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; pointer-events: none; }
 
   .stacked { display: none; }
   @media (max-width: 900px) {
-    .chapters { height: auto; }
     .scene, .anchor { display: none; }
     .stacked { display: block; }
     .flat { padding: 72px 16px 56px; background: var(--bg); }
     .flat h2 { margin: 6px 0 16px; font-family: "NB International", sans-serif; font-weight: 400; font-size: 34px; line-height: 1.08; }
     .flat h2 em { font-style: normal; color: #ffb27a; }
-    .flat > p { color: rgba(255, 255, 255, .8); margin: 0 0 12px; }
     .corner-flat { font-size: 13px; letter-spacing: .04em; color: rgba(255, 255, 255, .72); }
     .flat :global(.pf) { margin-top: 24px; }
+    .flat-sheet { margin-top: 28px; padding: 8px 20px; border-radius: 18px; background: #f4f1ec; color: #17212b; }
+    .flat-row { display: flex; flex-direction: column; gap: 8px; padding: 20px 0; border-top: 1px solid rgba(23, 33, 43, .14); }
+    .flat-row:first-child { border-top: 0; }
+    .flat-row strong { font-family: "NB International", sans-serif; font-weight: 400; font-size: 24px; line-height: 1.15; }
+    .flat-row img { width: 100%; border-radius: 10px; margin: 6px 0; }
+    .flat-row p { margin: 0; color: rgba(23, 33, 43, .82); }
   }
 </style>

@@ -5,22 +5,39 @@
 import Chapters, { type Chapter } from "../../components/case/Chapters.astro";
 
 // The story in three chapters. Camera keys: at = 0..1 through the chapter, zoom around the focus point (fx, fy)
+const I = "/images/grafana";
 const chapters: Chapter[] = [
   { id: "ch-question", label: "About the question", bg: "#1d3a5f", ghost: "?",
     left: "Nobody knew what", right: "*Loki, Mimir or Tempo* were.",
-    bodyL: "In 2022 Grafana Cloud kept adding products, and research kept showing the same thing: new users didn’t know what they were for.",
-    bodyR: "So the welcome screen does one job: explain what Grafana Cloud is, in five lines and one picture I drew from scratch.",
-    keys: [{ at: 0, hash: "#welcome", zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.35, zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.72, zoom: 1, fx: 0.5, fy: 0.5 }] },
+    keys: [{ at: 0, hash: "#welcome", zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.35, zoom: 1.9, fx: 0.24, fy: 0.46 }, { at: 0.72, zoom: 1, fx: 0.5, fy: 0.5 }],
+    sheet: [
+      { kicker: "The finding", title: "New users didn’t know what the products were for.", img: "https://i.postimg.cc/jS15ZYq0/feedback-onboard.png", alt: "User feedback showing confusion about the products",
+        text: "In 2022 Grafana Cloud kept adding products, and research kept showing the same thing. The people who needed the docs most were the ones who never opened them." },
+      { kicker: "The decision", title: "Answer the question before asking anything.", img: `${I}/onb-welcome.webp`, alt: "The welcome screen",
+        text: "The welcome screen does one job: explain what Grafana Cloud is, in five lines and one picture." },
+      { kicker: "The craft", title: "I drew the illustration from scratch.", img: "/images/grafana/welcome-illustration-affinity.webp", alt: "The illustration open in Affinity Designer",
+        text: "The Grafana core, the cloud above it, and one object for each part of the platform, so the answer is visible before it’s read." },
+    ] },
   { id: "ch-goals", label: "About setup", bg: "#3a2d5e", ghost: "Goals",
     left: "Ask what they came to do,", right: "*then bring the docs to them.*",
-    bodyL: "Goals, not product names: send metrics, monitor Kubernetes, build a dashboard, set up on-call.",
-    bodyR: "Point at a path and the panel explains it. The people who needed the docs most were the ones who never opened them.",
-    keys: [{ at: 0, hash: "#setup", zoom: 1.4, fx: 0.68, fy: 0.52 }, { at: 0.38, zoom: 1.4, fx: 0.68, fy: 0.52, hover: '.active .card[data-path="kube"]' }, { at: 0.7, zoom: 1.65, fx: 0.16, fy: 0.5 }] },
+    keys: [{ at: 0, hash: "#setup", zoom: 1.4, fx: 0.68, fy: 0.52 }, { at: 0.38, zoom: 1.4, fx: 0.68, fy: 0.52, hover: '.active .card[data-path="kube"]' }, { at: 0.7, zoom: 1.65, fx: 0.16, fy: 0.5 }],
+    sheet: [
+      { kicker: "The decision", title: "Goals, not product names.", img: `${I}/onb-setup.webp`, alt: "The setup step with four goals",
+        text: "Send metrics, monitor Kubernetes, build a dashboard, set up on-call. A new user knows what they want to do long before they know what Tempo is." },
+      { kicker: "The decision", title: "The docs come to them.", img: `${I}/onb-docs.webp`, alt: "The docs panel explaining Kubernetes monitoring",
+        text: "Point at a path and the panel explains it, with a link for anyone who wants more. No new tab, no digging." },
+      { kicker: "The detail", title: "Every path says what it takes.", img: `${I}/onb-cost.webp`, alt: "Cards showing time and access needed",
+        text: "Time and access up front, so nobody starts something they can’t finish." },
+    ] },
   { id: "ch-real", label: "About the landing", bg: "#1e4848", ghost: "Real",
     left: "Every path ends", right: "*somewhere real.*",
-    bodyL: "A short confirmation, then the actual product page with the next step ready.",
-    bodyR: "The menu entry pulses, so people know where onboarding lives when they want it again.",
-    keys: [{ at: 0, hash: "#dest-kube", zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.35, zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.76, zoom: 2.6, fx: 0.02, fy: 0.52 }] },
+    keys: [{ at: 0, hash: "#dest-kube", zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.35, zoom: 1, fx: 0.5, fy: 0.4 }, { at: 0.76, zoom: 2.6, fx: 0.02, fy: 0.52 }],
+    sheet: [
+      { kicker: "The decision", title: "A short confirmation, then the real page.", img: `${I}/onb-done.webp`, alt: "The confirmation screen",
+        text: "No dead end: every path lands on the product page it was about, with the next step ready." },
+      { kicker: "The detail", title: "Onboarding stays findable.", img: `${I}/onb-menu.webp`, alt: "The pulsing onboarding entry in the menu",
+        text: "The menu entry pulses, so people know where onboarding lives when they want it again." },
+    ] },
 ];
 
 const shipped = [
@@ -194,6 +211,11 @@ const facts: [string, string][] = [
       import "lenis/dist/lenis.css";
       // Smooth, inertial scrolling (skipped when the reader asks for less motion)
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) new Lenis({ autoRaf: true, anchors: true });
+      // The details card is tossed in: tilted while it rises, flat once it lands
+      const rest = document.querySelector<HTMLElement>(".rest")!;
+      const toss = () => { const top = rest.getBoundingClientRect().top; const u = Math.min(1, Math.max(0, (innerHeight - top) / (innerHeight * 0.8))); rest.style.rotate = `${(1 - u) * -3}deg`; };
+      addEventListener("scroll", toss, { passive: true });
+      toss();
       // Images in the details wipe into view
       const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { rootMargin: "0px 0px -10% 0px" });
       document.querySelectorAll(".wipe").forEach((f) => io.observe(f));
@@ -229,7 +251,7 @@ const facts: [string, string][] = [
       .play:focus-visible, summary:focus-visible { outline: 2px solid #ffb27a; outline-offset: 3px; }
 
       /* The details: a light card that peels up over the scene */
-      .rest { position: relative; z-index: 2; margin-top: -14vh; padding-bottom: 140px; border-radius: 36px 36px 0 0; background: #f4f1ec; color: #17212b; box-shadow: 0 -10px 40px rgba(0, 0, 0, .18); }
+      .rest { position: relative; z-index: 2; margin-top: -14vh; transform-origin: 50% 0; padding-bottom: 140px; border-radius: 36px 36px 0 0; background: #f4f1ec; color: #17212b; box-shadow: 0 -10px 40px rgba(0, 0, 0, .18); }
       .rest .back { color: rgba(23, 33, 43, .75); }
       .rest .back:hover { color: #17212b; }
       .block { max-width: 1200px; margin: 0 auto; padding: 96px clamp(24px, 4vw, 64px) 0; }
