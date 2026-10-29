@@ -103,28 +103,33 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     </aside>
 
     <section class="main">
-      <ol class="stepper">
-        {steps.map((s, i) => (
-          <li class={i === 0 ? "current" : ""}><span class="num">{i + 1}</span><span class="label">{s}</span></li>
-        ))}
-      </ol>
-      <a class="skip" href="#skip">Skip<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
+      <div class="column">
+        <ol class="stepper">
+          {steps.map((s, i) => (
+            <li class={i === 0 ? "current" : ""}><span class="num">{i + 1}</span><span class="label">{s}</span></li>
+          ))}
+        </ol>
+        <a class="skip" href="#skip">Skip<img src={`${A}/skip.svg`} alt="" width="16" height="16" /></a>
 
-      <p class="question" id="q">How would you want to begin?</p>
-      <div class="cards" role="radiogroup" aria-labelledby="q">
-        {paths.map((p) => (
-          <div class="card-slot">
-            <button class="card" role="radio" aria-checked="false" data-path={p.id}>
-              <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
-              <strong>{p.title}</strong>
-              <span>{p.sub}</span>
-            </button>
-            <p class="selected"><img src={`${A}/check.svg`} alt="" width="16" height="16" />Selected</p>
+        <div class="center">
+          <p class="question" id="q">How would you want to begin?</p>
+          <div class="cards" role="radiogroup" aria-labelledby="q">
+            {paths.map((p) => (
+              <div class="card-slot">
+                <button class="card" role="radio" aria-checked="false" data-path={p.id}>
+                  <img class="card-icon" src={`${A}/${p.icon}.svg`} alt="" />
+                  <strong>{p.title}</strong>
+                  <span>{p.sub}</span>
+                </button>
+                <p class="selected"><img src={`${A}/check.svg`} alt="" width="16" height="16" />Selected</p>
+              </div>
+            ))}
           </div>
-        ))}
+          <div class="actions">
+            <a class="next" href="#setup" aria-disabled="true">Next<img src={`${A}/next-arrow.svg`} alt="" width="16" height="16" /></a>
+          </div>
+        </div>
       </div>
-
-      <a class="next" href="#setup" aria-disabled="true">Next<img src={`${A}/next-arrow.svg`} alt="" width="16" height="16" /></a>
     </section>
   </main>
 
@@ -169,11 +174,12 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     /* ---------- 2. Setup ---------- */
     .setup { grid-template-columns: 440px 1fr; min-height: 100vh; background: var(--canvas); }
 
-    .side { position: relative; overflow: hidden; background: var(--bg); padding: 40px; }
+    .side { position: relative; overflow: hidden; background: var(--bg); padding: 40px; display: flex; flex-direction: column; }
+    .side > .doc { margin-block: auto; }
     .side-logo { display: block; }
     .plugs { position: absolute; left: -32px; top: 574px; width: 478px; height: 478px; pointer-events: none; }
     .doc {
-      position: relative; z-index: 1; margin-top: 143px; padding: 24px; border-radius: 4px;
+      position: relative; z-index: 1; padding: 24px; border-radius: 4px; animation: in .25s linear;
       background: rgba(61, 113, 217, .1); display: flex; flex-direction: column; gap: 18px;
     }
     .doc[hidden] { display: none; }
@@ -189,7 +195,10 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     .doc-links a img { transition: transform .15s ease; }
     .doc-links a:hover img { transform: translateX(3px); }
 
-    .main { position: relative; padding: 71px 55px 64px; }
+    /* On wide screens the original 1440 frame left two thirds empty: keep one centred column instead */
+    .main { position: relative; padding: 71px 55px 64px; display: flex; justify-content: center; }
+    .column { width: 100%; max-width: 1000px; display: flex; flex-direction: column; min-height: calc(100vh - 135px); }
+    .center { margin-block: auto; padding-block: 48px; }
     .stepper { list-style: none; margin: 0; padding: 0; display: flex; gap: 81px; font-size: 16px; line-height: 22px; }
     .stepper li { display: flex; align-items: center; gap: 19px; color: var(--text-faint); }
     .stepper .num { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(204, 204, 220, .25); background: rgba(36, 41, 46, .04); }
@@ -199,28 +208,31 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
     .skip img { margin-left: 4px; transition: transform .15s ease; }
     .skip:hover img { transform: translateX(3px); }
 
-    .question { margin: 143px 0 48px; color: var(--text-dim); font-size: 16px; line-height: 22px; }
-    .cards { display: grid; grid-template-columns: repeat(3, 250px); gap: 48px 24px; }
-    .card-slot { position: relative; }
+    .question { margin: 0 0 32px; color: var(--text-dim); font-size: clamp(16px, 1.2vw, 18px); line-height: 1.4; }
+    /* three across; the last two sit centred under them (6-track grid, each card spans 2) */
+    .cards { display: grid; grid-template-columns: repeat(6, 1fr); gap: 48px 24px; }
+    .card-slot { position: relative; grid-column: span 2; }
+    .card-slot:nth-child(4) { grid-column: 2 / span 2; }
     .card {
-      width: 250px; height: 150px; padding: 16px; border: 0; border-radius: 2px; background: var(--bg); color: var(--text);
+      width: 100%; height: clamp(150px, 11vw, 170px); padding: 16px 18px; border: 0; border-radius: 2px; background: var(--bg); color: var(--text);
       display: flex; flex-direction: column; align-items: flex-start; gap: 0; text-align: left; font: inherit; cursor: pointer;
       box-shadow: 0 0 0 0 transparent; transition: box-shadow .15s ease, background .15s ease;
     }
     .card-icon { height: 26px; width: auto; margin-bottom: 14px; }
-    .card strong { font-size: 14px; line-height: 24px; font-weight: 700; }
-    .card span { margin-top: 8px; font-size: 12px; line-height: 16px; }
+    .card strong { font-size: clamp(14px, 1.05vw, 16px); line-height: 24px; font-weight: 700; }
+    .card span { margin-top: 8px; font-size: clamp(12px, .9vw, 13px); line-height: 16px; }
     .card:hover { box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
     .card[aria-checked="true"] { background: var(--canvas); box-shadow: inset 0 0 0 2px #5794f2, 0 2px 9px rgba(50, 116, 217, 1); }
-    .selected { visibility: hidden; position: absolute; left: 0; right: 0; top: 150px; justify-content: center; display: flex; align-items: center; gap: 12px; margin: 16px 0 0; color: var(--link); font-size: 12px; line-height: 16px; }
+    .selected { visibility: hidden; position: absolute; left: 0; right: 0; top: 100%; justify-content: center; display: flex; align-items: center; gap: 12px; margin: 16px 0 0; color: var(--link); font-size: 12px; line-height: 16px; }
     .card[aria-checked="true"] + .selected { visibility: visible; }
 
     .next {
-      display: inline-flex; align-items: center; gap: 4px; margin: 56px 0 0 -20px; padding: 6px 16px; border-radius: 2px;
+      display: inline-flex; align-items: center; gap: 4px; padding: 6px 16px; border-radius: 2px;
       color: var(--text-faint); font-size: 14px; line-height: 20px; font-weight: 500; text-decoration: underline; pointer-events: none;
     }
     .next img { opacity: .4; }
-    .next[aria-disabled="false"] { margin-left: 0; background: #5a86de; color: #fff; text-decoration: none; pointer-events: auto; }
+    .actions { display: flex; justify-content: flex-end; margin-top: 56px; }
+    .next[aria-disabled="false"] { background: #5a86de; color: #fff; text-decoration: none; pointer-events: auto; }
     .next[aria-disabled="false"] img { opacity: 1; filter: brightness(10); }
     .next[aria-disabled="false"]:hover { background: var(--primary-hover); }
 
@@ -240,14 +252,15 @@ const steps = ["Setup", "Placeholder", "Placeholder"];
       .stepper { gap: 16px; font-size: 14px; }
       .stepper li:not(.current) .label { display: none; }
       .skip { top: 26px; right: 16px; }
-      .question { margin: 40px 0 20px; }
+      .question { margin: 0 0 20px; }
+      .column { min-height: 0; }
+      .center { padding-block: 32px 0; }
+      .actions { margin-top: 24px; justify-content: flex-start; }
       .cards { grid-template-columns: 1fr; gap: 12px; }
-      .card-slot { align-items: stretch; }
-      .card { width: 100%; height: auto; }
+      .cards { grid-template-columns: 1fr; }
+      .card-slot, .card-slot:nth-child(4) { grid-column: auto; }
+      .card { height: auto; }
       .selected { display: none; }
-    }
-    @media (min-width: 901px) and (max-width: 1260px) {
-      .cards { grid-template-columns: repeat(2, 250px); }
     }
   </style>
 
