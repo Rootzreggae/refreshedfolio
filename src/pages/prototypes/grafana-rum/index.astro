@@ -89,6 +89,16 @@ const fyData = {
   pages: perf.map((r, i) => ({ id: r[0], ttfb: r[1], fcp: r[2], lcp: r[3], inp: r[5], load: r[6], cls: [0.02, 0.08, 0.31, 0.12, 0.04, 0.27][i] })),
   pageIds: perf.map((r) => r[0]),
 };
+// Page drilldown: the resources a page loaded, as in the original frame
+const resources = [
+  ["https://code.google.com/jquery.js", "JS", "85.1 KB", "85.1 KB", "18ms", "Yes"], ["https://code.google.com/jquery.js", "JS", "85.1 KB", "85.1 KB", "18ms", "Yes"],
+  ["https://cdn.bootstrap.com/5/common.css", "CSS", "43.1 KB", "43.1 KB", "18ms", "No"], ["https://cdn.bootstrap.com/5/common.css", "CSS", "43.1 KB", "43.1 KB", "4ms", "Async"],
+  ["https://my-shop.com/product-detail", "HTML", "580 KB", "43.1 KB", "4ms", "No"], ["https://my-shop.com/product-detail", "HTML", "580 KB", "580 KB", "4ms", "Async"],
+  ["https://code.google.com/jquery.js", "JS", "580 KB", "580 KB", "120ms", "Yes"], ["https://code.google.com/jquery.js", "JS", "18.2 KB", "580 KB", "120ms", "Yes"],
+  ["https://code.google.com/jquery.js", "JS", "18.2 KB", "18.2 KB", "120ms", "Yes"], ["https://cdn.bootstrap.com/5/common.css", "CSS", "18.2 KB", "18.2 KB", "4ms", "Yes"],
+  ["https://cdn.bootstrap.com/5/common.css", "CSS", "45.5 KB", "18.2 KB", "4ms", "Yes"], ["https://cdn.bootstrap.com/5/common.css", "CSS", "45.5 KB", "18.2 KB", "4ms", "Async"],
+];
+const big = (v: string) => parseFloat(v) >= 500;
 const views = [["/", "2347ms", 826, "18ms"], ["product_detail", "743ms", 740, "4ms"], ["/products/1/detail", "200ms", 630, "120ms"], ["product_detail", "1114ms", 530, "4ms"], ["/products/1/detail", "123ms", 412, "4ms"], ["product_detail", "355ms", 90, "4ms"]];
 const p75 = [
   { title: "Page Load, p75", ticks: ["25 s", "20 s", "15 s", "10 s", "5 s", "0 ms"], color: "#f2b736", legend: [["TTFB", "#73bf69"], ["FCP", "#f2b736"], ["LCP", "#b877d9"]], d: series(51, 90, 6, 4).map((v, i) => v + (i > 45 && i < 80 ? 10 + Math.sin(i / 6) * 4 : 0)), max: 26 },
@@ -367,6 +377,21 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
           <div data-dd-body></div>
         </section>
 
+        <section data-pane="pdrill" hidden>
+          <p class="pd-crumb"><a class="lnk" href="#app">← Page Performance</a><span data-pd-page></span></p>
+          <div data-pd-stats></div>
+          <div data-pd-wf></div>
+          <section class="tpanel">
+            <table class="ptbl rtbl"><thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Size Compressed</th><th>Load Time</th><th>Blocking</th></tr></thead><tbody>
+              {resources.map(([n, t, sz, szc, lt, b]) => (
+                <tr><td>{n}</td><td><span class="ft"><span class:list={["fi", t.toLowerCase()]} aria-hidden="true">{t === "JS" ? "JS" : t === "CSS" ? "3" : "5"}</span>{t}</span></td>
+                  <td class:list={{ bad: big(sz) }}>{sz}</td><td class:list={{ bad: big(szc) }}>{szc}</td><td class:list={{ warn: parseFloat(lt) >= 100 }}>{lt}</td><td>{b}</td></tr>
+              ))}
+            </tbody></table>
+            <footer class="pager">Showing 1 to 12 of 46 resources <span><button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>›</button></span></footer>
+          </section>
+        </section>
+
         <section data-pane="sessions" hidden>
           <table class="tbl"><thead><tr><th>Session</th><th>Browser</th><th>Location</th><th>Pages</th><th>Errors</th><th>Duration</th></tr></thead><tbody>
             {sessions.map((r) => <tr>{r.map((c, i) => <td class:list={{ poor: i === 4 && c }}>{c || "—"}</td>)}</tr>)}
@@ -381,7 +406,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
             <button class="fy-ic" data-fy-close aria-label="Close panel"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 4 4 4-4 4M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <span class="fy-nav"><button class="fy-ic" data-fy-step="-1" aria-label="Previous"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.5V2.5M3 7.5l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="fy-ic" data-fy-step="1" aria-label="Next"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M3 8.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span>
             <h2 data-fy-title tabindex="-1"></h2>
-            <button class="btn primary drill" data-fy-drill>Drilldown <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7 9M11.5 9.5v4h-9v-9h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn primary drill" data-fy-drill>Drilldown <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </header>
 
           <div class="fy-body" data-fy="err">
@@ -451,8 +476,9 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     function show() {
       let id = location.hash.slice(1) || "landing", tab = "";
       if (id === "app-errors") { id = "app"; tab = "errors"; }
-      const dd = id.match(/^app-error-(\d+)$/);
+      const dd = id.match(/^app-error-(\d+)$/), pd = id.match(/^app-page-(\d+)$/);
       if (dd) { id = "app"; tab = "drill"; }
+      if (pd) { id = "app"; tab = "pdrill"; }
       const target = screens.find((s) => s.dataset.screen === id) ?? screens[0];
       screens.forEach((s) => s.classList.toggle("active", s === target));
       const appName = document.querySelector("[data-app-title]")?.textContent ?? "acme-monitoring";
@@ -461,8 +487,10 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       document.body.classList.toggle("focus", id === "setup");
       document.querySelectorAll<HTMLElement>("[data-side]").forEach((a) => a.classList.toggle("on", a.dataset.side === (tab === "errors" || tab === "drill" ? "Error awareness" : target.dataset.sideOn)));
       target.classList.toggle("drill", tab === "drill");
-      if (tab) openTab(tab);
+      target.classList.toggle("pdrill", tab === "pdrill");
+      if (tab) openTab(tab); else if (id === "app") openTab("overview");
       if (dd) drillTo(+dd[1]);
+      if (pd) pageDrill(+pd[1]);
       scrollTo(0, 0);
     }
     addEventListener("hashchange", show);
@@ -573,7 +601,7 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     });
     $("[data-fy-close]").addEventListener("click", closeFly);
     fly.querySelectorAll<HTMLElement>("[data-fy-step]").forEach((b) => b.addEventListener("click", () => { const rows = fyRows(), at = rows.indexOf(fyIdx), n = rows[at + +b.dataset.fyStep!]; if (n !== undefined) openFly(fyKind, n); }));
-    // Drilldown: the error's full page, opened in a new tab as the ↗ promises
+    // Drilldown: the record's full page, on the same tab (Back returns to the list)
     function drillTo(i: number) {
       if (!fyD.errors[i]) return;
       fillErr(i);
@@ -582,9 +610,15 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
       $("[data-dd-body]").replaceChildren(body);
       $("[data-dd-title]").textContent = fyD.errors[i].m;
     }
+    // Page drilldown: the overview's vitals, the request waterfall and the page's resources
+    function pageDrill(i: number) {
+      const pg = fyD.pages[i]; if (!pg) return;
+      $("[data-pd-page]").textContent = String(pg.id);
+      $("[data-pd-stats]").replaceChildren($(".statrow").cloneNode(true));
+      $("[data-pd-wf]").replaceChildren(fly.querySelector(".wf")!.cloneNode(true));
+    }
     $("[data-fy-drill]").addEventListener("click", () => {
-      if (fyKind === "err") window.open(`${location.pathname}#app-error-${fyIdx}`, "_blank", "noopener");
-      else toast("Drilldown opens the full page analysis");
+      location.hash = fyKind === "err" ? `#app-error-${fyIdx}` : `#app-page-${fyIdx}`;
     });
     addEventListener("keydown", (e) => { if (e.key === "Escape" && fly.classList.contains("on")) closeFly(); });
     addEventListener("hashchange", () => fly.classList.contains("on") && closeFly());
@@ -866,6 +900,12 @@ const bars = [[6, 4], [4, 7], [2, 1.2], [5, 4], [9, 0], [3, 2], [5, 4]]; // page
     [data-screen="app"].drill .tabs, [data-screen="app"].drill .app-h { display: none; }
     .dd-back { display: inline-block; margin: 18px 0 6px; } .dd-title { margin: 0 0 14px; font-size: 26px; font-weight: 500; color: #fff; }
     .dd-body { padding: 0; }
+    [data-screen="app"].pdrill .tabs { display: none; }
+    .pd-crumb { display: flex; gap: 14px; margin: -4px 0 14px; color: var(--text); } .pd-crumb span::before { content: "/"; margin-right: 14px; color: var(--dim); }
+    [data-pd-wf] .wf { margin: 0 0 8px; }
+    .rtbl th, .rtbl td { padding: 12px 8px; } .rtbl td:first-child { width: 32%; color: var(--text); } .rtbl .bad { color: #f2495c; }
+    .ft { display: inline-flex; align-items: center; gap: 12px; } .fi { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 3px; font: 700 10px/1 Inter, sans-serif; }
+    .fi.js { background: #f7df1e; color: #111; align-items: end; justify-items: end; padding: 0 2px 1px 0; } .fi.css { background: #264de4; color: #fff; clip-path: polygon(8% 0, 92% 0, 84% 88%, 50% 100%, 16% 88%); } .fi.html { background: #e44d26; color: #fff; clip-path: polygon(8% 0, 92% 0, 84% 88%, 50% 100%, 16% 88%); }
   </style>
 </body>
 </html>
